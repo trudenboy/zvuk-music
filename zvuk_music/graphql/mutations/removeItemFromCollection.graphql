@@ -1,0 +1,5 @@
+mutation removeItemFromCollection($id: ID, $type: CollectionItemType) {
+  collection {
+    removeItem(id: $id, type: $type)
+  }
+}

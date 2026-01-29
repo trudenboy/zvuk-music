@@ -1,0 +1,75 @@
+# vars
+# {
+#   "limit": 50,
+#   "offset": 0
+# }
+
+query listeningHistory($limit: Int = 50, $offset: Int) {
+  listeningHistory(limit: $limit, offset: $offset) {
+    lastListeningDttm
+    mediaContent {
+      ... on Track {
+        id
+        title
+        searchTitle
+        position
+        duration
+        availability
+        artistTemplate
+        condition
+        explicit
+        lyrics
+        zchan
+        hasFlac
+        artists {
+          id
+          title
+        }
+        release {
+          id
+          title
+          image {
+            src
+            palette
+            paletteBottom
+          }
+        }
+      }
+      ... on Episode {
+        id
+        availability
+        description
+        duration
+        explicit
+        image {
+          src
+          palette
+          paletteBottom
+        }
+        link
+        listenState
+        podcast {
+          id
+          title
+          image {
+            src
+            palette
+            paletteBottom
+          }
+          authors {
+            id
+            name
+          }
+        }
+        publicationDate
+        title
+        trackId
+        season {
+          seasonNumber
+          id
+          name
+        }
+      }
+    }
+  }
+}

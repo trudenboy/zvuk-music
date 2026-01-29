@@ -1,0 +1,87 @@
+query getArtists(
+  $ids: [ID!]!
+  $withReleases: Boolean = false
+  $withPopTracks: Boolean = false
+  $withRelatedArtists: Boolean = false
+  $withDescription: Boolean = false
+  $releasesOffset: Int = 0
+  $releasesLimit: Int = 100
+  $tracksOffset: Int = 0
+  $tracksLimit: Int = 100
+  $releatedArtistsLimit: Int = 100
+) {
+  getArtists(ids: $ids) {
+    id
+    title
+    image {
+      src
+    }
+    secondImage {
+      src
+    }
+    collectionItemData {
+      itemStatus
+      lastModified
+      likesCount
+    }
+    searchTitle
+    description @include(if: $withDescription)
+    releases(offset: $releasesOffset, limit: $releasesLimit)
+      @include(if: $withReleases) {
+      id
+      title
+      date
+      type
+      image {
+        src
+      }
+      explicit
+      artists {
+        id
+        title
+        image {
+          src
+        }
+      }
+    }
+    popularTracks(offset: $tracksOffset, limit: $tracksLimit)
+      @include(if: $withPopTracks) {
+      id
+      title
+      duration
+      explicit
+      artists {
+        id
+        title
+        image {
+          src
+        }
+      }
+      release {
+        id
+        title
+        date
+        type
+        image {
+          src
+        }
+        explicit
+        artists {
+          id
+          title
+          image {
+            src
+          }
+        }
+      }
+    }
+    relatedArtists(limit: $releatedArtistsLimit)
+      @include(if: $withRelatedArtists) {
+      id
+      title
+      image {
+        src
+      }
+    }
+  }
+}

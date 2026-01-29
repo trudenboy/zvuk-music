@@ -1,0 +1,44 @@
+# vars
+# {
+#   "ids": [
+#     ID_HERE
+#   ]
+# }
+
+query episodes($ids: [ID!]!) {
+  getEpisodes(ids: $ids) {
+    id
+    availability
+    description
+    duration
+    explicit
+    image {
+      src
+      palette
+      paletteBottom
+    }
+    link
+    listenState
+    podcast {
+      id
+      title
+      image {
+        src
+        palette
+        paletteBottom
+      }
+      authors {
+        id
+        name
+      }
+    }
+    publicationDate
+    title
+    trackId
+    season {
+      seasonNumber
+      id
+      name
+    }
+  }
+}

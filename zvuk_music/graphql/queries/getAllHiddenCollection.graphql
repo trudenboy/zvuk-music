@@ -1,0 +1,12 @@
+query getAllHiddenCollection {
+  hidden_collection {
+    tracks {
+      id
+      collectionLastModified
+    }
+    artists {
+      id
+      collectionLastModified
+    }
+  }
+}

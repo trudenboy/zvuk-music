@@ -1,0 +1,12 @@
+query getShortPlaylist($ids: [ID!]!) {
+  getPlaylists(ids: $ids) {
+    id
+    title
+    isPublic
+    description
+    duration
+    image {
+      src
+    }
+  }
+}

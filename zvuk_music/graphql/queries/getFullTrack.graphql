@@ -1,0 +1,46 @@
+query getFullTrack($ids: [ID!]!) {
+  getTracks(ids: $ids) {
+    id
+    title
+    duration
+    explicit
+    artists {
+      id
+      title
+      image {
+        src
+      }
+    }
+    release {
+      id
+      title
+      date
+      type
+      image {
+        src
+      }
+      explicit
+      artists {
+        id
+        title
+        image {
+          src
+        }
+      }
+    }
+    searchTitle
+    position
+    availability
+    artistTemplate
+    condition
+    lyrics
+    zchan
+    collectionItemData {
+      itemStatus
+      lastModified
+    }
+    hasFlac
+    artistNames
+    credits
+  }
+}

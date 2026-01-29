@@ -1,0 +1,5 @@
+mutation createPlayList($items: [PlaylistItem!]!, $name: String!) {
+  playlist {
+    create(items: $items, name: $name)
+  }
+}

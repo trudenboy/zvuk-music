@@ -1,0 +1,12 @@
+# vars
+# {
+#   "id": USER_ID_HERE?
+# }
+
+query followingCount($id: ID!) {
+  follows(item: { itemType: profile, itemId: $id }) {
+    followings {
+      count
+    }
+  }
+}

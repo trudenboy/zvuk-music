@@ -1,0 +1,36 @@
+query userCollection {
+  collection {
+    artists {
+      id
+      collectionLastModified
+    }
+    episodes {
+      id
+      collectionLastModified
+    }
+    podcasts {
+      id
+      collectionLastModified
+    }
+    playlists {
+      id
+      collectionLastModified
+    }
+    synthesisPlaylists {
+      id
+      collectionLastModified
+    }
+    profiles {
+      id
+      collectionLastModified
+    }
+    releases {
+      id
+      collectionLastModified
+    }
+    tracks {
+      id
+      collectionLastModified
+    }
+  }
+}

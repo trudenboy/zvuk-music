@@ -1,0 +1,14 @@
+# vars
+# {
+#   "ids": [
+#     USER_ID_HERE?
+#   ]
+# }
+
+query profileFollowersCount($ids: [ID!]!) {
+  profiles(ids: $ids) {
+    collectionItemData {
+      likesCount
+    }
+  }
+}

@@ -1,0 +1,5 @@
+mutation addItemToCollection($id: ID, $type: CollectionItemType) {
+  collection {
+    addItem(id: $id, type: $type)
+  }
+}

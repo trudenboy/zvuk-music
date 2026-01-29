@@ -1,0 +1,10 @@
+# {
+#   "id": ID_HERE,
+#   "name": STRING_NEW_NAME_HERE
+# }
+
+mutation renamePlaylist($id: ID!, $name: String!) {
+  playlist {
+    rename(id: $id, name: $name)
+  }
+}

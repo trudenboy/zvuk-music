@@ -1,0 +1,25 @@
+query getPodcasts($ids: [ID!]!) {
+  getPodcasts(ids: $ids) {
+    id
+    title
+    explicit
+    image {
+      src
+    }
+    authors {
+      id
+      name
+    }
+    collectionItemData {
+      itemStatus
+      lastModified
+    }
+    description
+    updatedDate
+    availability
+    type
+    episodes {
+      id
+    }
+  }
+}

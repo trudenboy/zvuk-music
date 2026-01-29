@@ -1,0 +1,82 @@
+query getReleases($ids: [ID!]!, $relatedLimit: Int = 100) {
+  getReleases(ids: $ids) {
+    id
+    title
+    date
+    type
+    image {
+      src
+    }
+    explicit
+    artists {
+      id
+      title
+      image {
+        src
+      }
+    }
+    collectionItemData {
+      itemStatus
+      lastModified
+    }
+    searchTitle
+    genres {
+      id
+      name
+      shortName
+    }
+    tracks {
+      id
+      title
+      duration
+      explicit
+      artists {
+        id
+        title
+        image {
+          src
+        }
+      }
+      release {
+        id
+        title
+        date
+        type
+        image {
+          src
+        }
+        explicit
+        artists {
+          id
+          title
+          image {
+            src
+          }
+        }
+      }
+    }
+    label {
+      id
+      title
+    }
+    related(limit: $relatedLimit) {
+      id
+      title
+      date
+      type
+      image {
+        src
+      }
+      explicit
+      artists {
+        id
+        title
+        image {
+          src
+        }
+      }
+    }
+    availability
+    artistTemplate
+  }
+}

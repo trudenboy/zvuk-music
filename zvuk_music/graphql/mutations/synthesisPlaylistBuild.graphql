@@ -1,0 +1,45 @@
+query synthesisPlaylistBuild($firstAuthorId: ID!, $secondAuthorId: ID!) {
+  synthesisPlaylistBuild(authorIds: [$firstAuthorId, $secondAuthorId]) {
+    id
+    tracks {
+      id
+      title
+      duration
+      explicit
+      artists {
+        id
+        title
+        image {
+          src
+        }
+      }
+      release {
+        id
+        title
+        date
+        type
+        image {
+          src
+        }
+        explicit
+        artists {
+          id
+          title
+          image {
+            src
+          }
+        }
+      }
+    }
+    authors {
+      id
+      name
+      image {
+        src
+      }
+      matches {
+        score
+      }
+    }
+  }
+}

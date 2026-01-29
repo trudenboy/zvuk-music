@@ -1,0 +1,21 @@
+query getPlaylists($ids: [ID!]!) {
+  getPlaylists(ids: $ids) {
+    id
+    title
+    isPublic
+    description
+    duration
+    image {
+      src
+    }
+    tracks {
+      id
+    }
+    userId
+    isDeleted
+    shared
+    branded
+    updated
+    searchTitle
+  }
+}

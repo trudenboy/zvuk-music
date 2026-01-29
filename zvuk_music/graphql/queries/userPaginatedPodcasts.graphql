@@ -1,0 +1,22 @@
+query userPaginatedPodcasts($cursor: String, $count: Int) {
+  paginatedCollection {
+    podcasts(pagination: { after: $cursor, first: $count }) {
+      items {
+        id
+        title
+        explicit
+        image {
+          src
+        }
+        authors {
+          id
+          name
+        }
+      }
+      page {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+}

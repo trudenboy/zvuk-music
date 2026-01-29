@@ -1,0 +1,5 @@
+mutation removeItemFromHidden($id: ID!, $type: CollectionItemType!) {
+  hidden_collection {
+    removeItem(id: $id, type: $type)
+  }
+}

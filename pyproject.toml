@@ -1,0 +1,115 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zvuk-music"
+version = "0.1.0"
+description = "Python библиотека для работы с API Zvuk.com (СберЗвук)"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Zvuk Music API" }
+]
+keywords = [
+    "zvuk",
+    "sberzvuk",
+    "сберзвук",
+    "music",
+    "api",
+    "streaming",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "requests>=2.28.0",
+    "typing_extensions>=4.0.0",
+]
+
+[project.optional-dependencies]
+async = [
+    "aiohttp>=3.8.0",
+    "aiofiles>=23.0.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "types-requests>=2.28.0",
+]
+fast = [
+    "ujson>=5.0.0",
+]
+all = [
+    "zvuk-music[async,fast]",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-repo/zvuk-api"
+Documentation = "https://github.com/your-repo/zvuk-api#readme"
+Repository = "https://github.com/your-repo/zvuk-api"
+Issues = "https://github.com/your-repo/zvuk-api/issues"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/zvuk_music",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["zvuk_music"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "C4",     # flake8-comprehensions
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade
+    "ARG",    # flake8-unused-arguments
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults
+    "C901",   # too complex
+    "ARG001", # unused function argument
+    "ARG002", # unused method argument
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["zvuk_music"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

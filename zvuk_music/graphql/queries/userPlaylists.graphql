@@ -1,0 +1,9 @@
+query userPlaylists {
+  collection {
+    playlists {
+      id
+      userId
+      collectionLastModified
+    }
+  }
+}

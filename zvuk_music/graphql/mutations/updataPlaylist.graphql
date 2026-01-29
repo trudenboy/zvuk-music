@@ -1,0 +1,10 @@
+mutation updataPlaylist(
+  $id: ID!
+  $items: [PlaylistItem!]!
+  $isPublic: Boolean!
+  $name: String!
+) {
+  playlist {
+    update(id: $id, items: $items, isPublic: $isPublic, name: $name)
+  }
+}

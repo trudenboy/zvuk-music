@@ -1,0 +1,45 @@
+query synthesisPlaylist($ids: [ID!]!) {
+  synthesisPlaylist(ids: $ids) {
+    id
+    tracks {
+      id
+      title
+      duration
+      explicit
+      artists {
+        id
+        title
+        image {
+          src
+        }
+      }
+      release {
+        id
+        title
+        date
+        type
+        image {
+          src
+        }
+        explicit
+        artists {
+          id
+          title
+          image {
+            src
+          }
+        }
+      }
+    }
+    authors {
+      id
+      name
+      image {
+        src
+      }
+      matches {
+        score
+      }
+    }
+  }
+}

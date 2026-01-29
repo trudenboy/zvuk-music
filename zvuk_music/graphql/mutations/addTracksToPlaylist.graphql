@@ -1,0 +1,5 @@
+mutation addTracksToPlaylist($id: ID!, $items: [PlaylistItem!]!) {
+  playlist {
+    addItems(id: $id, items: $items)
+  }
+}

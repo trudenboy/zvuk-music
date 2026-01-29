@@ -1,0 +1,11 @@
+# vars
+# {
+#   "id": ID_HERE,
+#   "isPublic": true | false
+# }
+
+mutation setPlaylistToPublic($id: ID!, $isPublic: Boolean!) {
+  playlist {
+    setPublic(id: $id, isPublic: $isPublic)
+  }
+}

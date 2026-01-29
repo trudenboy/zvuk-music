@@ -1,0 +1,9 @@
+# vars
+# {}
+
+query listenedEpisodes {
+  getPlayState {
+    episodes
+    chapters
+  }
+}
