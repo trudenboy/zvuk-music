@@ -506,11 +506,11 @@ class Client:
         gql = load_query("createPlaylist")
         items = []
         if track_ids:
-            items = [{"type": "track", "itemId": tid} for tid in track_ids]
+            items = [{"type": "track", "item_id": tid} for tid in track_ids]
 
-        result = self._request.graphql(gql, "createPlaylist", {"name": name, "items": items})
-        create_data: Dict[str, Any] = result.get("playlist_create", {})
-        return str(create_data.get("id", ""))
+        result = self._request.graphql(gql, "createPlayList", {"name": name, "items": items})
+        playlist_data: Dict[str, Any] = result.get("playlist", {})
+        return str(playlist_data.get("create", ""))
 
     def delete_playlist(self, playlist_id: Union[str, int]) -> bool:
         """Удалить плейлист.
@@ -522,8 +522,9 @@ class Client:
             Успешность операции.
         """
         gql = load_query("deletePlaylist")
-        result = self._request.graphql(gql, "deletePlaylist", {"playlistId": str(playlist_id)})
-        return result.get("playlist_delete") is True
+        result = self._request.graphql(gql, "deletePlaylist", {"id": str(playlist_id)})
+        playlist_data: Dict[str, Any] = result.get("playlist", {})
+        return "delete" in playlist_data
 
     def rename_playlist(self, playlist_id: Union[str, int], new_name: str) -> bool:
         """Переименовать плейлист.
@@ -537,9 +538,10 @@ class Client:
         """
         gql = load_query("renamePlaylist")
         result = self._request.graphql(
-            gql, "renamePlaylist", {"playlistId": str(playlist_id), "name": new_name}
+            gql, "renamePlaylist", {"id": str(playlist_id), "name": new_name}
         )
-        return result.get("playlist_rename") is not None
+        playlist_data: Dict[str, Any] = result.get("playlist", {})
+        return "rename" in playlist_data
 
     def add_tracks_to_playlist(self, playlist_id: Union[str, int], track_ids: List[str]) -> bool:
         """Добавить треки в плейлист.
@@ -552,11 +554,12 @@ class Client:
             Успешность операции.
         """
         gql = load_query("addTracksToPlaylist")
-        items = [{"type": "track", "itemId": tid} for tid in track_ids]
+        items = [{"type": "track", "item_id": tid} for tid in track_ids]
         result = self._request.graphql(
-            gql, "addTracksToPlaylist", {"playlistId": str(playlist_id), "items": items}
+            gql, "addTracksToPlaylist", {"id": str(playlist_id), "items": items}
         )
-        return result.get("playlist_add_items") is not None
+        playlist_data: Dict[str, Any] = result.get("playlist", {})
+        return "add_items" in playlist_data
 
     def update_playlist(
         self,
@@ -577,18 +580,17 @@ class Client:
             Успешность операции.
         """
         gql = load_query("updataPlaylist")
-        items = [{"type": "track", "itemId": tid} for tid in track_ids]
+        items = [{"type": "track", "item_id": tid} for tid in track_ids]
         variables: Dict[str, Any] = {
-            "playlistId": str(playlist_id),
+            "id": str(playlist_id),
             "items": items,
+            "name": name or "",
+            "isPublic": is_public if is_public is not None else False,
         }
-        if name is not None:
-            variables["name"] = name
-        if is_public is not None:
-            variables["isPublic"] = is_public
 
-        result = self._request.graphql(gql, "updatePlaylist", variables)
-        return result.get("playlist_update") is not None
+        result = self._request.graphql(gql, "updataPlaylist", variables)
+        playlist_data: Dict[str, Any] = result.get("playlist", {})
+        return "update" in playlist_data
 
     def set_playlist_public(self, playlist_id: Union[str, int], is_public: bool) -> bool:
         """Изменить видимость плейлиста.
@@ -604,9 +606,10 @@ class Client:
         result = self._request.graphql(
             gql,
             "setPlaylistToPublic",
-            {"playlistId": str(playlist_id), "isPublic": is_public},
+            {"id": str(playlist_id), "isPublic": is_public},
         )
-        return result.get("playlist_set_is_public") is not None
+        playlist_data: Dict[str, Any] = result.get("playlist", {})
+        return "set_public" in playlist_data
 
     def synthesis_playlist_build(
         self, first_author_id: str, second_author_id: str
@@ -782,9 +785,10 @@ class Client:
         result = self._request.graphql(
             gql,
             "addItemToCollection",
-            {"itemId": str(item_id), "itemType": item_type.value},
+            {"id": str(item_id), "type": item_type.value},
         )
-        return result.get("collection_add_item") is not None
+        collection_data: Dict[str, Any] = result.get("collection", {})
+        return "add_item" in collection_data
 
     def remove_from_collection(
         self, item_id: Union[str, int], item_type: CollectionItemType
@@ -802,9 +806,10 @@ class Client:
         result = self._request.graphql(
             gql,
             "removeItemFromCollection",
-            {"itemId": str(item_id), "itemType": item_type.value},
+            {"id": str(item_id), "type": item_type.value},
         )
-        return result.get("collection_remove_item") is not None
+        collection_data: Dict[str, Any] = result.get("collection", {})
+        return "remove_item" in collection_data
 
     # Shortcut методы для лайков
     def like_track(self, track_id: Union[str, int]) -> bool:
@@ -884,9 +889,10 @@ class Client:
         result = self._request.graphql(
             gql,
             "addItemToHidden",
-            {"itemId": str(item_id), "itemType": item_type.value},
+            {"id": str(item_id), "type": item_type.value},
         )
-        return result.get("hidden_add_item") is not None
+        hidden_data: Dict[str, Any] = result.get("hidden_collection", {})
+        return "add_item" in hidden_data
 
     def remove_from_hidden(self, item_id: Union[str, int], item_type: CollectionItemType) -> bool:
         """Убрать элемент из скрытых.
@@ -902,9 +908,10 @@ class Client:
         result = self._request.graphql(
             gql,
             "removeItemFromHidden",
-            {"itemId": str(item_id), "itemType": item_type.value},
+            {"id": str(item_id), "type": item_type.value},
         )
-        return result.get("hidden_remove_item") is not None
+        hidden_data: Dict[str, Any] = result.get("hidden_collection", {})
+        return "remove_item" in hidden_data
 
     def hide_track(self, track_id: Union[str, int]) -> bool:
         """Скрыть трек."""
@@ -934,7 +941,7 @@ class Client:
         gql = load_query("profileFollowersCount")
         result = self._request.graphql(gql, "profileFollowersCount", {"ids": ids})
         profiles: List[Dict[str, Any]] = result.get("profiles", [])
-        return [p.get("followers_count", 0) for p in profiles]
+        return [p.get("collection_item_data", {}).get("likes_count", 0) for p in profiles]
 
     def get_following_count(self, profile_id: Union[str, int]) -> int:
         """Получить количество подписок пользователя.
@@ -973,7 +980,8 @@ class Client:
         """
         gql = load_query("listenedEpisodes")
         result = self._request.graphql(gql, "listenedEpisodes", {})
-        episodes: List[Dict[str, Any]] = result.get("listened_episodes", [])
+        play_state: Dict[str, Any] = result.get("get_play_state", {})
+        episodes: List[Dict[str, Any]] = play_state.get("episodes", [])
         return episodes
 
     def has_unread_notifications(self) -> bool:
