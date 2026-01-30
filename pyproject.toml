@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zvuk-music"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Python библиотека для работы с API Zvuk.com (СберЗвук)"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 authors = [
-    { name = "Zvuk Music API" }
+    { name = "trudenboy" }
 ]
 keywords = [
     "zvuk",
@@ -30,6 +30,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
@@ -60,10 +61,14 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-repo/zvuk-api"
-Documentation = "https://github.com/your-repo/zvuk-api#readme"
-Repository = "https://github.com/your-repo/zvuk-api"
-Issues = "https://github.com/your-repo/zvuk-api/issues"
+Homepage = "https://github.com/trudenboy/zvuk-music"
+Documentation = "https://github.com/trudenboy/zvuk-music#readme"
+Repository = "https://github.com/trudenboy/zvuk-music"
+Issues = "https://github.com/trudenboy/zvuk-music/issues"
+Changelog = "https://github.com/trudenboy/zvuk-music/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "zvuk_music/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
