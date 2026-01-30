@@ -134,9 +134,7 @@ class ProfileResult(ZvukMusicModel):
         if "image" in data:
             data["image"] = Image.de_json(data["image"], client)
         if "external_profile" in data:
-            data["external_profile"] = ExternalProfile.de_json(
-                data["external_profile"], client
-            )
+            data["external_profile"] = ExternalProfile.de_json(data["external_profile"], client)
 
         return cls(client=client, **cls.cleanup_data(data, client))
 

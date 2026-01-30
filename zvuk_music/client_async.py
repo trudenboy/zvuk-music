@@ -9,8 +9,8 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 
 from zvuk_music.enums import CollectionItemType, OrderBy, OrderDirection, Quality
-from zvuk_music.exceptions import QualityNotAvailableError, SubscriptionRequiredError
-from zvuk_music.models.artist import Artist, SimpleArtist
+from zvuk_music.exceptions import QualityNotAvailableError
+from zvuk_music.models.artist import Artist
 from zvuk_music.models.collection import Collection, CollectionItem, HiddenCollection
 from zvuk_music.models.playlist import Playlist, SimplePlaylist, SimpleTrack, SynthesisPlaylist
 from zvuk_music.models.podcast import Episode, Podcast

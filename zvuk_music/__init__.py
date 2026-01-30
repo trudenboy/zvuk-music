@@ -13,8 +13,8 @@ Example:
     ...     print(f"{track.title} - {track.get_artists_str()}")
 """
 
-from zvuk_music.client import Client
 from zvuk_music.base import ZvukMusicModel, ZvukMusicObject
+from zvuk_music.client import Client
 from zvuk_music.enums import (
     BackgroundType,
     CollectionItemStatus,

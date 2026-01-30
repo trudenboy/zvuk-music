@@ -28,7 +28,14 @@ logger = logging.getLogger(__name__)
 JSONType = Union[Dict[str, "JSONType"], Sequence["JSONType"], str, int, float, bool, None]
 ClientType = Union["Client", "ClientAsync"]
 ModelFieldType = Union[
-    Dict[str, "ModelFieldType"], Sequence["ModelFieldType"], "ZvukMusicModel", str, int, float, bool, None
+    Dict[str, "ModelFieldType"],
+    Sequence["ModelFieldType"],
+    "ZvukMusicModel",
+    str,
+    int,
+    float,
+    bool,
+    None,
 ]
 ModelFieldMap = Dict[str, "ModelFieldType"]
 MapTypeToDeJson = Dict[str, Callable[["JSONType", "ClientType"], Optional["ZvukMusicModel"]]]
@@ -116,7 +123,9 @@ class ZvukMusicModel(ZvukMusicObject):
         Returns:
             Валидны ли данные.
         """
-        return bool(data) and isinstance(data, list) and all(isinstance(item, dict) for item in data)
+        return (
+            bool(data) and isinstance(data, list) and all(isinstance(item, dict) for item in data)
+        )
 
     @classmethod
     def cleanup_data(cls, data: JSONType, client: Optional["ClientType"]) -> ModelFieldMap:
@@ -275,5 +284,7 @@ class ZvukMusicModel(ZvukMusicObject):
         if not id_attrs:
             return super().__hash__()
 
-        frozen_attrs = tuple(frozenset(attr) if isinstance(attr, list) else attr for attr in id_attrs)
+        frozen_attrs = tuple(
+            frozenset(attr) if isinstance(attr, list) else attr for attr in id_attrs
+        )
         return hash((self.__class__, frozen_attrs))

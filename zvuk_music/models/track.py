@@ -10,7 +10,7 @@ from zvuk_music.base import JSONType, ZvukMusicModel
 from zvuk_music.enums import Quality
 from zvuk_music.models.artist import SimpleArtist
 from zvuk_music.models.collection import CollectionItem
-from zvuk_music.models.common import Genre, Image
+from zvuk_music.models.common import Genre
 from zvuk_music.models.release import SimpleRelease
 from zvuk_music.utils import model
 

@@ -45,16 +45,12 @@ class StreamUrls(ZvukMusicModel):
         """
         if quality == Quality.FLAC:
             if not self.flacdrm:
-                raise SubscriptionRequiredError(
-                    "FLAC quality requires subscription"
-                )
+                raise SubscriptionRequiredError("FLAC quality requires subscription")
             return self.flacdrm
 
         if quality == Quality.HIGH:
             if not self.high:
-                raise SubscriptionRequiredError(
-                    "High quality (320kbps) requires subscription"
-                )
+                raise SubscriptionRequiredError("High quality (320kbps) requires subscription")
             return self.high
 
         if quality == Quality.MID:

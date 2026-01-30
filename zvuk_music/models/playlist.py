@@ -135,9 +135,7 @@ class Playlist(ZvukMusicModel):
 
         return cls(client=client, **cls.cleanup_data(data, client))
 
-    def get_tracks_paginated(
-        self, limit: int = 50, offset: int = 0
-    ) -> List[SimpleTrack]:
+    def get_tracks_paginated(self, limit: int = 50, offset: int = 0) -> List[SimpleTrack]:
         """Получить треки с пагинацией.
 
         Args:

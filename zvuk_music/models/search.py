@@ -130,13 +130,9 @@ class Search(ZvukMusicModel):
         data = data.copy()
 
         if "tracks" in data and data["tracks"]:
-            data["tracks"] = SearchResult.de_json_with_type(
-                data["tracks"], client, SimpleTrack
-            )
+            data["tracks"] = SearchResult.de_json_with_type(data["tracks"], client, SimpleTrack)
         if "artists" in data and data["artists"]:
-            data["artists"] = SearchResult.de_json_with_type(
-                data["artists"], client, SimpleArtist
-            )
+            data["artists"] = SearchResult.de_json_with_type(data["artists"], client, SimpleArtist)
         if "releases" in data and data["releases"]:
             data["releases"] = SearchResult.de_json_with_type(
                 data["releases"], client, SimpleRelease
@@ -150,9 +146,7 @@ class Search(ZvukMusicModel):
                 data["profiles"], client, SimpleProfile
             )
         if "books" in data and data["books"]:
-            data["books"] = SearchResult.de_json_with_type(
-                data["books"], client, SimpleBook
-            )
+            data["books"] = SearchResult.de_json_with_type(data["books"], client, SimpleBook)
         if "episodes" in data and data["episodes"]:
             data["episodes"] = SearchResult.de_json_with_type(
                 data["episodes"], client, SimpleEpisode

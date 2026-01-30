@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 
 from zvuk_music.enums import CollectionItemType, OrderBy, OrderDirection, Quality
-from zvuk_music.exceptions import QualityNotAvailableError, SubscriptionRequiredError
-from zvuk_music.models.artist import Artist, SimpleArtist
+from zvuk_music.exceptions import QualityNotAvailableError
+from zvuk_music.models.artist import Artist
 from zvuk_music.models.collection import Collection, CollectionItem, HiddenCollection
 from zvuk_music.models.playlist import Playlist, SimplePlaylist, SimpleTrack, SynthesisPlaylist
 from zvuk_music.models.podcast import Episode, Podcast
@@ -216,9 +216,7 @@ class Client:
 
     # ========== Треки ==========
 
-    def get_tracks(
-        self, track_ids: Union[str, int, List[Union[str, int]]]
-    ) -> List[Track]:
+    def get_tracks(self, track_ids: Union[str, int, List[Union[str, int]]]) -> List[Track]:
         """Получить треки по ID.
 
         Args:
@@ -275,9 +273,7 @@ class Client:
         )
         return Track.de_list(result.get("get_tracks", []), self)  # type: ignore
 
-    def get_stream_urls(
-        self, track_ids: Union[str, int, List[Union[str, int]]]
-    ) -> List[Stream]:
+    def get_stream_urls(self, track_ids: Union[str, int, List[Union[str, int]]]) -> List[Stream]:
         """Получить URL для стриминга.
 
         Args:
@@ -301,9 +297,7 @@ class Client:
                     streams.append(stream)
         return streams
 
-    def get_stream_url(
-        self, track_id: Union[str, int], quality: Quality = Quality.HIGH
-    ) -> str:
+    def get_stream_url(self, track_id: Union[str, int], quality: Quality = Quality.HIGH) -> str:
         """Получить URL для стриминга в указанном качестве.
 
         Args:
@@ -415,9 +409,7 @@ class Client:
         )
         return Artist.de_list(result.get("get_artists", []), self)  # type: ignore
 
-    def get_artist(
-        self, artist_id: Union[str, int], **kwargs: Any
-    ) -> Optional[Artist]:
+    def get_artist(self, artist_id: Union[str, int], **kwargs: Any) -> Optional[Artist]:
         """Получить артиста по ID.
 
         Args:
@@ -432,9 +424,7 @@ class Client:
 
     # ========== Плейлисты ==========
 
-    def get_playlists(
-        self, playlist_ids: Union[str, int, List[Union[str, int]]]
-    ) -> List[Playlist]:
+    def get_playlists(self, playlist_ids: Union[str, int, List[Union[str, int]]]) -> List[Playlist]:
         """Получить плейлисты по ID.
 
         Args:
@@ -504,9 +494,7 @@ class Client:
         playlist_data = result.get("playlists", [{}])[0]
         return SimpleTrack.de_list(playlist_data.get("tracks", []), self)  # type: ignore
 
-    def create_playlist(
-        self, name: str, track_ids: Optional[List[str]] = None
-    ) -> str:
+    def create_playlist(self, name: str, track_ids: Optional[List[str]] = None) -> str:
         """Создать плейлист.
 
         Args:
@@ -521,9 +509,7 @@ class Client:
         if track_ids:
             items = [{"type": "track", "itemId": tid} for tid in track_ids]
 
-        result = self._request.graphql(
-            gql, "createPlaylist", {"name": name, "items": items}
-        )
+        result = self._request.graphql(gql, "createPlaylist", {"name": name, "items": items})
         return result.get("playlist_create", {}).get("id", "")
 
     def delete_playlist(self, playlist_id: Union[str, int]) -> bool:
@@ -536,14 +522,10 @@ class Client:
             Успешность операции.
         """
         gql = load_query("deletePlaylist")
-        result = self._request.graphql(
-            gql, "deletePlaylist", {"playlistId": str(playlist_id)}
-        )
+        result = self._request.graphql(gql, "deletePlaylist", {"playlistId": str(playlist_id)})
         return result.get("playlist_delete") is True
 
-    def rename_playlist(
-        self, playlist_id: Union[str, int], new_name: str
-    ) -> bool:
+    def rename_playlist(self, playlist_id: Union[str, int], new_name: str) -> bool:
         """Переименовать плейлист.
 
         Args:
@@ -559,9 +541,7 @@ class Client:
         )
         return result.get("playlist_rename") is not None
 
-    def add_tracks_to_playlist(
-        self, playlist_id: Union[str, int], track_ids: List[str]
-    ) -> bool:
+    def add_tracks_to_playlist(self, playlist_id: Union[str, int], track_ids: List[str]) -> bool:
         """Добавить треки в плейлист.
 
         Args:
@@ -610,9 +590,7 @@ class Client:
         result = self._request.graphql(gql, "updatePlaylist", variables)
         return result.get("playlist_update") is not None
 
-    def set_playlist_public(
-        self, playlist_id: Union[str, int], is_public: bool
-    ) -> bool:
+    def set_playlist_public(self, playlist_id: Union[str, int], is_public: bool) -> bool:
         """Изменить видимость плейлиста.
 
         Args:
@@ -648,9 +626,7 @@ class Client:
             "synthesisPlaylistBuild",
             {"firstAuthorId": first_author_id, "secondAuthorId": second_author_id},
         )
-        return SynthesisPlaylist.de_json(
-            result.get("synthesis_playlist_build", {}), self
-        )  # type: ignore
+        return SynthesisPlaylist.de_json(result.get("synthesis_playlist_build", {}), self)  # type: ignore
 
     def get_synthesis_playlists(self, ids: List[str]) -> List[SynthesisPlaylist]:
         """Получить синтез-плейлисты.
@@ -663,15 +639,11 @@ class Client:
         """
         gql = load_query("synthesisPlaylist")
         result = self._request.graphql(gql, "synthesisPlaylist", {"ids": ids})
-        return SynthesisPlaylist.de_list(
-            result.get("synthesis_playlists", []), self
-        )  # type: ignore
+        return SynthesisPlaylist.de_list(result.get("synthesis_playlists", []), self)  # type: ignore
 
     # ========== Подкасты ==========
 
-    def get_podcasts(
-        self, podcast_ids: Union[str, int, List[Union[str, int]]]
-    ) -> List[Podcast]:
+    def get_podcasts(self, podcast_ids: Union[str, int, List[Union[str, int]]]) -> List[Podcast]:
         """Получить подкасты по ID.
 
         Args:
@@ -700,9 +672,7 @@ class Client:
         podcasts = self.get_podcasts(podcast_id)
         return podcasts[0] if podcasts else None
 
-    def get_episodes(
-        self, episode_ids: Union[str, int, List[Union[str, int]]]
-    ) -> List[Episode]:
+    def get_episodes(self, episode_ids: Union[str, int, List[Union[str, int]]]) -> List[Episode]:
         """Получить эпизоды по ID.
 
         Args:
@@ -795,9 +765,7 @@ class Client:
         result = self._request.graphql(gql, "userPaginatedPodcasts", variables)
         return result.get("user_paginated_podcasts", {})
 
-    def add_to_collection(
-        self, item_id: Union[str, int], item_type: CollectionItemType
-    ) -> bool:
+    def add_to_collection(self, item_id: Union[str, int], item_type: CollectionItemType) -> bool:
         """Добавить элемент в коллекцию (лайк).
 
         Args:
@@ -886,9 +854,7 @@ class Client:
         """
         gql = load_query("getAllHiddenCollection")
         result = self._request.graphql(gql, "getAllHiddenCollection", {})
-        return HiddenCollection.de_json(
-            result.get("get_all_hidden_collection", {}), self
-        )  # type: ignore
+        return HiddenCollection.de_json(result.get("get_all_hidden_collection", {}), self)  # type: ignore
 
     def get_hidden_tracks(self) -> List[CollectionItem]:
         """Получить скрытые треки.
@@ -900,9 +866,7 @@ class Client:
         result = self._request.graphql(gql, "getHiddenTracks", {})
         return CollectionItem.de_list(result.get("hidden_tracks", []), self)  # type: ignore
 
-    def add_to_hidden(
-        self, item_id: Union[str, int], item_type: CollectionItemType
-    ) -> bool:
+    def add_to_hidden(self, item_id: Union[str, int], item_type: CollectionItemType) -> bool:
         """Скрыть элемент.
 
         Args:
@@ -920,9 +884,7 @@ class Client:
         )
         return result.get("hidden_add_item") is not None
 
-    def remove_from_hidden(
-        self, item_id: Union[str, int], item_type: CollectionItemType
-    ) -> bool:
+    def remove_from_hidden(self, item_id: Union[str, int], item_type: CollectionItemType) -> bool:
         """Убрать элемент из скрытых.
 
         Args:
@@ -980,9 +942,7 @@ class Client:
             Количество подписок.
         """
         gql = load_query("followingCount")
-        result = self._request.graphql(
-            gql, "followingCount", {"id": str(profile_id)}
-        )
+        result = self._request.graphql(gql, "followingCount", {"id": str(profile_id)})
         return result.get("following_count", 0)
 
     # ========== История ==========
