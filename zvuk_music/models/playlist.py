@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
 
@@ -61,12 +61,12 @@ class SimplePlaylist(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_full_info(self) -> Optional["Playlist"]:
         """Получить полную информацию о плейлисте."""
@@ -126,14 +126,14 @@ class Playlist(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "tracks" in data:
-            data["tracks"] = SimpleTrack.de_list(data["tracks"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "tracks" in data_dict:
+            data_dict["tracks"] = SimpleTrack.de_list(data_dict["tracks"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_tracks_paginated(self, limit: int = 50, offset: int = 0) -> List[SimpleTrack]:
         """Получить треки с пагинацией.
@@ -264,12 +264,12 @@ class PlaylistAuthor(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
 
 @model
@@ -299,11 +299,11 @@ class SynthesisPlaylist(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "tracks" in data:
-            data["tracks"] = SimpleTrack.de_list(data["tracks"], client)
-        if "authors" in data:
-            data["authors"] = PlaylistAuthor.de_list(data["authors"], client)
+        if "tracks" in data_dict:
+            data_dict["tracks"] = SimpleTrack.de_list(data_dict["tracks"], client)
+        if "authors" in data_dict:
+            data_dict["authors"] = PlaylistAuthor.de_list(data_dict["authors"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))

@@ -263,7 +263,7 @@ class Request:
             raise NetworkError(str(e)) from e
 
         if 200 <= resp.status <= 299:
-            return content
+            return bytes(content)
 
         message = "Unknown error"
         try:
@@ -284,7 +284,7 @@ class Request:
         if resp.status == 502:
             raise NetworkError("Bad Gateway")
 
-        raise NetworkError(f"{message} ({resp.status}): {content}")
+        raise NetworkError(f"{message} ({resp.status}): {content!r}")
 
     async def graphql(
         self,
@@ -292,7 +292,7 @@ class Request:
         operation_name: Optional[str] = None,
         variables: Optional[Dict[str, Any]] = None,
         timeout: "TimeoutType" = default_timeout,
-    ) -> "JSONType":
+    ) -> Dict[str, Any]:
         """Выполнение GraphQL запроса.
 
         Args:
@@ -332,9 +332,9 @@ class Request:
             )
 
         if response:
-            return response.get_result()
+            return response.get_result() or {}
 
-        return None
+        return {}
 
     async def get(
         self,
@@ -342,7 +342,7 @@ class Request:
         params: Optional[Dict[str, Any]] = None,
         timeout: "TimeoutType" = default_timeout,
         **kwargs: Any,
-    ) -> "JSONType":
+    ) -> Optional[Dict[str, Any]]:
         """Отправка GET запроса.
 
         Args:
@@ -367,7 +367,8 @@ class Request:
             data = response.get_result()
             # Tiny API возвращает {"result": {...}}
             if isinstance(data, dict) and "result" in data:
-                return data["result"]
+                inner: Optional[Dict[str, Any]] = data["result"]
+                return inner
             return data
 
         return None
@@ -378,7 +379,7 @@ class Request:
         data: Optional[Dict[str, Any]] = None,
         timeout: "TimeoutType" = default_timeout,
         **kwargs: Any,
-    ) -> "JSONType":
+    ) -> Optional[Dict[str, Any]]:
         """Отправка POST запроса.
 
         Args:

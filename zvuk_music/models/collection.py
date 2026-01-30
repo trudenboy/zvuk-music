@@ -1,6 +1,6 @@
 """Модели коллекции (лайки, скрытые)."""
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
 
@@ -45,15 +45,15 @@ class CollectionItem(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "item_status" in data and data["item_status"]:
+        if "item_status" in data_dict and data_dict["item_status"]:
             try:
-                data["item_status"] = CollectionItemStatus(data["item_status"])
+                data_dict["item_status"] = CollectionItemStatus(data_dict["item_status"])
             except ValueError:
                 pass
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
 
 @model
@@ -104,7 +104,7 @@ class Collection(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
         for field in [
             "artists",
@@ -116,10 +116,10 @@ class Collection(ZvukMusicModel):
             "releases",
             "tracks",
         ]:
-            if field in data:
-                data[field] = CollectionItem.de_list(data[field], client)
+            if field in data_dict:
+                data_dict[field] = CollectionItem.de_list(data_dict[field], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
 
 @model
@@ -146,11 +146,11 @@ class HiddenCollection(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "tracks" in data:
-            data["tracks"] = CollectionItem.de_list(data["tracks"], client)
-        if "artists" in data:
-            data["artists"] = CollectionItem.de_list(data["artists"], client)
+        if "tracks" in data_dict:
+            data_dict["tracks"] = CollectionItem.de_list(data_dict["tracks"], client)
+        if "artists" in data_dict:
+            data_dict["artists"] = CollectionItem.de_list(data_dict["artists"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))

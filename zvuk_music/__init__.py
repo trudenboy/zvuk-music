@@ -76,7 +76,7 @@ from zvuk_music.models import (
     Track,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Zvuk Music API"
 
 __all__ = [

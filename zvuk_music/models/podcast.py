@@ -62,14 +62,14 @@ class SimplePodcast(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "authors" in data:
-            data["authors"] = PodcastAuthor.de_list(data["authors"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "authors" in data_dict:
+            data_dict["authors"] = PodcastAuthor.de_list(data_dict["authors"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_full_info(self) -> Optional["Podcast"]:
         """Получить полную информацию о подкасте."""
@@ -127,18 +127,18 @@ class Podcast(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "authors" in data:
-            data["authors"] = PodcastAuthor.de_list(data["authors"], client)
-        if "collection_item_data" in data:
-            data["collection_item_data"] = CollectionItem.de_json(
-                data["collection_item_data"], client
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "authors" in data_dict:
+            data_dict["authors"] = PodcastAuthor.de_list(data_dict["authors"], client)
+        if "collection_item_data" in data_dict:
+            data_dict["collection_item_data"] = CollectionItem.de_json(
+                data_dict["collection_item_data"], client
             )
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def is_liked(self) -> bool:
         """Проверка, лайкнут ли подкаст."""
@@ -200,12 +200,12 @@ class SimpleEpisode(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_full_info(self) -> Optional["Episode"]:
         """Получить полную информацию об эпизоде."""
@@ -257,18 +257,18 @@ class Episode(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "podcast" in data:
-            data["podcast"] = SimplePodcast.de_json(data["podcast"], client)
-        if "collection_item_data" in data:
-            data["collection_item_data"] = CollectionItem.de_json(
-                data["collection_item_data"], client
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "podcast" in data_dict:
+            data_dict["podcast"] = SimplePodcast.de_json(data_dict["podcast"], client)
+        if "collection_item_data" in data_dict:
+            data_dict["collection_item_data"] = CollectionItem.de_json(
+                data_dict["collection_item_data"], client
             )
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_duration_str(self) -> str:
         """Получить длительность в формате MM:SS."""

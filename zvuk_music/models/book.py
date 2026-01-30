@@ -1,6 +1,6 @@
 """Модели аудиокниг."""
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
 
@@ -35,12 +35,12 @@ class BookAuthor(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
 
 @model
@@ -74,14 +74,14 @@ class SimpleBook(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "book_authors" in data:
-            data["book_authors"] = BookAuthor.de_list(data["book_authors"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "book_authors" in data_dict:
+            data_dict["book_authors"] = BookAuthor.de_list(data_dict["book_authors"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_authors_str(self) -> str:
         """Получить строку с именами авторов.

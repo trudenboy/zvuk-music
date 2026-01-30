@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generic, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Generic, List, Optional, TypeVar
 
 from typing_extensions import Self
 
@@ -76,20 +76,20 @@ class SearchResult(ZvukMusicModel, Generic[T]):
 
     @classmethod
     def de_json_with_type(
-        cls, data: JSONType, client: "ClientType", item_class: type
+        cls, data: JSONType, client: "ClientType", item_class: type[ZvukMusicModel]
     ) -> Optional[Self]:
         """Десериализация с указанием типа элементов."""
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "page" in data:
-            data["page"] = Page.de_json(data["page"], client)
-        if "items" in data:
-            data["items"] = item_class.de_list(data["items"], client)
+        if "page" in data_dict:
+            data_dict["page"] = Page.de_json(data_dict["page"], client)
+        if "items" in data_dict:
+            data_dict["items"] = item_class.de_list(data_dict["items"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
 
 @model
@@ -127,36 +127,42 @@ class Search(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "tracks" in data and data["tracks"]:
-            data["tracks"] = SearchResult.de_json_with_type(data["tracks"], client, SimpleTrack)
-        if "artists" in data and data["artists"]:
-            data["artists"] = SearchResult.de_json_with_type(data["artists"], client, SimpleArtist)
-        if "releases" in data and data["releases"]:
-            data["releases"] = SearchResult.de_json_with_type(
-                data["releases"], client, SimpleRelease
+        if "tracks" in data_dict and data_dict["tracks"]:
+            data_dict["tracks"] = SearchResult.de_json_with_type(
+                data_dict["tracks"], client, SimpleTrack
             )
-        if "playlists" in data and data["playlists"]:
-            data["playlists"] = SearchResult.de_json_with_type(
-                data["playlists"], client, SimplePlaylist
+        if "artists" in data_dict and data_dict["artists"]:
+            data_dict["artists"] = SearchResult.de_json_with_type(
+                data_dict["artists"], client, SimpleArtist
             )
-        if "profiles" in data and data["profiles"]:
-            data["profiles"] = SearchResult.de_json_with_type(
-                data["profiles"], client, SimpleProfile
+        if "releases" in data_dict and data_dict["releases"]:
+            data_dict["releases"] = SearchResult.de_json_with_type(
+                data_dict["releases"], client, SimpleRelease
             )
-        if "books" in data and data["books"]:
-            data["books"] = SearchResult.de_json_with_type(data["books"], client, SimpleBook)
-        if "episodes" in data and data["episodes"]:
-            data["episodes"] = SearchResult.de_json_with_type(
-                data["episodes"], client, SimpleEpisode
+        if "playlists" in data_dict and data_dict["playlists"]:
+            data_dict["playlists"] = SearchResult.de_json_with_type(
+                data_dict["playlists"], client, SimplePlaylist
             )
-        if "podcasts" in data and data["podcasts"]:
-            data["podcasts"] = SearchResult.de_json_with_type(
-                data["podcasts"], client, SimplePodcast
+        if "profiles" in data_dict and data_dict["profiles"]:
+            data_dict["profiles"] = SearchResult.de_json_with_type(
+                data_dict["profiles"], client, SimpleProfile
+            )
+        if "books" in data_dict and data_dict["books"]:
+            data_dict["books"] = SearchResult.de_json_with_type(
+                data_dict["books"], client, SimpleBook
+            )
+        if "episodes" in data_dict and data_dict["episodes"]:
+            data_dict["episodes"] = SearchResult.de_json_with_type(
+                data_dict["episodes"], client, SimpleEpisode
+            )
+        if "podcasts" in data_dict and data_dict["podcasts"]:
+            data_dict["podcasts"] = SearchResult.de_json_with_type(
+                data_dict["podcasts"], client, SimplePodcast
             )
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
 
 @model
@@ -213,10 +219,10 @@ class QuickSearch(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
         # API возвращает content как смешанный массив с __typename
-        if "content" in data and isinstance(data["content"], list):
+        if "content" in data_dict and isinstance(data_dict["content"], list):
             tracks_data = []
             artists_data = []
             releases_data = []
@@ -226,7 +232,7 @@ class QuickSearch(ZvukMusicModel):
             episodes_data = []
             podcasts_data = []
 
-            for item in data["content"]:
+            for item in data_dict["content"]:
                 if not isinstance(item, dict):
                     continue
                 typename = item.get("__typename", "")
@@ -247,32 +253,32 @@ class QuickSearch(ZvukMusicModel):
                 elif typename == "Podcast":
                     podcasts_data.append(item)
 
-            data["tracks"] = SimpleTrack.de_list(tracks_data, client)
-            data["artists"] = SimpleArtist.de_list(artists_data, client)
-            data["releases"] = SimpleRelease.de_list(releases_data, client)
-            data["playlists"] = SimplePlaylist.de_list(playlists_data, client)
-            data["profiles"] = SimpleProfile.de_list(profiles_data, client)
-            data["books"] = SimpleBook.de_list(books_data, client)
-            data["episodes"] = SimpleEpisode.de_list(episodes_data, client)
-            data["podcasts"] = SimplePodcast.de_list(podcasts_data, client)
-            del data["content"]
+            data_dict["tracks"] = SimpleTrack.de_list(tracks_data, client)
+            data_dict["artists"] = SimpleArtist.de_list(artists_data, client)
+            data_dict["releases"] = SimpleRelease.de_list(releases_data, client)
+            data_dict["playlists"] = SimplePlaylist.de_list(playlists_data, client)
+            data_dict["profiles"] = SimpleProfile.de_list(profiles_data, client)
+            data_dict["books"] = SimpleBook.de_list(books_data, client)
+            data_dict["episodes"] = SimpleEpisode.de_list(episodes_data, client)
+            data_dict["podcasts"] = SimplePodcast.de_list(podcasts_data, client)
+            del data_dict["content"]
         else:
             # Fallback для старого формата (отдельные списки)
-            if "tracks" in data:
-                data["tracks"] = SimpleTrack.de_list(data["tracks"], client)
-            if "artists" in data:
-                data["artists"] = SimpleArtist.de_list(data["artists"], client)
-            if "releases" in data:
-                data["releases"] = SimpleRelease.de_list(data["releases"], client)
-            if "playlists" in data:
-                data["playlists"] = SimplePlaylist.de_list(data["playlists"], client)
-            if "profiles" in data:
-                data["profiles"] = SimpleProfile.de_list(data["profiles"], client)
-            if "books" in data:
-                data["books"] = SimpleBook.de_list(data["books"], client)
-            if "episodes" in data:
-                data["episodes"] = SimpleEpisode.de_list(data["episodes"], client)
-            if "podcasts" in data:
-                data["podcasts"] = SimplePodcast.de_list(data["podcasts"], client)
+            if "tracks" in data_dict:
+                data_dict["tracks"] = SimpleTrack.de_list(data_dict["tracks"], client)
+            if "artists" in data_dict:
+                data_dict["artists"] = SimpleArtist.de_list(data_dict["artists"], client)
+            if "releases" in data_dict:
+                data_dict["releases"] = SimpleRelease.de_list(data_dict["releases"], client)
+            if "playlists" in data_dict:
+                data_dict["playlists"] = SimplePlaylist.de_list(data_dict["playlists"], client)
+            if "profiles" in data_dict:
+                data_dict["profiles"] = SimpleProfile.de_list(data_dict["profiles"], client)
+            if "books" in data_dict:
+                data_dict["books"] = SimpleBook.de_list(data_dict["books"], client)
+            if "episodes" in data_dict:
+                data_dict["episodes"] = SimpleEpisode.de_list(data_dict["episodes"], client)
+            if "podcasts" in data_dict:
+                data_dict["podcasts"] = SimplePodcast.de_list(data_dict["podcasts"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))

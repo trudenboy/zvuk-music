@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
 
@@ -50,14 +50,14 @@ class SimpleTrack(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "artists" in data:
-            data["artists"] = SimpleArtist.de_list(data["artists"], client)
-        if "release" in data:
-            data["release"] = SimpleRelease.de_json(data["release"], client)
+        if "artists" in data_dict:
+            data_dict["artists"] = SimpleArtist.de_list(data_dict["artists"], client)
+        if "release" in data_dict:
+            data_dict["release"] = SimpleRelease.de_json(data_dict["release"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_duration_str(self) -> str:
         """Получить длительность в формате MM:SS.
@@ -153,20 +153,20 @@ class Track(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "genres" in data:
-            data["genres"] = Genre.de_list(data["genres"], client)
-        if "artists" in data:
-            data["artists"] = SimpleArtist.de_list(data["artists"], client)
-        if "release" in data:
-            data["release"] = SimpleRelease.de_json(data["release"], client)
-        if "collection_item_data" in data:
-            data["collection_item_data"] = CollectionItem.de_json(
-                data["collection_item_data"], client
+        if "genres" in data_dict:
+            data_dict["genres"] = Genre.de_list(data_dict["genres"], client)
+        if "artists" in data_dict:
+            data_dict["artists"] = SimpleArtist.de_list(data_dict["artists"], client)
+        if "release" in data_dict:
+            data_dict["release"] = SimpleRelease.de_json(data_dict["release"], client)
+        if "collection_item_data" in data_dict:
+            data_dict["collection_item_data"] = CollectionItem.de_json(
+                data_dict["collection_item_data"], client
             )
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_duration_str(self) -> str:
         """Получить длительность в формате MM:SS."""

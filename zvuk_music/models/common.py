@@ -1,6 +1,6 @@
 """Общие модели данных."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from typing_extensions import Self
@@ -123,16 +123,16 @@ class Background(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
         # Конвертация type в enum
-        if "type" in data and data["type"]:
+        if "type" in data_dict and data_dict["type"]:
             try:
-                data["type"] = BackgroundType(data["type"])
+                data_dict["type"] = BackgroundType(data_dict["type"])
             except ValueError:
                 pass
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
 
 @model
@@ -160,9 +160,9 @@ class Animation(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "background" in data:
-            data["background"] = Background.de_json(data["background"], client)
+        if "background" in data_dict:
+            data_dict["background"] = Background.de_json(data_dict["background"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))

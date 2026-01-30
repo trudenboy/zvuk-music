@@ -88,7 +88,7 @@ class Client:
         response = requests.get(f"{TINY_API_URL}/profile", headers=headers)
         response.raise_for_status()
         data = response.json()
-        return data["result"]["token"]
+        return str(data["result"]["token"])
 
     def init(self) -> "Client":
         """Инициализировать клиент, загрузить профиль.
@@ -99,7 +99,7 @@ class Client:
         self.get_profile()
         return self
 
-    def get_profile(self) -> Profile:
+    def get_profile(self) -> Optional[Profile]:
         """Получить профиль текущего пользователя.
 
         Returns:
@@ -110,7 +110,7 @@ class Client:
         profile = Profile.de_json({"result": data}, self)
         if profile and profile.result:
             self._profile = profile.result
-        return profile  # type: ignore[return-value]
+        return profile
 
     def is_authorized(self) -> bool:
         """Авторизован ли пользователь (не анонимный).
@@ -129,7 +129,7 @@ class Client:
         query: str,
         limit: int = 10,
         search_session_id: Optional[str] = None,
-    ) -> QuickSearch:
+    ) -> Optional[QuickSearch]:
         """Быстрый поиск с автодополнением.
 
         Args:
@@ -148,7 +148,7 @@ class Client:
         result = self._request.graphql(gql, "quickSearch", variables)
         # API возвращает quick_search (snake_case после нормализации)
         data = result.get("quick_search") or result.get("quickSearch") or {}
-        return QuickSearch.de_json(data, self)  # type: ignore
+        return QuickSearch.de_json(data, self)
 
     def search(
         self,
@@ -166,7 +166,7 @@ class Client:
         artist_cursor: Optional[str] = None,
         release_cursor: Optional[str] = None,
         playlist_cursor: Optional[str] = None,
-    ) -> Search:
+    ) -> Optional[Search]:
         """Полнотекстовый поиск.
 
         Args:
@@ -212,7 +212,7 @@ class Client:
             variables["playlistCursor"] = playlist_cursor
 
         result = self._request.graphql(gql, "search", variables)
-        return Search.de_json(result.get("search", {}), self)  # type: ignore
+        return Search.de_json(result.get("search", {}), self)
 
     # ========== Треки ==========
 
@@ -231,7 +231,7 @@ class Client:
 
         gql = load_query("getTracks")
         result = self._request.graphql(gql, "getTracks", {"ids": ids})
-        return Track.de_list(result.get("get_tracks", []), self)  # type: ignore
+        return Track.de_list(result.get("get_tracks", []), self)
 
     def get_track(self, track_id: Union[str, int]) -> Optional[Track]:
         """Получить трек по ID.
@@ -271,7 +271,7 @@ class Client:
             "getFullTrack",
             {"ids": ids, "withArtists": with_artists, "withReleases": with_releases},
         )
-        return Track.de_list(result.get("get_tracks", []), self)  # type: ignore
+        return Track.de_list(result.get("get_tracks", []), self)
 
     def get_stream_urls(self, track_ids: Union[str, int, List[Union[str, int]]]) -> List[Stream]:
         """Получить URL для стриминга.
@@ -340,7 +340,7 @@ class Client:
         result = self._request.graphql(
             gql, "getReleases", {"ids": ids, "relatedLimit": related_limit}
         )
-        return Release.de_list(result.get("get_releases", []), self)  # type: ignore
+        return Release.de_list(result.get("get_releases", []), self)
 
     def get_release(self, release_id: Union[str, int]) -> Optional[Release]:
         """Получить релиз по ID.
@@ -407,7 +407,7 @@ class Client:
                 "withDescription": with_description,
             },
         )
-        return Artist.de_list(result.get("get_artists", []), self)  # type: ignore
+        return Artist.de_list(result.get("get_artists", []), self)
 
     def get_artist(self, artist_id: Union[str, int], **kwargs: Any) -> Optional[Artist]:
         """Получить артиста по ID.
@@ -439,7 +439,7 @@ class Client:
 
         gql = load_query("getPlaylists")
         result = self._request.graphql(gql, "getPlaylists", {"ids": ids})
-        return Playlist.de_list(result.get("playlists", []), self)  # type: ignore
+        return Playlist.de_list(result.get("playlists", []), self)
 
     def get_playlist(self, playlist_id: Union[str, int]) -> Optional[Playlist]:
         """Получить плейлист по ID.
@@ -470,7 +470,7 @@ class Client:
 
         gql = load_query("getShortPlaylist")
         result = self._request.graphql(gql, "getShortPlaylist", {"ids": ids})
-        return SimplePlaylist.de_list(result.get("playlists", []), self)  # type: ignore
+        return SimplePlaylist.de_list(result.get("playlists", []), self)
 
     def get_playlist_tracks(
         self, playlist_id: Union[str, int], limit: int = 50, offset: int = 0
@@ -492,7 +492,7 @@ class Client:
             {"id": str(playlist_id), "limit": limit, "offset": offset},
         )
         playlist_data = result.get("playlists", [{}])[0]
-        return SimpleTrack.de_list(playlist_data.get("tracks", []), self)  # type: ignore
+        return SimpleTrack.de_list(playlist_data.get("tracks", []), self)
 
     def create_playlist(self, name: str, track_ids: Optional[List[str]] = None) -> str:
         """Создать плейлист.
@@ -510,7 +510,8 @@ class Client:
             items = [{"type": "track", "itemId": tid} for tid in track_ids]
 
         result = self._request.graphql(gql, "createPlaylist", {"name": name, "items": items})
-        return result.get("playlist_create", {}).get("id", "")
+        create_data: Dict[str, Any] = result.get("playlist_create", {})
+        return str(create_data.get("id", ""))
 
     def delete_playlist(self, playlist_id: Union[str, int]) -> bool:
         """Удалить плейлист.
@@ -610,7 +611,7 @@ class Client:
 
     def synthesis_playlist_build(
         self, first_author_id: str, second_author_id: str
-    ) -> SynthesisPlaylist:
+    ) -> Optional[SynthesisPlaylist]:
         """Создать синтез-плейлист.
 
         Args:
@@ -626,7 +627,7 @@ class Client:
             "synthesisPlaylistBuild",
             {"firstAuthorId": first_author_id, "secondAuthorId": second_author_id},
         )
-        return SynthesisPlaylist.de_json(result.get("synthesis_playlist_build", {}), self)  # type: ignore
+        return SynthesisPlaylist.de_json(result.get("synthesis_playlist_build", {}), self)
 
     def get_synthesis_playlists(self, ids: List[str]) -> List[SynthesisPlaylist]:
         """Получить синтез-плейлисты.
@@ -639,7 +640,7 @@ class Client:
         """
         gql = load_query("synthesisPlaylist")
         result = self._request.graphql(gql, "synthesisPlaylist", {"ids": ids})
-        return SynthesisPlaylist.de_list(result.get("synthesis_playlists", []), self)  # type: ignore
+        return SynthesisPlaylist.de_list(result.get("synthesis_playlists", []), self)
 
     # ========== Подкасты ==========
 
@@ -658,7 +659,7 @@ class Client:
 
         gql = load_query("getPodcasts")
         result = self._request.graphql(gql, "getPodcasts", {"ids": ids})
-        return Podcast.de_list(result.get("podcasts", []), self)  # type: ignore
+        return Podcast.de_list(result.get("podcasts", []), self)
 
     def get_podcast(self, podcast_id: Union[str, int]) -> Optional[Podcast]:
         """Получить подкаст по ID.
@@ -687,7 +688,7 @@ class Client:
 
         gql = load_query("getEpisodes")
         result = self._request.graphql(gql, "getEpisodes", {"ids": ids})
-        return Episode.de_list(result.get("episodes", []), self)  # type: ignore
+        return Episode.de_list(result.get("episodes", []), self)
 
     def get_episode(self, episode_id: Union[str, int]) -> Optional[Episode]:
         """Получить эпизод по ID.
@@ -703,7 +704,7 @@ class Client:
 
     # ========== Коллекция ==========
 
-    def get_collection(self) -> Collection:
+    def get_collection(self) -> Optional[Collection]:
         """Получить коллекцию пользователя.
 
         Returns:
@@ -711,7 +712,7 @@ class Client:
         """
         gql = load_query("userCollection")
         result = self._request.graphql(gql, "userCollection", {})
-        return Collection.de_json(result.get("user_collection", {}), self)  # type: ignore
+        return Collection.de_json(result.get("user_collection", {}), self)
 
     def get_liked_tracks(
         self,
@@ -733,7 +734,7 @@ class Client:
             "userTracks",
             {"orderBy": order_by.value, "orderDirection": direction.value},
         )
-        return Track.de_list(result.get("user_tracks", []), self)  # type: ignore
+        return Track.de_list(result.get("user_tracks", []), self)
 
     def get_user_playlists(self) -> List[CollectionItem]:
         """Получить плейлисты пользователя.
@@ -743,7 +744,7 @@ class Client:
         """
         gql = load_query("userPlaylists")
         result = self._request.graphql(gql, "userPlaylists", {})
-        return CollectionItem.de_list(result.get("user_playlists", []), self)  # type: ignore
+        return CollectionItem.de_list(result.get("user_playlists", []), self)
 
     def get_user_paginated_podcasts(
         self, cursor: Optional[str] = None, count: int = 20
@@ -763,7 +764,8 @@ class Client:
             variables["cursor"] = cursor
 
         result = self._request.graphql(gql, "userPaginatedPodcasts", variables)
-        return result.get("user_paginated_podcasts", {})
+        podcasts_data: Dict[str, Any] = result.get("user_paginated_podcasts", {})
+        return podcasts_data
 
     def add_to_collection(self, item_id: Union[str, int], item_type: CollectionItemType) -> bool:
         """Добавить элемент в коллекцию (лайк).
@@ -846,7 +848,7 @@ class Client:
 
     # ========== Скрытые элементы ==========
 
-    def get_hidden_collection(self) -> HiddenCollection:
+    def get_hidden_collection(self) -> Optional[HiddenCollection]:
         """Получить скрытые элементы.
 
         Returns:
@@ -854,7 +856,7 @@ class Client:
         """
         gql = load_query("getAllHiddenCollection")
         result = self._request.graphql(gql, "getAllHiddenCollection", {})
-        return HiddenCollection.de_json(result.get("get_all_hidden_collection", {}), self)  # type: ignore
+        return HiddenCollection.de_json(result.get("get_all_hidden_collection", {}), self)
 
     def get_hidden_tracks(self) -> List[CollectionItem]:
         """Получить скрытые треки.
@@ -864,7 +866,7 @@ class Client:
         """
         gql = load_query("getHiddenTracks")
         result = self._request.graphql(gql, "getHiddenTracks", {})
-        return CollectionItem.de_list(result.get("hidden_tracks", []), self)  # type: ignore
+        return CollectionItem.de_list(result.get("hidden_tracks", []), self)
 
     def add_to_hidden(self, item_id: Union[str, int], item_type: CollectionItemType) -> bool:
         """Скрыть элемент.
@@ -929,7 +931,7 @@ class Client:
 
         gql = load_query("profileFollowersCount")
         result = self._request.graphql(gql, "profileFollowersCount", {"ids": ids})
-        profiles = result.get("profiles", [])
+        profiles: List[Dict[str, Any]] = result.get("profiles", [])
         return [p.get("followers_count", 0) for p in profiles]
 
     def get_following_count(self, profile_id: Union[str, int]) -> int:
@@ -943,7 +945,8 @@ class Client:
         """
         gql = load_query("followingCount")
         result = self._request.graphql(gql, "followingCount", {"id": str(profile_id)})
-        return result.get("following_count", 0)
+        count: int = result.get("following_count", 0)
+        return count
 
     # ========== История ==========
 
@@ -955,7 +958,8 @@ class Client:
         """
         gql = load_query("listeningHistory")
         result = self._request.graphql(gql, "listeningHistory", {})
-        return result.get("listening_history", [])
+        history: List[Dict[str, Any]] = result.get("listening_history", [])
+        return history
 
     def get_listened_episodes(self) -> List[Dict[str, Any]]:
         """Получить прослушанные эпизоды.
@@ -965,7 +969,8 @@ class Client:
         """
         gql = load_query("listenedEpisodes")
         result = self._request.graphql(gql, "listenedEpisodes", {})
-        return result.get("listened_episodes", [])
+        episodes: List[Dict[str, Any]] = result.get("listened_episodes", [])
+        return episodes
 
     def has_unread_notifications(self) -> bool:
         """Проверить наличие непрочитанных уведомлений.
@@ -975,4 +980,5 @@ class Client:
         """
         gql = load_query("notificationsHasUnread")
         result = self._request.graphql(gql, "notificationsHasUnread", {})
-        return result.get("notifications_has_unread", False)
+        has_unread: bool = result.get("notifications_has_unread", False)
+        return has_unread

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
 
@@ -40,12 +40,12 @@ class SimpleArtist(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_full_info(self) -> Optional["Artist"]:
         """Получить полную информацию об артисте.
@@ -119,26 +119,28 @@ class Artist(ZvukMusicModel):
         from zvuk_music.models.release import SimpleRelease
         from zvuk_music.models.track import SimpleTrack
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "second_image" in data:
-            data["second_image"] = Image.de_json(data["second_image"], client)
-        if "animation" in data:
-            data["animation"] = Animation.de_json(data["animation"], client)
-        if "collection_item_data" in data:
-            data["collection_item_data"] = CollectionItem.de_json(
-                data["collection_item_data"], client
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "second_image" in data_dict:
+            data_dict["second_image"] = Image.de_json(data_dict["second_image"], client)
+        if "animation" in data_dict:
+            data_dict["animation"] = Animation.de_json(data_dict["animation"], client)
+        if "collection_item_data" in data_dict:
+            data_dict["collection_item_data"] = CollectionItem.de_json(
+                data_dict["collection_item_data"], client
             )
-        if "releases" in data:
-            data["releases"] = SimpleRelease.de_list(data["releases"], client)
-        if "popular_tracks" in data:
-            data["popular_tracks"] = SimpleTrack.de_list(data["popular_tracks"], client)
-        if "related_artists" in data:
-            data["related_artists"] = SimpleArtist.de_list(data["related_artists"], client)
+        if "releases" in data_dict:
+            data_dict["releases"] = SimpleRelease.de_list(data_dict["releases"], client)
+        if "popular_tracks" in data_dict:
+            data_dict["popular_tracks"] = SimpleTrack.de_list(data_dict["popular_tracks"], client)
+        if "related_artists" in data_dict:
+            data_dict["related_artists"] = SimpleArtist.de_list(
+                data_dict["related_artists"], client
+            )
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def is_liked(self) -> bool:
         """Проверка, лайкнут ли артист."""

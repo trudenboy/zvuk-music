@@ -1,6 +1,6 @@
 """Модели профиля."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from typing_extensions import Self
 
@@ -37,12 +37,12 @@ class SimpleProfile(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
 
 @model
@@ -129,14 +129,16 @@ class ProfileResult(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "external_profile" in data:
-            data["external_profile"] = ExternalProfile.de_json(data["external_profile"], client)
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "external_profile" in data_dict:
+            data_dict["external_profile"] = ExternalProfile.de_json(
+                data_dict["external_profile"], client
+            )
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def is_authorized(self) -> bool:
         """Проверка, авторизован ли пользователь (не анонимный)."""
@@ -162,12 +164,12 @@ class Profile(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "result" in data:
-            data["result"] = ProfileResult.de_json(data["result"], client)
+        if "result" in data_dict:
+            data_dict["result"] = ProfileResult.de_json(data_dict["result"], client)
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def is_authorized(self) -> bool:
         """Проверка, авторизован ли пользователь."""

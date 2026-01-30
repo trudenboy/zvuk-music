@@ -82,12 +82,16 @@ def gen_client(output_client_filename: str) -> None:
     # Internal method calls that need await
     internal_methods = [
         'get_profile', 'get_tracks', 'get_stream_urls', 'get_releases',
-        'get_artists', 'get_playlists', 'get_podcasts', 'get_episodes'
+        'get_artists', 'get_playlists', 'get_podcasts', 'get_episodes',
+        'add_to_collection', 'remove_from_collection',
+        'add_to_hidden', 'remove_from_hidden',
     ]
     for method in internal_methods:
-        # Handle both assignment patterns
+        # Handle assignment, return, and standalone call patterns
         code = code.replace(f' = self.{method}(', f' = await self.{method}(')
         code = code.replace(f'return self.{method}(', f'return await self.{method}(')
+        # Standalone calls (line starts with whitespace + self.method)
+        code = code.replace(f'        self.{method}(', f'        await self.{method}(')
 
     # Add asyncio import at the top
     code = code.replace(

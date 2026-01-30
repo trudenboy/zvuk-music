@@ -55,6 +55,8 @@ class ZvukMusicModel(ZvukMusicObject):
     из/в JSON и словари.
     """
 
+    client: Optional["ClientType"] = None
+
     def __str__(self) -> str:
         return str(self.to_dict())
 
@@ -74,7 +76,7 @@ class ZvukMusicModel(ZvukMusicObject):
         logger.warning(f"Type: {klass.__module__}.{klass.__name__}; fields: {unknown_fields}")
 
     @staticmethod
-    def is_dict_model_data(data: JSONType) -> TypeGuard[Dict[str, JSONType]]:
+    def is_dict_model_data(data: JSONType) -> TypeGuard[Dict[str, Any]]:
         """Проверка на соответствие данных словарю.
 
         Args:
@@ -114,7 +116,7 @@ class ZvukMusicModel(ZvukMusicObject):
         return isinstance(client, ClientAsync)
 
     @staticmethod
-    def is_array_model_data(data: JSONType) -> TypeGuard[List[Dict[str, JSONType]]]:
+    def is_array_model_data(data: JSONType) -> TypeGuard[List[Dict[str, Any]]]:
         """Проверка на соответствие данных массиву словарей.
 
         Args:
@@ -128,7 +130,7 @@ class ZvukMusicModel(ZvukMusicObject):
         )
 
     @classmethod
-    def cleanup_data(cls, data: JSONType, client: Optional["ClientType"]) -> ModelFieldMap:
+    def cleanup_data(cls, data: JSONType, client: Optional["ClientType"]) -> Dict[str, Any]:
         """Удаляет незадекларированные поля для текущей модели из сырых данных.
 
         Note:
@@ -182,7 +184,7 @@ class ZvukMusicModel(ZvukMusicObject):
         return cls(client=client, **cls.cleanup_data(data, client))
 
     @classmethod
-    def de_list(cls, data: JSONType, client: "ClientType") -> Sequence[Self]:
+    def de_list(cls, data: JSONType, client: "ClientType") -> List[Self]:
         """Десериализация списка объектов.
 
         Note:
@@ -210,7 +212,8 @@ class ZvukMusicModel(ZvukMusicObject):
         Returns:
             Сериализованный в JSON объект.
         """
-        return json.dumps(self.to_dict(for_request), ensure_ascii=not _ujson)
+        result: str = json.dumps(self.to_dict(for_request), ensure_ascii=not _ujson)
+        return result
 
     def to_dict(self, for_request: bool = False) -> JSONType:
         """Рекурсивная сериализация объекта в словарь.
@@ -225,7 +228,7 @@ class ZvukMusicModel(ZvukMusicObject):
             Сериализованный в dict объект.
         """
 
-        def parse(val: Union["ZvukMusicModel", JSONType]) -> Any:
+        def parse(val: Union["ZvukMusicModel", JSONType]) -> JSONType:
             if isinstance(val, ZvukMusicModel):
                 return val.to_dict(for_request)
             if isinstance(val, list):

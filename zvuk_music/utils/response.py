@@ -31,7 +31,7 @@ class Response(ZvukMusicModel):
         self._id_attrs = (self.data,)
 
     @classmethod
-    def de_json(cls, data: Any, client: "ClientType") -> Optional["Response"]:
+    def de_json(cls, data: Any, client: Optional["ClientType"]) -> Optional["Response"]:
         """Десериализация ответа API.
 
         Args:
@@ -71,7 +71,7 @@ class Response(ZvukMusicModel):
     def get_error(self) -> str:
         """Получение текста первой ошибки."""
         if self.errors and len(self.errors) > 0:
-            return self.errors[0].get("message", "Unknown GraphQL error")
+            return str(self.errors[0].get("message", "Unknown GraphQL error"))
         return "Unknown error"
 
     def get_all_errors(self) -> List[str]:
@@ -80,6 +80,6 @@ class Response(ZvukMusicModel):
             return []
         return [e.get("message", str(e)) for e in self.errors]
 
-    def get_result(self) -> JSONType:
+    def get_result(self) -> Optional[Dict[str, Any]]:
         """Получение данных ответа."""
         return self.data

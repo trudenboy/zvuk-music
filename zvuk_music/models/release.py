@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
 
@@ -51,19 +51,19 @@ class SimpleRelease(ZvukMusicModel):
         if not cls.is_dict_model_data(data):
             return None
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "artists" in data:
-            data["artists"] = SimpleArtist.de_list(data["artists"], client)
-        if "type" in data and data["type"]:
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "artists" in data_dict:
+            data_dict["artists"] = SimpleArtist.de_list(data_dict["artists"], client)
+        if "type" in data_dict and data_dict["type"]:
             try:
-                data["type"] = ReleaseType(data["type"])
+                data_dict["type"] = ReleaseType(data_dict["type"])
             except ValueError:
                 pass
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_year(self) -> Optional[int]:
         """Получить год выхода.
@@ -152,31 +152,31 @@ class Release(ZvukMusicModel):
 
         from zvuk_music.models.track import SimpleTrack
 
-        data = data.copy()
+        data_dict: Dict[str, Any] = data.copy()
 
-        if "image" in data:
-            data["image"] = Image.de_json(data["image"], client)
-        if "genres" in data:
-            data["genres"] = Genre.de_list(data["genres"], client)
-        if "label" in data:
-            data["label"] = Label.de_json(data["label"], client)
-        if "artists" in data:
-            data["artists"] = SimpleArtist.de_list(data["artists"], client)
-        if "tracks" in data:
-            data["tracks"] = SimpleTrack.de_list(data["tracks"], client)
-        if "related" in data:
-            data["related"] = SimpleRelease.de_list(data["related"], client)
-        if "collection_item_data" in data:
-            data["collection_item_data"] = CollectionItem.de_json(
-                data["collection_item_data"], client
+        if "image" in data_dict:
+            data_dict["image"] = Image.de_json(data_dict["image"], client)
+        if "genres" in data_dict:
+            data_dict["genres"] = Genre.de_list(data_dict["genres"], client)
+        if "label" in data_dict:
+            data_dict["label"] = Label.de_json(data_dict["label"], client)
+        if "artists" in data_dict:
+            data_dict["artists"] = SimpleArtist.de_list(data_dict["artists"], client)
+        if "tracks" in data_dict:
+            data_dict["tracks"] = SimpleTrack.de_list(data_dict["tracks"], client)
+        if "related" in data_dict:
+            data_dict["related"] = SimpleRelease.de_list(data_dict["related"], client)
+        if "collection_item_data" in data_dict:
+            data_dict["collection_item_data"] = CollectionItem.de_json(
+                data_dict["collection_item_data"], client
             )
-        if "type" in data and data["type"]:
+        if "type" in data_dict and data_dict["type"]:
             try:
-                data["type"] = ReleaseType(data["type"])
+                data_dict["type"] = ReleaseType(data_dict["type"])
             except ValueError:
                 pass
 
-        return cls(client=client, **cls.cleanup_data(data, client))
+        return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_year(self) -> Optional[int]:
         """Получить год выхода."""
