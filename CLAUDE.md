@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **zvuk-music** is a Python library for the Zvuk.com (СберЗвук) music streaming API. It provides both synchronous and asynchronous interfaces for accessing music content, managing playlists, retrieving tracks, and handling user collections.
 
-- **Version**: 0.1.0 (Beta)
+- **Version**: 0.1.3
 - **License**: MIT
 - **Language**: Python 3.9+
 
@@ -37,11 +37,11 @@ python scripts/generate_async_version.py
 ### Directory Structure
 
 - `zvuk_music/` - Main library package
-  - `client.py` - Synchronous API client (~59 methods)
+  - `client.py` - Synchronous API client (58 methods)
   - `client_async.py` - Auto-generated async client
   - `models/` - Data models (Track, Artist, Release, Playlist, etc.)
-  - `graphql/queries/` - GraphQL query files (27 files)
-  - `graphql/mutations/` - GraphQL mutation files (13 files)
+  - `graphql/queries/` - GraphQL query files (25 files)
+  - `graphql/mutations/` - GraphQL mutation files (11 files)
   - `utils/` - HTTP request handlers and utilities
   - `base.py` - Base classes (ZvukMusicModel, ZvukMusicObject)
   - `enums.py` - Enumerations (Quality, ReleaseType, OrderBy)
