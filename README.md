@@ -1,8 +1,10 @@
 # Zvuk Music API
 
-Python library for the [Zvuk.com](https://zvuk.com) music streaming API.
+Unofficial Python library for the [Zvuk.com](https://zvuk.com) music streaming API.
 
 **[Документация на русском / Russian documentation](README.ru.md)**
+
+> **Disclaimer:** This library is not affiliated with or endorsed by Zvuk.com. It was built by analyzing the Zvuk.com web application and studying existing open-source projects (see [References](#references)).
 
 ## Installation
 
@@ -395,6 +397,14 @@ Help for any subcommand: `python scripts/zvuk_cli.py <subcommand> --help`
 | `get_profile_followers_count(ids)` | Follower count |
 | `get_following_count(id)` | Following count |
 | `has_unread_notifications()` | Unread notifications |
+
+## References
+
+This library was designed based on analysis of the [Zvuk.com](https://zvuk.com) web application and the following open-source projects:
+
+- [yandex-music-api](https://github.com/MarshalX/yandex-music-api) -- Python library for Yandex Music API (architecture and code style reference)
+- [gozvuk](https://github.com/oklookat/gozvuk) -- Unofficial Go client for Zvuk.com API
+- [sberzvuk-api](https://github.com/Aiving/sberzvuk-api) -- JavaScript/TypeScript library for Zvuk API
 
 ## License
 

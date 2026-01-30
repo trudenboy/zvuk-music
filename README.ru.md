@@ -1,6 +1,8 @@
 # Zvuk Music API
 
-Python-библиотека для работы с API музыкального сервиса [Zvuk.com](https://zvuk.com).
+Неофициальная Python-библиотека для работы с API музыкального сервиса [Zvuk.com](https://zvuk.com).
+
+> **Дисклеймер:** Библиотека не связана с Zvuk.com и не является официальной. Она создана на основе анализа веб-приложения Zvuk.com и изучения существующих open-source проектов (см. [Ссылки](#ссылки)).
 
 ## Установка
 
@@ -393,6 +395,14 @@ python scripts/zvuk_cli.py -p search "Nothing Else Matters" --no-podcasts --no-b
 | `get_profile_followers_count(ids)` | Количество подписчиков |
 | `get_following_count(id)` | Количество подписок |
 | `has_unread_notifications()` | Непрочитанные уведомления |
+
+## Ссылки
+
+Библиотека спроектирована на основе анализа веб-приложения [Zvuk.com](https://zvuk.com) и следующих open-source проектов:
+
+- [yandex-music-api](https://github.com/MarshalX/yandex-music-api) -- Python-библиотека для API Яндекс Музыки (референс архитектуры и стиля кода)
+- [gozvuk](https://github.com/oklookat/gozvuk) -- Неофициальный Go-клиент для API Zvuk.com
+- [sberzvuk-api](https://github.com/Aiving/sberzvuk-api) -- JavaScript/TypeScript-библиотека для API Zvuk
 
 ## Лицензия
 
