@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "zvuk-music"
 dynamic = ["version"]
-description = "Python библиотека для работы с API Zvuk.com (СберЗвук)"
+description = "Python library for the Zvuk.com music streaming API"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"

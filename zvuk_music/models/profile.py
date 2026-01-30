@@ -47,7 +47,7 @@ class SimpleProfile(ZvukMusicModel):
 
 @model
 class ExternalProfile(ZvukMusicModel):
-    """Внешний профиль (Сбер ID).
+    """Внешний профиль (External ID).
 
     Attributes:
         birthday: День рождения (timestamp).

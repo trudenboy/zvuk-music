@@ -1,118 +1,118 @@
 # Zvuk Music API
 
-Python библиотека для работы с API музыкального сервиса [Zvuk.com](https://zvuk.com) (СберЗвук).
+Python library for the [Zvuk.com](https://zvuk.com) music streaming API.
 
-## Установка
+## Installation
 
 ```bash
 pip install zvuk-music
 ```
 
-С поддержкой async:
+With async support:
 
 ```bash
 pip install zvuk-music[async]
 ```
 
-С ускоренным JSON парсингом:
+With faster JSON parsing:
 
 ```bash
 pip install zvuk-music[fast]
 ```
 
-## Быстрый старт
+## Quick Start
 
-### Анонимный доступ
+### Anonymous Access
 
 ```python
 from zvuk_music import Client
 
-# Получение анонимного токена (ограниченный функционал)
+# Get an anonymous token (limited functionality)
 token = Client.get_anonymous_token()
 client = Client(token=token)
 
-# Поиск
+# Search
 results = client.quick_search("Metallica")
 for track in results.tracks[:5]:
     print(f"{track.title} - {track.get_artists_str()}")
 ```
 
-### Авторизованный доступ
+### Authorized Access
 
-Для полного функционала (high quality, лайки, плейлисты) необходим токен авторизованного пользователя:
+For full functionality (high quality, likes, playlists) you need an authorized user token:
 
-1. Войдите на [zvuk.com](https://zvuk.com) в браузере
-2. Откройте https://zvuk.com/api/tiny/profile
-3. Скопируйте значение поля `token`
+1. Log in to [zvuk.com](https://zvuk.com) in your browser
+2. Open https://zvuk.com/api/tiny/profile
+3. Copy the `token` field value
 
 ```python
 from zvuk_music import Client
 
-client = Client(token="ваш_токен")
+client = Client(token="your_token")
 
-# Получение информации об артисте
+# Get artist info
 artist = client.get_artist(754367, with_popular_tracks=True)
 print(f"{artist.title}")
 for track in artist.popular_tracks[:5]:
     print(f"  - {track.title}")
 ```
 
-## Примеры использования
+## Usage Examples
 
-### Поиск
+### Search
 
 ```python
-# Быстрый поиск (для автокомплита)
+# Quick search (autocomplete)
 quick = client.quick_search("Nothing Else Matters", limit=5)
 
-# Полнотекстовый поиск
+# Full-text search
 search = client.search("Metallica", limit=10)
-print(f"Найдено треков: {search.tracks.page.total}")
-print(f"Найдено артистов: {search.artists.page.total}")
+print(f"Tracks found: {search.tracks.page.total}")
+print(f"Artists found: {search.artists.page.total}")
 ```
 
-### Треки
+### Tracks
 
 ```python
-# Получение трека
+# Get a track
 track = client.get_track(5896627)
 print(f"{track.title} ({track.get_duration_str()})")
 
-# Получение URL для стриминга
+# Get stream URL
 from zvuk_music import Quality
 
 url = client.get_stream_url(track.id, quality=Quality.HIGH)
 print(f"Stream URL: {url}")
 
-# Скачивание трека
+# Download track
 track.download("metallica_nothing_else_matters.mp3", quality=Quality.MID)
 ```
 
-### Плейлисты
+### Playlists
 
 ```python
-# Создание плейлиста
-playlist_id = client.create_playlist("Мой плейлист", track_ids=["5896627", "5896628"])
+# Create a playlist
+playlist_id = client.create_playlist("My Playlist", track_ids=["5896627", "5896628"])
 
-# Добавление треков
+# Add tracks
 client.add_tracks_to_playlist(playlist_id, ["5896629", "5896630"])
 
-# Получение плейлиста
+# Get playlist
 playlist = client.get_playlist(playlist_id)
 for track in playlist.tracks:
     print(f"  - {track.title}")
 
-# Удаление плейлиста
+# Delete playlist
 client.delete_playlist(playlist_id)
 ```
 
-### Коллекция (лайки)
+### Collection (Likes)
 
 ```python
-# Лайкнуть трек
+# Like a track
 client.like_track(5896627)
 
-# Получить лайкнутые треки
+# Get liked tracks
 from zvuk_music import OrderBy, OrderDirection
 
 liked = client.get_liked_tracks(
@@ -122,14 +122,14 @@ liked = client.get_liked_tracks(
 for track in liked[:10]:
     print(f"{track.title} - {track.get_artists_str()}")
 
-# Убрать лайк
+# Remove like
 client.unlike_track(5896627)
 ```
 
-### Артисты и релизы
+### Artists and Releases
 
 ```python
-# Информация об артисте
+# Artist info
 artist = client.get_artist(
     754367,  # Metallica
     with_releases=True,
@@ -137,24 +137,24 @@ artist = client.get_artist(
     with_related_artists=True,
 )
 
-print(f"Артист: {artist.title}")
-print(f"Релизов: {len(artist.releases)}")
-print(f"Популярные треки: {len(artist.popular_tracks)}")
+print(f"Artist: {artist.title}")
+print(f"Releases: {len(artist.releases)}")
+print(f"Popular tracks: {len(artist.popular_tracks)}")
 
-# Получение релиза
+# Get a release
 release = client.get_release(artist.releases[0].id)
-print(f"\nАльбом: {release.title} ({release.get_year()})")
+print(f"\nAlbum: {release.title} ({release.get_year()})")
 for track in release.tracks:
     print(f"  {track.position}. {track.title}")
 ```
 
-## Качество аудио
+## Audio Quality
 
-| Качество | Битрейт | Требует подписку |
-|----------|---------|------------------|
-| `Quality.MID` | 128kbps MP3 | Нет |
-| `Quality.HIGH` | 320kbps MP3 | Да |
-| `Quality.FLAC` | FLAC | Да |
+| Quality | Bitrate | Subscription required |
+|---------|---------|----------------------|
+| `Quality.MID` | 128kbps MP3 | No |
+| `Quality.HIGH` | 320kbps MP3 | Yes |
+| `Quality.FLAC` | FLAC | Yes |
 
 ```python
 from zvuk_music import Quality, SubscriptionRequiredError
@@ -162,11 +162,11 @@ from zvuk_music import Quality, SubscriptionRequiredError
 try:
     url = client.get_stream_url(track_id, quality=Quality.HIGH)
 except SubscriptionRequiredError:
-    # Fallback на mid качество
+    # Fallback to mid quality
     url = client.get_stream_url(track_id, quality=Quality.MID)
 ```
 
-## Обработка ошибок
+## Error Handling
 
 ```python
 from zvuk_music import (
@@ -180,16 +180,16 @@ from zvuk_music import (
 try:
     track = client.get_track(123456789)
 except NotFoundError:
-    print("Трек не найден")
+    print("Track not found")
 except UnauthorizedError:
-    print("Невалидный токен")
+    print("Invalid token")
 except BotDetectedError:
-    print("API заблокировал запрос (бот-защита)")
+    print("API blocked the request (bot protection)")
 except ZvukMusicError as e:
-    print(f"Ошибка: {e}")
+    print(f"Error: {e}")
 ```
 
-## Асинхронный клиент
+## Async Client
 
 ```python
 import asyncio
@@ -199,7 +199,7 @@ async def main():
     token = Client.get_anonymous_token()
     client = ClientAsync(token=token)
 
-    # Параллельные запросы
+    # Parallel requests
     track, artist = await asyncio.gather(
         client.get_track(5896627),
         client.get_artist(754367, with_popular_tracks=True),
@@ -209,101 +209,191 @@ async def main():
 asyncio.run(main())
 ```
 
-Для установки: `pip install zvuk-music[async]`
+Installation: `pip install zvuk-music[async]`
+
+## CLI
+
+The `scripts/zvuk_cli.py` script provides access to all 58 API methods via the command line. Output is JSON.
+
+### Usage
+
+```bash
+python scripts/zvuk_cli.py <subcommand> [arguments]
+```
+
+### Global Flags
+
+| Flag | Description |
+|------|-------------|
+| `-t`, `--token` | Auth token (also read from `ZVUK_TOKEN` env var) |
+| `-p`, `--pretty` | Pretty-print JSON (indent=2) |
+| `--timeout` | Request timeout in seconds (default: 10) |
+| `--proxy` | Proxy server URL |
+
+### Examples
+
+```bash
+# Get an anonymous token
+python scripts/zvuk_cli.py get-anonymous-token
+
+# Search (with pretty output)
+python scripts/zvuk_cli.py -p quick-search "Metallica" --limit 3
+
+# Get a track
+python scripts/zvuk_cli.py -p track-get 5896627
+
+# Artist info with releases
+python scripts/zvuk_cli.py -p artist-get 754367 --with-releases --releases-limit 5
+
+# Using a token via environment variable
+export ZVUK_TOKEN=<your_token>
+python scripts/zvuk_cli.py -p collection-liked-tracks --order-by dateAdded
+python scripts/zvuk_cli.py -p like-track 5896627
+
+# Create a playlist
+python scripts/zvuk_cli.py -p playlist-create "My Playlist" --track-ids 5896627 5896628
+
+# Full-text search without podcasts and books
+python scripts/zvuk_cli.py -p search "Nothing Else Matters" --no-podcasts --no-books
+```
+
+### All Subcommands
+
+**Auth:**
+`get-anonymous-token`, `init`, `get-profile`, `is-authorized`
+
+**Search:**
+`quick-search`, `search`
+
+**Tracks:**
+`track-get`, `tracks-get`, `track-get-full`, `stream-url`, `stream-urls`
+
+**Releases:**
+`release-get`, `releases-get`
+
+**Artists:**
+`artist-get`, `artists-get`
+
+**Playlists:**
+`playlist-get`, `playlists-get`, `playlist-get-short`, `playlist-tracks`,
+`playlist-create`, `playlist-delete`, `playlist-rename`, `playlist-add-tracks`,
+`playlist-update`, `playlist-set-public`, `synthesis-playlist-build`, `synthesis-playlists-get`
+
+**Podcasts:**
+`podcast-get`, `podcasts-get`, `episode-get`, `episodes-get`
+
+**Collection:**
+`collection-get`, `collection-liked-tracks`, `collection-playlists`, `collection-podcasts`,
+`collection-add`, `collection-remove`,
+`like-track`, `unlike-track`, `like-release`, `unlike-release`,
+`like-artist`, `unlike-artist`, `like-playlist`, `unlike-playlist`,
+`like-podcast`, `unlike-podcast`
+
+**Hidden:**
+`hidden-collection`, `hidden-tracks`, `hidden-add`, `hidden-remove`,
+`hide-track`, `unhide-track`
+
+**Profiles:**
+`profile-followers-count`, `profile-following-count`
+
+**History:**
+`listening-history`, `listened-episodes`, `has-unread-notifications`
+
+Help for any subcommand: `python scripts/zvuk_cli.py <subcommand> --help`
 
 ## API Reference
 
 ### Client
 
-58 методов. Все методы доступны как в синхронном (`Client`), так и в асинхронном (`ClientAsync`) клиентах.
+58 methods. All methods are available in both the synchronous (`Client`) and asynchronous (`ClientAsync`) clients.
 
-**Авторизация и профиль:**
+**Auth & Profile:**
 
-| Метод | Описание |
-|-------|----------|
-| `get_anonymous_token()` | Получить анонимный токен |
-| `init()` | Инициализация клиента (загрузка профиля) |
-| `get_profile()` | Профиль пользователя |
-| `is_authorized()` | Проверка авторизации |
+| Method | Description |
+|--------|-------------|
+| `get_anonymous_token()` | Get anonymous token |
+| `init()` | Initialize client (load profile) |
+| `get_profile()` | User profile |
+| `is_authorized()` | Check authorization |
 
-**Поиск:**
+**Search:**
 
-| Метод | Описание |
-|-------|----------|
-| `quick_search(query)` | Быстрый поиск (автокомплит) |
-| `search(query)` | Полнотекстовый поиск |
+| Method | Description |
+|--------|-------------|
+| `quick_search(query)` | Quick search (autocomplete) |
+| `search(query)` | Full-text search |
 
-**Треки и стриминг:**
+**Tracks & Streaming:**
 
-| Метод | Описание |
-|-------|----------|
-| `get_track(id)` | Получить трек |
-| `get_tracks(ids)` | Получить несколько треков |
-| `get_full_track(id)` | Трек с артистами и релизами |
-| `get_stream_url(id, quality)` | URL для стриминга |
-| `get_stream_urls(ids)` | Несколько URL стримов |
+| Method | Description |
+|--------|-------------|
+| `get_track(id)` | Get a track |
+| `get_tracks(ids)` | Get multiple tracks |
+| `get_full_track(id)` | Track with artists and releases |
+| `get_stream_url(id, quality)` | Stream URL |
+| `get_stream_urls(ids)` | Multiple stream URLs |
 
-**Артисты и релизы:**
+**Artists & Releases:**
 
-| Метод | Описание |
-|-------|----------|
-| `get_artist(id)` | Артист (с релизами, треками, связанными) |
-| `get_artists(ids)` | Несколько артистов |
-| `get_release(id)` | Релиз (альбом/сингл) |
-| `get_releases(ids)` | Несколько релизов |
+| Method | Description |
+|--------|-------------|
+| `get_artist(id)` | Artist (with releases, tracks, related) |
+| `get_artists(ids)` | Multiple artists |
+| `get_release(id)` | Release (album/single) |
+| `get_releases(ids)` | Multiple releases |
 
-**Плейлисты:**
+**Playlists:**
 
-| Метод | Описание |
-|-------|----------|
-| `get_playlist(id)` | Получить плейлист |
-| `get_playlists(ids)` | Несколько плейлистов |
-| `get_playlist_tracks(id)` | Треки плейлиста |
-| `create_playlist(name)` | Создать плейлист |
-| `rename_playlist(id, name)` | Переименовать |
-| `add_tracks_to_playlist(id, track_ids)` | Добавить треки |
-| `update_playlist(id, track_ids)` | Обновить плейлист |
-| `set_playlist_public(id, is_public)` | Изменить видимость |
-| `delete_playlist(id)` | Удалить плейлист |
+| Method | Description |
+|--------|-------------|
+| `get_playlist(id)` | Get playlist |
+| `get_playlists(ids)` | Multiple playlists |
+| `get_playlist_tracks(id)` | Playlist tracks |
+| `create_playlist(name)` | Create playlist |
+| `rename_playlist(id, name)` | Rename |
+| `add_tracks_to_playlist(id, track_ids)` | Add tracks |
+| `update_playlist(id, track_ids)` | Update playlist |
+| `set_playlist_public(id, is_public)` | Change visibility |
+| `delete_playlist(id)` | Delete playlist |
 
-**Подкасты:**
+**Podcasts:**
 
-| Метод | Описание |
-|-------|----------|
-| `get_podcast(id)` | Получить подкаст |
-| `get_podcasts(ids)` | Несколько подкастов |
-| `get_episode(id)` | Получить эпизод |
-| `get_episodes(ids)` | Несколько эпизодов |
+| Method | Description |
+|--------|-------------|
+| `get_podcast(id)` | Get podcast |
+| `get_podcasts(ids)` | Multiple podcasts |
+| `get_episode(id)` | Get episode |
+| `get_episodes(ids)` | Multiple episodes |
 
-**Коллекция (лайки):**
+**Collection (Likes):**
 
-| Метод | Описание |
-|-------|----------|
-| `get_collection()` | Коллекция пользователя |
-| `get_liked_tracks()` | Лайкнутые треки |
-| `get_user_playlists()` | Плейлисты пользователя |
-| `like_track(id)` / `unlike_track(id)` | Лайк / анлайк трека |
-| `like_release(id)` / `unlike_release(id)` | Лайк / анлайк релиза |
-| `like_artist(id)` / `unlike_artist(id)` | Лайк / анлайк артиста |
-| `like_playlist(id)` / `unlike_playlist(id)` | Лайк / анлайк плейлиста |
-| `like_podcast(id)` / `unlike_podcast(id)` | Лайк / анлайк подкаста |
+| Method | Description |
+|--------|-------------|
+| `get_collection()` | User collection |
+| `get_liked_tracks()` | Liked tracks |
+| `get_user_playlists()` | User playlists |
+| `like_track(id)` / `unlike_track(id)` | Like / unlike track |
+| `like_release(id)` / `unlike_release(id)` | Like / unlike release |
+| `like_artist(id)` / `unlike_artist(id)` | Like / unlike artist |
+| `like_playlist(id)` / `unlike_playlist(id)` | Like / unlike playlist |
+| `like_podcast(id)` / `unlike_podcast(id)` | Like / unlike podcast |
 
-**Скрытая коллекция:**
+**Hidden Collection:**
 
-| Метод | Описание |
-|-------|----------|
-| `get_hidden_collection()` | Скрытые элементы |
-| `get_hidden_tracks()` | Скрытые треки |
-| `hide_track(id)` / `unhide_track(id)` | Скрыть / показать трек |
+| Method | Description |
+|--------|-------------|
+| `get_hidden_collection()` | Hidden items |
+| `get_hidden_tracks()` | Hidden tracks |
+| `hide_track(id)` / `unhide_track(id)` | Hide / unhide track |
 
-**Профили и социальные функции:**
+**Profiles & Social:**
 
-| Метод | Описание |
-|-------|----------|
-| `get_profile_followers_count(ids)` | Количество подписчиков |
-| `get_following_count(id)` | Количество подписок |
-| `has_unread_notifications()` | Непрочитанные уведомления |
+| Method | Description |
+|--------|-------------|
+| `get_profile_followers_count(ids)` | Follower count |
+| `get_following_count(id)` | Following count |
+| `has_unread_notifications()` | Unread notifications |
 
-## Лицензия
+## License
 
 MIT License
