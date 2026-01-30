@@ -2,6 +2,8 @@
 
 Python library for the [Zvuk.com](https://zvuk.com) music streaming API.
 
+**[Документация на русском / Russian documentation](README.ru.md)**
+
 ## Installation
 
 ```bash
