@@ -1,0 +1,42 @@
+name: Auto PR
+
+on:
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-pr:
+    name: Create PR & Enable Auto-Merge
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for existing PR
+        id: check
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          PR_COUNT=$(gh pr list --head "$BRANCH" --state open --json number --jq 'length')
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "has_pr=$([[ "$PR_COUNT" -gt 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create PR
+        if: steps.check.outputs.has_pr == 'false'
+        id: create
+        run: |
+          PR_URL=$(gh pr create --fill)
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge
+        if: steps.check.outputs.has_pr == 'false'
+        run: gh pr merge --auto --squash "${{ steps.create.outputs.pr_url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

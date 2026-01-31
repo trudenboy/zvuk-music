@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **zvuk-music** is a Python library for the Zvuk.com music streaming API. It provides both synchronous and asynchronous interfaces for accessing music content, managing playlists, retrieving tracks, and handling user collections.
 
-- **Version**: 0.2.0
+- **Version**: 0.4.0
 - **License**: MIT
 - **Language**: Python 3.9+
 

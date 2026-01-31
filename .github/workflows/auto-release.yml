@@ -1,0 +1,42 @@
+name: Auto Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release if Version Changed
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from __init__.py
+        id: version
+        run: |
+          VERSION=$(python -c "
+          import re
+          with open('zvuk_music/__init__.py') as f:
+              match = re.search(r'__version__\s*=\s*\"(.+?)\"', f.read())
+              print(match.group(1))
+          ")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Get latest tag
+        id: latest_tag
+        run: |
+          LATEST=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+          echo "tag=$LATEST" >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        if: steps.version.outputs.tag != steps.latest_tag.outputs.tag
+        run: gh release create "${{ steps.version.outputs.tag }}" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

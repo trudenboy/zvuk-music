@@ -5,6 +5,35 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.4.0] - 2026-01-31
+
+### Добавлено
+
+- Полный CI/CD pipeline на GitHub Actions
+- Автоматическое создание PR с auto-merge для feature-веток
+- Автоматический релиз при изменении версии в main
+- Workflow публикации с проверкой версии и полным прогоном тестов перед загрузкой на PyPI
+- Конфигурация Dependabot для pip и GitHub Actions зависимостей
+- Конфигурация Codecov (целевое покрытие: 65% проект, 60% патч)
+- Шаблон pull request
+
+### Изменено
+
+- Workflow тестов: триггер на все ветки, concurrency, кэширование pip, jobs для build и async-check, порог покрытия (65%)
+- Workflow публикации: проверка версии, матрица тестов и проверка async-клиента перед публикацией
+
+## [0.3.0] - 2026-01-31
+
+### Добавлено
+
+- Комплексный набор тестов: base, client, exceptions, request errors, utils, models
+- Тесты для всех типов моделей: artist, book, collection, common, playlist, podcast, release, search
+
+### Изменено
+
+- Улучшение качества кода в клиенте и моделях
+- Исправление граничных случаев десериализации моделей
+
 ## [0.2.0] - 2026-01-31
 
 ### Добавлено

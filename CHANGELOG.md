@@ -5,6 +5,35 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-01-31
+
+### Added
+
+- Full CI/CD pipeline with GitHub Actions
+- Auto-PR creation with auto-merge for feature branches
+- Auto-release on version bump in main
+- Publish workflow with version verification and full test matrix before PyPI upload
+- Dependabot configuration for pip and GitHub Actions dependencies
+- Codecov configuration (65% project target, 60% patch target)
+- Pull request template
+
+### Changed
+
+- Tests workflow: trigger on all branches, add concurrency, pip caching, build and async-check jobs, coverage threshold (65%)
+- Publish workflow: add version-check, test matrix, and async-consistency verification before publishing
+
+## [0.3.0] - 2026-01-31
+
+### Added
+
+- Comprehensive test suite: base, client, exceptions, request errors, utils, models
+- Tests for all model types: artist, book, collection, common, playlist, podcast, release, search
+
+### Changed
+
+- Improve code quality across client and models
+- Fix model deserialization edge cases
+
 ## [0.2.0] - 2026-01-31
 
 ### Added

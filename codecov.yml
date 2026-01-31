@@ -1,0 +1,21 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 65%
+        threshold: 3%
+    patch:
+      default:
+        target: 60%
+
+ignore:
+  - "tests/"
+  - "scripts/"
+  - "examples/"
+  - "zvuk_music/client_async.py"
+  - "zvuk_music/utils/request_async.py"
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: true
