@@ -30,7 +30,7 @@ jobs:
         if: steps.check.outputs.has_pr == 'false'
         id: create
         run: |
-          PR_URL=$(gh pr create --fill)
+          PR_URL=$(gh pr create --base main --fill)
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,26 @@
+name: Get Package Version
+description: Extract version from zvuk_music/__init__.py
+
+outputs:
+  version:
+    description: "Version string (e.g. 0.5.0)"
+    value: ${{ steps.version.outputs.version }}
+  tag:
+    description: "Version tag (e.g. v0.5.0)"
+    value: ${{ steps.version.outputs.tag }}
+
+runs:
+  using: composite
+  steps:
+    - name: Extract version
+      id: version
+      shell: bash
+      run: |
+        VERSION=$(python -c "
+        import re
+        with open('zvuk_music/__init__.py') as f:
+            match = re.search(r'__version__\s*=\s*\"(.+?)\"', f.read())
+            print(match.group(1))
+        ")
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
