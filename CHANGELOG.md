@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.1] - 2026-01-31
+
+### Changed
+
+- Optimize CI/CD: reduce release pipeline from 15 to 5 test jobs, 3 to 2 build jobs
+- Extract version parsing into reusable composite action (`.github/actions/get-version`)
+- Simplify `auto-release.yml` to only create releases (remove duplicate test/build/publish)
+- Remove duplicate test matrix from `publish.yml` (trusts `tests.yml`)
+- Add concurrency control to `auto-release.yml`
+- Upload build artifacts in `tests.yml`
+- Bump `codecov-action` v4 to v5
+- Add explicit `--base main` to `auto-pr.yml`
+- Add CI/CD architecture section to CLAUDE.md
+
 ## [0.5.0] - 2026-01-31
 
 ### Changed
