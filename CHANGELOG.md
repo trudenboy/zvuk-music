@@ -5,6 +5,19 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.2] - 2026-01-31
+
+### Fixed
+
+- Fix v0.5.1 not published to PyPI (auto-release had no build+publish at the time of v0.5.1 bump)
+
+### Changed
+
+- Group all GitHub Actions into single dependabot PR (was 3 separate PRs)
+- Change dependabot schedule from weekly to monthly
+- Exclude `dependabot/**` branches from `tests.yml` push trigger (tested via `pull_request` instead)
+- Exclude `dependabot/**` branches from `auto-pr.yml` (dependabot creates its own PRs)
+
 ## [0.5.1] - 2026-01-31
 
 ### Changed

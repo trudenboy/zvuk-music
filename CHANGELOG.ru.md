@@ -5,6 +5,19 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.5.2] - 2026-01-31
+
+### Исправлено
+
+- Исправлена проблема неопубликованной v0.5.1 на PyPI (auto-release не содержал build+publish на момент бампа v0.5.1)
+
+### Изменено
+
+- Все GitHub Actions объединены в один PR от dependabot (было 3 отдельных PR)
+- Расписание dependabot изменено с еженедельного на ежемесячное
+- Исключены ветки `dependabot/**` из push-триггера `tests.yml` (тестируются через `pull_request`)
+- Исключены ветки `dependabot/**` из `auto-pr.yml` (dependabot создаёт собственные PR)
+
 ## [0.5.1] - 2026-01-31
 
 ### Изменено

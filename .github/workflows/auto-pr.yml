@@ -2,7 +2,7 @@ name: Auto PR
 
 on:
   push:
-    branches-ignore: [main]
+    branches-ignore: [main, "dependabot/**"]
 
 permissions:
   contents: write
