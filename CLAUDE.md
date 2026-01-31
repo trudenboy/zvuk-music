@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **zvuk-music** is a Python library for the Zvuk.com music streaming API. It provides both synchronous and asynchronous interfaces for accessing music content, managing playlists, retrieving tracks, and handling user collections.
 
-- **Version**: 0.4.0
+- **Version**: 0.5.2
 - **License**: MIT
 - **Language**: Python 3.9+
 
@@ -63,8 +63,24 @@ python scripts/generate_async_version.py
 - **Line length**: 100 characters
 - **Formatting**: Ruff (double quotes, 4-space indent)
 - **Type hints**: Full mypy compliance required
-- **Language**: Russian for documentation and comments
+- **Language**: English for code comments; bilingual (EN + RU) for docstrings
 - **Import sorting**: isort via Ruff
+
+## CI/CD
+
+GitHub Actions workflows in `.github/workflows/`:
+
+- **`tests.yml`** — Runs on every push/PR. Jobs: lint (ruff + mypy), build (package + upload artifact), async-check (regenerate & diff), test matrix (Python 3.9–3.13, 65% coverage threshold). Codecov upload on 3.12.
+- **`auto-release.yml`** — Runs on push to main. Compares `__version__` with latest git tag; if changed: creates GitHub release, builds package (with async-check), publishes to PyPI. Build and publish are embedded because `GITHUB_TOKEN`-created releases don't trigger other workflows.
+- **`publish.yml`** — Fallback for manually-created releases. Triggered by `release: published` event. Jobs: version-check (tag matches `__version__`), build (with async-check), publish to PyPI via OIDC.
+- **`auto-pr.yml`** — Runs on push to non-main branches. Creates PR with `--base main` and enables auto-merge (squash).
+- **`dependabot.yml`** — Monthly updates for pip (dev deps grouped) and GitHub Actions (grouped into single PR).
+
+Shared logic:
+
+- **`.github/actions/get-version/action.yml`** — Composite action that extracts version from `zvuk_music/__init__.py`. Used by `auto-release.yml` and `publish.yml`.
+
+Release flow: push to main → `tests.yml` validates → `auto-release.yml` creates release → `publish.yml` builds & publishes to PyPI.
 
 ## Testing
 

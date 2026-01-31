@@ -1,4 +1,7 @@
-"""Базовые классы библиотеки Zvuk Music API."""
+"""Base classes for the Zvuk Music API library.
+
+Note (RU): Базовые классы библиотеки Zvuk Music API.
+"""
 
 import dataclasses
 import keyword
@@ -42,15 +45,22 @@ MapTypeToDeJson = Dict[str, Callable[["JSONType", "ClientType"], Optional["ZvukM
 
 
 class ZvukMusicObject:
-    """Базовый класс для всех классов библиотеки."""
+    """Base class for all library classes.
+
+    Note (RU): Базовый класс для всех классов библиотеки.
+    """
 
     pass
 
 
 @model
 class ZvukMusicModel(ZvukMusicObject):
-    """Базовый класс для всех моделей библиотеки.
+    """Base class for all library models.
 
+    Provides methods for serialization/deserialization of objects
+    from/to JSON and dictionaries.
+
+    Note (RU): Базовый класс для всех моделей библиотеки.
     Предоставляет методы для сериализации/десериализации объектов
     из/в JSON и словари.
     """
@@ -68,7 +78,10 @@ class ZvukMusicModel(ZvukMusicObject):
 
     @staticmethod
     def report_unknown_fields_callback(klass: type, unknown_fields: JSONType) -> None:
-        """Обратный вызов для обработки неизвестных полей."""
+        """Callback for handling unknown fields.
+
+        Note (RU): Обратный вызов для обработки неизвестных полей.
+        """
         logger.warning(
             "Found unknown fields received from API! "
             "Please report this at https://github.com/your-repo/zvuk-api/issues"
@@ -77,25 +90,29 @@ class ZvukMusicModel(ZvukMusicObject):
 
     @staticmethod
     def is_dict_model_data(data: JSONType) -> TypeGuard[Dict[str, Any]]:
-        """Проверка на соответствие данных словарю.
+        """Check if data is a valid dictionary.
 
         Args:
-            data: Данные для проверки.
+            data: Data to validate.
 
         Returns:
-            Валидны ли данные.
+            Whether the data is valid.
+
+        Note (RU): Проверка на соответствие данных словарю.
         """
         return bool(data) and isinstance(data, dict)
 
     @staticmethod
     def valid_client(client: Optional["ClientType"]) -> TypeGuard["Client"]:
-        """Проверка что клиент передан и является синхронным.
+        """Check that the client is provided and is synchronous.
 
         Args:
-            client: Клиент для проверки.
+            client: Client to check.
 
         Returns:
-            Синхронный ли клиент.
+            Whether the client is synchronous.
+
+        Note (RU): Проверка что клиент передан и является синхронным.
         """
         from zvuk_music import Client
 
@@ -103,13 +120,15 @@ class ZvukMusicModel(ZvukMusicObject):
 
     @staticmethod
     def valid_async_client(client: Optional["ClientType"]) -> TypeGuard["ClientAsync"]:
-        """Проверка что клиент передан и является асинхронным.
+        """Check that the client is provided and is asynchronous.
 
         Args:
-            client: Клиент для проверки.
+            client: Client to check.
 
         Returns:
-            Асинхронный ли клиент.
+            Whether the client is asynchronous.
+
+        Note (RU): Проверка что клиент передан и является асинхронным.
         """
         from zvuk_music import ClientAsync
 
@@ -117,13 +136,15 @@ class ZvukMusicModel(ZvukMusicObject):
 
     @staticmethod
     def is_array_model_data(data: JSONType) -> TypeGuard[List[Dict[str, Any]]]:
-        """Проверка на соответствие данных массиву словарей.
+        """Check if data is a valid list of dictionaries.
 
         Args:
-            data: Данные для проверки.
+            data: Data to validate.
 
         Returns:
-            Валидны ли данные.
+            Whether the data is valid.
+
+        Note (RU): Проверка на соответствие данных массиву словарей.
         """
         return (
             bool(data) and isinstance(data, list) and all(isinstance(item, dict) for item in data)
@@ -131,17 +152,19 @@ class ZvukMusicModel(ZvukMusicObject):
 
     @classmethod
     def cleanup_data(cls, data: JSONType, client: Optional["ClientType"]) -> Dict[str, Any]:
-        """Удаляет незадекларированные поля для текущей модели из сырых данных.
+        """Remove undeclared fields for the current model from raw data.
 
         Note:
-            Фильтрует только словарь поле:значение. Иначе вернёт пустой dict.
+            Only filters a field:value dictionary. Otherwise returns an empty dict.
 
         Args:
-            data: Поля и значения десериализуемого объекта.
-            client: Клиент Zvuk Music.
+            data: Fields and values of the object being deserialized.
+            client: Zvuk Music client.
 
         Returns:
-            Отфильтрованные данные.
+            Filtered data.
+
+        Note (RU): Удаляет незадекларированные поля для текущей модели из сырых данных.
         """
         if not ZvukMusicModel.is_dict_model_data(data):
             return {}
@@ -166,17 +189,19 @@ class ZvukMusicModel(ZvukMusicObject):
 
     @classmethod
     def de_json(cls, data: "JSONType", client: "ClientType") -> Optional[Self]:
-        """Десериализация объекта.
+        """Deserialize an object.
 
         Note:
-            Переопределяется в дочерних классах когда есть вложенные объекты.
+            Overridden in subclasses when there are nested objects.
 
         Args:
-            data: Поля и значения десериализуемого объекта.
-            client: Клиент Zvuk Music.
+            data: Fields and values of the object being deserialized.
+            client: Zvuk Music client.
 
         Returns:
-            Десериализованный объект.
+            Deserialized object.
+
+        Note (RU): Десериализация объекта.
         """
         if not cls.is_dict_model_data(data):
             return None
@@ -185,17 +210,19 @@ class ZvukMusicModel(ZvukMusicObject):
 
     @classmethod
     def de_list(cls, data: JSONType, client: "ClientType") -> List[Self]:
-        """Десериализация списка объектов.
+        """Deserialize a list of objects.
 
         Note:
-            Переопределяется в дочерних классах, если необходимо.
+            Overridden in subclasses if necessary.
 
         Args:
-            data: Список словарей с полями и значениями десериализуемого объекта.
-            client: Клиент Zvuk Music.
+            data: List of dictionaries with fields and values of the object being deserialized.
+            client: Zvuk Music client.
 
         Returns:
-            Список десериализованных объектов.
+            List of deserialized objects.
+
+        Note (RU): Десериализация списка объектов.
         """
         if not cls.is_array_model_data(data):
             return []
@@ -204,28 +231,32 @@ class ZvukMusicModel(ZvukMusicObject):
         return [item for item in items if item is not None]
 
     def to_json(self, for_request: bool = False) -> str:
-        """Сериализация объекта в JSON строку.
+        """Serialize the object to a JSON string.
 
         Args:
-            for_request: Подготовить ли объект для отправки в теле запроса.
+            for_request: Whether to prepare the object for sending in a request body.
 
         Returns:
-            Сериализованный в JSON объект.
+            JSON-serialized object.
+
+        Note (RU): Сериализация объекта в JSON строку.
         """
         result: str = json.dumps(self.to_dict(for_request), ensure_ascii=not _ujson)
         return result
 
     def to_dict(self, for_request: bool = False) -> JSONType:
-        """Рекурсивная сериализация объекта в словарь.
+        """Recursively serialize the object to a dictionary.
 
         Args:
-            for_request: Перевести ли обратно все поля в camelCase.
+            for_request: Whether to convert all fields back to camelCase.
 
         Note:
-            Исключает из сериализации `client` и `_id_attrs`.
+            Excludes ``client`` and ``_id_attrs`` from serialization.
 
         Returns:
-            Сериализованный в dict объект.
+            Dictionary-serialized object.
+
+        Note (RU): Рекурсивная сериализация объекта в словарь.
         """
 
         def parse(val: Union["ZvukMusicModel", JSONType]) -> JSONType:
@@ -257,31 +288,37 @@ class ZvukMusicModel(ZvukMusicObject):
         return parse(data)
 
     def _get_id_attrs(self) -> Tuple[str, ...]:
-        """Получение ключевых атрибутов объекта.
+        """Get key attributes of the object.
 
         Returns:
-            Ключевые атрибуты объекта для сравнения.
+            Key attributes of the object for comparison.
+
+        Note (RU): Получение ключевых атрибутов объекта.
         """
         return cast(Tuple[str, ...], getattr(self, "_id_attrs", ()))
 
     def __eq__(self, other: Any) -> bool:
-        """Проверка на равенство двух объектов.
+        """Check equality of two objects.
 
         Note:
-            Проверка осуществляется по атрибутам, перечисленным в `_id_attrs`.
+            Comparison is based on attributes listed in ``_id_attrs``.
 
         Returns:
-            Одинаковые ли объекты (по содержимому).
+            Whether the objects are equal (by content).
+
+        Note (RU): Проверка на равенство двух объектов.
         """
         if isinstance(other, self.__class__):
             return self._get_id_attrs() == other._get_id_attrs()
         return super().__eq__(other)
 
     def __hash__(self) -> int:
-        """Реализация хеш-функции на основе ключевых атрибутов.
+        """Hash function implementation based on key attributes.
 
         Returns:
-            Хеш объекта.
+            Hash of the object.
+
+        Note (RU): Реализация хеш-функции на основе ключевых атрибутов.
         """
         id_attrs = self._get_id_attrs()
         if not id_attrs:

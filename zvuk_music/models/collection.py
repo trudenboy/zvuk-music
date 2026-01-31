@@ -1,4 +1,7 @@
-"""Модели коллекции (лайки, скрытые)."""
+"""Collection models (likes, hidden).
+
+Note (RU): Модели коллекции (лайки, скрытые).
+"""
 
 from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
@@ -15,9 +18,17 @@ if TYPE_CHECKING:
 
 @model
 class CollectionItem(ZvukMusicModel):
-    """Элемент коллекции.
+    """Collection item.
 
     Attributes:
+        id: Item ID.
+        user_id: User ID.
+        item_status: Item status (liked).
+        last_modified: Last modified date.
+        collection_last_modified: Collection modification date.
+        likes_count: Number of likes.
+
+    Note (RU): Элемент коллекции.
         id: ID элемента.
         user_id: ID пользователя.
         item_status: Статус элемента (liked).
@@ -38,7 +49,10 @@ class CollectionItem(ZvukMusicModel):
         self._id_attrs = (self.id, self.user_id)
 
     def is_liked(self) -> bool:
-        """Проверка, лайкнут ли элемент."""
+        """Check if item is liked.
+
+        Note (RU): Проверка, лайкнут ли элемент.
+        """
         return self.item_status == CollectionItemStatus.LIKED
 
     @classmethod
@@ -59,9 +73,19 @@ class CollectionItem(ZvukMusicModel):
 
 @model
 class Collection(ZvukMusicModel):
-    """Коллекция пользователя.
+    """User collection.
 
     Attributes:
+        artists: Liked artists.
+        episodes: Liked episodes.
+        podcasts: Liked podcasts.
+        playlists: Liked playlists.
+        synthesis_playlists: Synthesis playlists.
+        profiles: Profile subscriptions.
+        releases: Liked releases.
+        tracks: Liked tracks.
+
+    Note (RU): Коллекция пользователя.
         artists: Лайкнутые артисты.
         episodes: Лайкнутые эпизоды.
         podcasts: Лайкнутые подкасты.
@@ -107,9 +131,13 @@ class Collection(ZvukMusicModel):
 
 @model
 class HiddenCollection(ZvukMusicModel):
-    """Скрытые элементы.
+    """Hidden items.
 
     Attributes:
+        tracks: Hidden tracks.
+        artists: Hidden artists.
+
+    Note (RU): Скрытые элементы.
         tracks: Скрытые треки.
         artists: Скрытые артисты.
     """

@@ -1,4 +1,7 @@
-"""Модели данных Zvuk Music API."""
+"""Zvuk Music API data models.
+
+Note (RU): Модели данных Zvuk Music API.
+"""
 
 from zvuk_music.models.artist import Artist, SimpleArtist
 from zvuk_music.models.book import BookAuthor, SimpleBook

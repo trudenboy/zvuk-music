@@ -1,57 +1,57 @@
-"""Пример быстрого старта с Zvuk Music API."""
+"""Quick start example with Zvuk Music API."""
 
 from zvuk_music import Client, Quality
 
 
 def main() -> None:
-    # Получение анонимного токена
-    print("Получение анонимного токена...")
+    # Get anonymous token
+    print("Getting anonymous token...")
     token = Client.get_anonymous_token()
-    print(f"Токен: {token[:20]}...")
+    print(f"Token: {token[:20]}...")
 
-    # Создание клиента
+    # Create client
     client = Client(token=token)
 
-    # Быстрый поиск
-    print("\n=== Быстрый поиск 'Metallica' ===")
+    # Quick search
+    print("\n=== Quick search 'Metallica' ===")
     results = client.quick_search("Metallica", limit=5)
 
-    print(f"\nНайдено треков: {len(results.tracks)}")
+    print(f"\nTracks found: {len(results.tracks)}")
     for track in results.tracks:
         print(f"  - {track.title} - {track.get_artists_str()} ({track.get_duration_str()})")
 
-    print(f"\nНайдено артистов: {len(results.artists)}")
+    print(f"\nArtists found: {len(results.artists)}")
     for artist in results.artists:
         print(f"  - {artist.title}")
 
-    print(f"\nНайдено релизов: {len(results.releases)}")
+    print(f"\nReleases found: {len(results.releases)}")
     for release in results.releases[:3]:
         print(f"  - {release.title}")
 
-    # Получение информации о треке
+    # Get track information
     if results.tracks:
         track = results.tracks[0]
-        print(f"\n=== Информация о треке '{track.title}' ===")
+        print(f"\n=== Track info '{track.title}' ===")
         full_track = client.get_track(track.id)
         if full_track:
             print(f"ID: {full_track.id}")
-            print(f"Название: {full_track.title}")
-            print(f"Артисты: {full_track.get_artists_str()}")
-            print(f"Длительность: {full_track.get_duration_str()}")
+            print(f"Title: {full_track.title}")
+            print(f"Artists: {full_track.get_artists_str()}")
+            print(f"Duration: {full_track.get_duration_str()}")
             print(f"Explicit: {full_track.explicit}")
-            print(f"FLAC доступен: {full_track.has_flac}")
+            print(f"FLAC available: {full_track.has_flac}")
 
-            # Попробуем получить URL стрима
+            # Try to get stream URL
             try:
                 stream_url = client.get_stream_url(track.id, quality=Quality.MID)
                 print(f"Stream URL (mid): {stream_url[:50]}...")
             except Exception as e:
-                print(f"Ошибка получения стрима: {e}")
+                print(f"Error getting stream: {e}")
 
-    # Информация об артисте
+    # Artist information
     if results.artists:
         artist = results.artists[0]
-        print(f"\n=== Информация об артисте '{artist.title}' ===")
+        print(f"\n=== Artist info '{artist.title}' ===")
         full_artist = client.get_artist(
             artist.id,
             with_popular_tracks=True,
@@ -59,10 +59,10 @@ def main() -> None:
         )
         if full_artist:
             print(f"ID: {full_artist.id}")
-            print(f"Название: {full_artist.title}")
+            print(f"Title: {full_artist.title}")
             if full_artist.description:
-                print(f"Описание: {full_artist.description[:100]}...")
-            print(f"Популярные треки ({len(full_artist.popular_tracks)}):")
+                print(f"Description: {full_artist.description[:100]}...")
+            print(f"Popular tracks ({len(full_artist.popular_tracks)}):")
             for t in full_artist.popular_tracks[:5]:
                 print(f"  - {t.title}")
 

@@ -1,16 +1,18 @@
-"""Zvuk Music API - Python библиотека для работы с API Zvuk.com.
+"""Zvuk Music API - Python library for the Zvuk.com API.
 
 Example:
     >>> from zvuk_music import Client
     >>>
-    >>> # Анонимный доступ
+    >>> # Anonymous access
     >>> token = Client.get_anonymous_token()
     >>> client = Client(token=token)
     >>>
-    >>> # Поиск
+    >>> # Search
     >>> results = client.quick_search("Metallica")
     >>> for track in results.tracks:
     ...     print(f"{track.title} - {track.get_artists_str()}")
+
+Note (RU): Zvuk Music API - Python библиотека для работы с API Zvuk.com.
 """
 
 from zvuk_music.base import ZvukMusicModel, ZvukMusicObject
@@ -144,7 +146,7 @@ __all__ = [
     "Track",
 ]
 
-# Placeholder для async клиента
+# Placeholder for the async client
 try:
     from zvuk_music.client_async import ClientAsync
 

@@ -2,7 +2,10 @@
 # THIS IS AUTO GENERATED COPY. DON'T EDIT BY HANDS #
 ####################################################
 
-"""Асинхронный клиент Zvuk Music API."""
+"""Synchronous Zvuk Music API client.
+
+Note (RU): Асинхронный клиент Zvuk Music API.
+"""
 
 from typing import Any, Dict, List, Optional, Union
 
@@ -24,36 +27,40 @@ from zvuk_music.utils.request_async import TINY_API_URL, Request
 
 
 class ClientAsync:
-    """Асинхронный клиент Zvuk Music API.
+    """Synchronous Zvuk Music API client.
 
     Args:
-        token: Токен авторизации (получить через get_anonymous_token() или из браузера).
-        timeout: Таймаут запросов в секундах.
-        proxy_url: URL прокси сервера.
-        user_agent: User-Agent для запросов (важно для обхода бот-защиты).
-        report_unknown_fields: Логировать неизвестные поля от API.
+        token: Authorization token (obtain via get_anonymous_token() or from browser).
+        timeout: Request timeout in seconds.
+        proxy_url: Proxy server URL.
+        user_agent: User-Agent for requests (important for bypassing bot protection).
+        report_unknown_fields: Log unknown fields from API.
 
     Example:
-        >>> # Анонимный доступ (ограниченный функционал):
+        >>> # Anonymous access (limited functionality):
         >>> token = Client.get_anonymous_token()
         >>> client = Client(token=token)
         >>>
-        >>> # Авторизованный доступ (полный функционал):
-        >>> # 1. Войти на zvuk.com в браузере
-        >>> # 2. Открыть https://zvuk.com/api/tiny/profile
-        >>> # 3. Скопировать значение поля "token"
-        >>> client = Client(token="ваш_токен")
+        >>> # Authorized access (full functionality):
+        >>> # 1. Log in to zvuk.com in browser
+        >>> # 2. Open https://zvuk.com/api/tiny/profile
+        >>> # 3. Copy the "token" field value
+        >>> client = Client(token="your_token")
+
+    Note (RU): Асинхронный клиент Zvuk Music API.
     """
 
     @staticmethod
     def _to_id_list(ids: Union[str, int, List[Union[str, int]]]) -> List[str]:
-        """Нормализация ID в список строк.
+        """Normalize IDs to a list of strings.
 
         Args:
-            ids: ID или список ID.
+            ids: ID or list of IDs.
 
         Returns:
-            Список строковых ID.
+            List of string IDs.
+
+        Note (RU): Нормализация ID в список строк.
         """
         if not isinstance(ids, list):
             ids = [ids]
@@ -86,15 +93,17 @@ class ClientAsync:
 
     @staticmethod
     def get_anonymous_token() -> str:
-        """Получить анонимный токен.
+        """Get an anonymous token.
 
-        Анонимный токен обеспечивает ограниченный доступ:
-        - Только mid качество (128kbps)
-        - Нет доступа к коллекции
-        - Нет возможности лайкать
+        Anonymous token provides limited access:
+        - Only mid quality (128kbps)
+        - No access to collection
+        - No ability to like
 
         Returns:
-            Анонимный токен.
+            Anonymous token.
+
+        Note (RU): Получить анонимный токен.
         """
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -109,38 +118,44 @@ class ClientAsync:
         return str(data["result"]["token"])
 
     async def init(self) -> "ClientAsync":
-        """Инициализировать клиент, загрузить профиль.
+        """Initialize the client, load profile.
 
         Returns:
-            self для цепочки вызовов.
+            self for method chaining.
+
+        Note (RU): Инициализировать клиент, загрузить профиль.
         """
         await self.get_profile()
         return self
 
     async def get_profile(self) -> Optional[Profile]:
-        """Получить профиль текущего пользователя.
+        """Get the current user's profile.
 
         Returns:
-            Профиль пользователя.
+            User profile.
+
+        Note (RU): Получить профиль текущего пользователя.
         """
         data = await self._request.get(f"{TINY_API_URL}/profile")
-        # Request.get уже возвращает result, оборачиваем обратно для Profile
+        # Request.get already returns result, wrap back for Profile
         profile = Profile.de_json({"result": data}, self)
         if profile and profile.result:
             self._profile = profile.result
         return profile
 
     async def is_authorized(self) -> bool:
-        """Авторизован ли пользователь (не анонимный).
+        """Check if the user is authorized (not anonymous).
 
         Returns:
-            True если авторизован.
+            True if authorized.
+
+        Note (RU): Авторизован ли пользователь (не анонимный).
         """
         if self._profile:
             return self._profile.is_authorized()
         return False
 
-    # ========== Поиск ==========
+    # ========== Search ==========
 
     async def quick_search(
         self,
@@ -148,15 +163,17 @@ class ClientAsync:
         limit: int = 10,
         search_session_id: Optional[str] = None,
     ) -> Optional[QuickSearch]:
-        """Быстрый поиск с автодополнением.
+        """Quick search with autocomplete.
 
         Args:
-            query: Поисковый запрос.
-            limit: Максимум результатов.
-            search_session_id: ID сессии поиска.
+            query: Search query.
+            limit: Maximum results.
+            search_session_id: Search session ID.
 
         Returns:
-            Результаты быстрого поиска.
+            Quick search results.
+
+        Note (RU): Быстрый поиск с автодополнением.
         """
         gql = load_query("quickSearch")
         variables: Dict[str, Any] = {"query": query, "limit": limit}
@@ -164,7 +181,7 @@ class ClientAsync:
             variables["searchSessionId"] = search_session_id
 
         result = await self._request.graphql(gql, "quickSearch", variables)
-        # API возвращает quick_search (snake_case после нормализации)
+        # API returns quick_search (snake_case after normalization)
         data = result.get("quick_search") or result.get("quickSearch") or {}
         return QuickSearch.de_json(data, self)
 
@@ -185,26 +202,28 @@ class ClientAsync:
         release_cursor: Optional[str] = None,
         playlist_cursor: Optional[str] = None,
     ) -> Optional[Search]:
-        """Полнотекстовый поиск.
+        """Full-text search.
 
         Args:
-            query: Поисковый запрос.
-            limit: Максимум результатов в категории.
-            tracks: Искать треки.
-            artists: Искать артистов.
-            releases: Искать релизы.
-            playlists: Искать плейлисты.
-            podcasts: Искать подкасты.
-            episodes: Искать эпизоды.
-            profiles: Искать профили.
-            books: Искать книги.
-            track_cursor: Курсор для треков.
-            artist_cursor: Курсор для артистов.
-            release_cursor: Курсор для релизов.
-            playlist_cursor: Курсор для плейлистов.
+            query: Search query.
+            limit: Maximum results per category.
+            tracks: Search tracks.
+            artists: Search artists.
+            releases: Search releases.
+            playlists: Search playlists.
+            podcasts: Search podcasts.
+            episodes: Search episodes.
+            profiles: Search profiles.
+            books: Search books.
+            track_cursor: Cursor for tracks.
+            artist_cursor: Cursor for artists.
+            release_cursor: Cursor for releases.
+            playlist_cursor: Cursor for playlists.
 
         Returns:
-            Результаты поиска.
+            Search results.
+
+        Note (RU): Полнотекстовый поиск.
         """
         gql = load_query("search")
         variables: Dict[str, Any] = {
@@ -232,16 +251,18 @@ class ClientAsync:
         result = await self._request.graphql(gql, "search", variables)
         return Search.de_json(result.get("search", {}), self)
 
-    # ========== Треки ==========
+    # ========== Tracks ==========
 
     async def get_tracks(self, track_ids: Union[str, int, List[Union[str, int]]]) -> List[Track]:
-        """Получить треки по ID.
+        """Get tracks by ID.
 
         Args:
-            track_ids: ID трека или список ID.
+            track_ids: Track ID or list of IDs.
 
         Returns:
-            Список треков.
+            List of tracks.
+
+        Note (RU): Получить треки по ID.
         """
         ids = self._to_id_list(track_ids)
 
@@ -250,13 +271,15 @@ class ClientAsync:
         return Track.de_list(result.get("get_tracks", []), self)
 
     async def get_track(self, track_id: Union[str, int]) -> Optional[Track]:
-        """Получить трек по ID.
+        """Get a track by ID.
 
         Args:
-            track_id: ID трека.
+            track_id: Track ID.
 
         Returns:
-            Трек или None.
+            Track or None.
+
+        Note (RU): Получить трек по ID.
         """
         tracks = await self.get_tracks(track_id)
         return tracks[0] if tracks else None
@@ -267,15 +290,17 @@ class ClientAsync:
         with_artists: bool = False,
         with_releases: bool = False,
     ) -> List[Track]:
-        """Получить полную информацию о треках.
+        """Get full track information.
 
         Args:
-            track_ids: ID трека или список ID.
-            with_artists: Включить информацию об артистах.
-            with_releases: Включить информацию о релизах.
+            track_ids: Track ID or list of IDs.
+            with_artists: Include artist information.
+            with_releases: Include release information.
 
         Returns:
-            Список треков с полной информацией.
+            List of tracks with full information.
+
+        Note (RU): Получить полную информацию о треках.
         """
         ids = self._to_id_list(track_ids)
 
@@ -290,13 +315,15 @@ class ClientAsync:
     async def get_stream_urls(
         self, track_ids: Union[str, int, List[Union[str, int]]]
     ) -> List[Stream]:
-        """Получить URL для стриминга.
+        """Get streaming URLs.
 
         Args:
-            track_ids: ID трека или список ID.
+            track_ids: Track ID or list of IDs.
 
         Returns:
-            Список объектов Stream с URL.
+            List of Stream objects with URLs.
+
+        Note (RU): Получить URL для стриминга.
         """
         ids = self._to_id_list(track_ids)
 
@@ -314,39 +341,43 @@ class ClientAsync:
     async def get_stream_url(
         self, track_id: Union[str, int], quality: Quality = Quality.HIGH
     ) -> str:
-        """Получить URL для стриминга в указанном качестве.
+        """Get streaming URL for specified quality.
 
         Args:
-            track_id: ID трека.
-            quality: Качество аудио.
+            track_id: Track ID.
+            quality: Audio quality.
 
         Returns:
-            URL для скачивания/стриминга.
+            URL for downloading/streaming.
 
         Raises:
-            SubscriptionRequiredError: Если требуется подписка.
-            QualityNotAvailableError: Если качество недоступно.
+            SubscriptionRequiredError: If subscription is required.
+            QualityNotAvailableError: If quality is not available.
+
+        Note (RU): Получить URL для стриминга в указанном качестве.
         """
         streams = await self.get_stream_urls(track_id)
         if not streams:
             raise QualityNotAvailableError("Stream URLs not available")
         return streams[0].get_url(quality)
 
-    # ========== Релизы ==========
+    # ========== Releases ==========
 
     async def get_releases(
         self,
         release_ids: Union[str, int, List[Union[str, int]]],
         related_limit: int = 10,
     ) -> List[Release]:
-        """Получить релизы по ID.
+        """Get releases by ID.
 
         Args:
-            release_ids: ID релиза или список ID.
-            related_limit: Количество похожих релизов.
+            release_ids: Release ID or list of IDs.
+            related_limit: Number of related releases.
 
         Returns:
-            Список релизов.
+            List of releases.
+
+        Note (RU): Получить релизы по ID.
         """
         ids = self._to_id_list(release_ids)
 
@@ -357,18 +388,20 @@ class ClientAsync:
         return Release.de_list(result.get("get_releases", []), self)
 
     async def get_release(self, release_id: Union[str, int]) -> Optional[Release]:
-        """Получить релиз по ID.
+        """Get a release by ID.
 
         Args:
-            release_id: ID релиза.
+            release_id: Release ID.
 
         Returns:
-            Релиз или None.
+            Release or None.
+
+        Note (RU): Получить релиз по ID.
         """
         releases = await self.get_releases(release_id)
         return releases[0] if releases else None
 
-    # ========== Артисты ==========
+    # ========== Artists ==========
 
     async def get_artists(
         self,
@@ -383,22 +416,24 @@ class ClientAsync:
         related_artists_limit: int = 100,
         with_description: bool = False,
     ) -> List[Artist]:
-        """Получить артистов по ID.
+        """Get artists by ID.
 
         Args:
-            artist_ids: ID артиста или список ID.
-            with_releases: Включить релизы.
-            releases_limit: Лимит релизов.
-            releases_offset: Смещение релизов.
-            with_popular_tracks: Включить популярные треки.
-            tracks_limit: Лимит треков.
-            tracks_offset: Смещение треков.
-            with_related_artists: Включить похожих артистов.
-            related_artists_limit: Лимит похожих артистов.
-            with_description: Включить описание.
+            artist_ids: Artist ID or list of IDs.
+            with_releases: Include releases.
+            releases_limit: Releases limit.
+            releases_offset: Releases offset.
+            with_popular_tracks: Include popular tracks.
+            tracks_limit: Tracks limit.
+            tracks_offset: Tracks offset.
+            with_related_artists: Include related artists.
+            related_artists_limit: Related artists limit.
+            with_description: Include description.
 
         Returns:
-            Список артистов.
+            List of artists.
+
+        Note (RU): Получить артистов по ID.
         """
         ids = self._to_id_list(artist_ids)
 
@@ -411,41 +446,45 @@ class ClientAsync:
                 "withReleases": with_releases,
                 "releasesLimit": releases_limit,
                 "releasesOffset": releases_offset,
-                "withPopTracks": with_popular_tracks,  # Должно соответствовать GraphQL
+                "withPopTracks": with_popular_tracks,  # Must match GraphQL
                 "tracksLimit": tracks_limit,
                 "tracksOffset": tracks_offset,
                 "withRelatedArtists": with_related_artists,
-                "releatedArtistsLimit": related_artists_limit,  # Опечатка в оригинальном GraphQL
+                "releatedArtistsLimit": related_artists_limit,  # Typo in original GraphQL
                 "withDescription": with_description,
             },
         )
         return Artist.de_list(result.get("get_artists", []), self)
 
     async def get_artist(self, artist_id: Union[str, int], **kwargs: Any) -> Optional[Artist]:
-        """Получить артиста по ID.
+        """Get an artist by ID.
 
         Args:
-            artist_id: ID артиста.
-            **kwargs: Дополнительные параметры для get_artists.
+            artist_id: Artist ID.
+            **kwargs: Additional parameters for get_artists.
 
         Returns:
-            Артист или None.
+            Artist or None.
+
+        Note (RU): Получить артиста по ID.
         """
         artists = await self.get_artists(artist_id, **kwargs)
         return artists[0] if artists else None
 
-    # ========== Плейлисты ==========
+    # ========== Playlists ==========
 
     async def get_playlists(
         self, playlist_ids: Union[str, int, List[Union[str, int]]]
     ) -> List[Playlist]:
-        """Получить плейлисты по ID.
+        """Get playlists by ID.
 
         Args:
-            playlist_ids: ID плейлиста или список ID.
+            playlist_ids: Playlist ID or list of IDs.
 
         Returns:
-            Список плейлистов.
+            List of playlists.
+
+        Note (RU): Получить плейлисты по ID.
         """
         ids = self._to_id_list(playlist_ids)
 
@@ -454,13 +493,15 @@ class ClientAsync:
         return Playlist.de_list(result.get("get_playlists", []), self)
 
     async def get_playlist(self, playlist_id: Union[str, int]) -> Optional[Playlist]:
-        """Получить плейлист по ID.
+        """Get a playlist by ID.
 
         Args:
-            playlist_id: ID плейлиста.
+            playlist_id: Playlist ID.
 
         Returns:
-            Плейлист или None.
+            Playlist or None.
+
+        Note (RU): Получить плейлист по ID.
         """
         playlists = await self.get_playlists(playlist_id)
         return playlists[0] if playlists else None
@@ -468,13 +509,15 @@ class ClientAsync:
     async def get_short_playlist(
         self, playlist_ids: Union[str, int, List[Union[str, int]]]
     ) -> List[SimplePlaylist]:
-        """Получить краткую информацию о плейлистах.
+        """Get brief playlist information.
 
         Args:
-            playlist_ids: ID плейлиста или список ID.
+            playlist_ids: Playlist ID or list of IDs.
 
         Returns:
-            Список плейлистов.
+            List of playlists.
+
+        Note (RU): Получить краткую информацию о плейлистах.
         """
         ids = self._to_id_list(playlist_ids)
 
@@ -485,15 +528,17 @@ class ClientAsync:
     async def get_playlist_tracks(
         self, playlist_id: Union[str, int], limit: int = 50, offset: int = 0
     ) -> List[SimpleTrack]:
-        """Получить треки плейлиста с пагинацией.
+        """Get playlist tracks with pagination.
 
         Args:
-            playlist_id: ID плейлиста.
-            limit: Количество треков.
-            offset: Смещение.
+            playlist_id: Playlist ID.
+            limit: Number of tracks.
+            offset: Offset.
 
         Returns:
-            Список треков.
+            List of tracks.
+
+        Note (RU): Получить треки плейлиста с пагинацией.
         """
         gql = load_query("getPlaylistTracks")
         result = await self._request.graphql(
@@ -504,14 +549,16 @@ class ClientAsync:
         return SimpleTrack.de_list(result.get("playlist_tracks", []), self)
 
     async def create_playlist(self, name: str, track_ids: Optional[List[str]] = None) -> str:
-        """Создать плейлист.
+        """Create a playlist.
 
         Args:
-            name: Название плейлиста.
-            track_ids: ID треков для добавления.
+            name: Playlist name.
+            track_ids: Track IDs to add.
 
         Returns:
-            ID созданного плейлиста.
+            Created playlist ID.
+
+        Note (RU): Создать плейлист.
         """
         gql = load_query("createPlaylist")
         items = []
@@ -523,13 +570,15 @@ class ClientAsync:
         return str(playlist_data.get("create", ""))
 
     async def delete_playlist(self, playlist_id: Union[str, int]) -> bool:
-        """Удалить плейлист.
+        """Delete a playlist.
 
         Args:
-            playlist_id: ID плейлиста.
+            playlist_id: Playlist ID.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Удалить плейлист.
         """
         gql = load_query("deletePlaylist")
         result = await self._request.graphql(gql, "deletePlaylist", {"id": str(playlist_id)})
@@ -537,14 +586,16 @@ class ClientAsync:
         return "delete" in playlist_data
 
     async def rename_playlist(self, playlist_id: Union[str, int], new_name: str) -> bool:
-        """Переименовать плейлист.
+        """Rename a playlist.
 
         Args:
-            playlist_id: ID плейлиста.
-            new_name: Новое название.
+            playlist_id: Playlist ID.
+            new_name: New name.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Переименовать плейлист.
         """
         gql = load_query("renamePlaylist")
         result = await self._request.graphql(
@@ -556,14 +607,16 @@ class ClientAsync:
     async def add_tracks_to_playlist(
         self, playlist_id: Union[str, int], track_ids: List[str]
     ) -> bool:
-        """Добавить треки в плейлист.
+        """Add tracks to a playlist.
 
         Args:
-            playlist_id: ID плейлиста.
-            track_ids: ID треков.
+            playlist_id: Playlist ID.
+            track_ids: Track IDs.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Добавить треки в плейлист.
         """
         gql = load_query("addTracksToPlaylist")
         items = [{"type": "track", "item_id": tid} for tid in track_ids]
@@ -580,16 +633,18 @@ class ClientAsync:
         name: Optional[str] = None,
         is_public: Optional[bool] = None,
     ) -> bool:
-        """Обновить плейлист целиком.
+        """Update a playlist entirely.
 
         Args:
-            playlist_id: ID плейлиста.
-            track_ids: Новый список треков.
-            name: Новое название.
-            is_public: Публичный ли.
+            playlist_id: Playlist ID.
+            track_ids: New track list.
+            name: New name.
+            is_public: Whether public.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Обновить плейлист целиком.
         """
         gql = load_query("updataPlaylist")
         items = [{"type": "track", "item_id": tid} for tid in track_ids]
@@ -605,14 +660,16 @@ class ClientAsync:
         return "update" in playlist_data
 
     async def set_playlist_public(self, playlist_id: Union[str, int], is_public: bool) -> bool:
-        """Изменить видимость плейлиста.
+        """Change playlist visibility.
 
         Args:
-            playlist_id: ID плейлиста.
-            is_public: Публичный или приватный.
+            playlist_id: Playlist ID.
+            is_public: Public or private.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Изменить видимость плейлиста.
         """
         gql = load_query("setPlaylistToPublic")
         result = await self._request.graphql(
@@ -626,14 +683,16 @@ class ClientAsync:
     async def synthesis_playlist_build(
         self, first_author_id: str, second_author_id: str
     ) -> Optional[SynthesisPlaylist]:
-        """Создать синтез-плейлист.
+        """Create a synthesis playlist.
 
         Args:
-            first_author_id: ID первого автора.
-            second_author_id: ID второго автора.
+            first_author_id: First author ID.
+            second_author_id: Second author ID.
 
         Returns:
-            Синтез-плейлист.
+            Synthesis playlist.
+
+        Note (RU): Создать синтез-плейлист.
         """
         gql = load_query("synthesisPlaylistBuild")
         result = await self._request.graphql(
@@ -644,30 +703,34 @@ class ClientAsync:
         return SynthesisPlaylist.de_json(result.get("synthesis_playlist_build", {}), self)
 
     async def get_synthesis_playlists(self, ids: List[str]) -> List[SynthesisPlaylist]:
-        """Получить синтез-плейлисты.
+        """Get synthesis playlists.
 
         Args:
-            ids: ID плейлистов.
+            ids: Playlist IDs.
 
         Returns:
-            Список синтез-плейлистов.
+            List of synthesis playlists.
+
+        Note (RU): Получить синтез-плейлисты.
         """
         gql = load_query("synthesisPlaylist")
         result = await self._request.graphql(gql, "synthesisPlaylist", {"ids": ids})
         return SynthesisPlaylist.de_list(result.get("synthesis_playlist", []), self)
 
-    # ========== Подкасты ==========
+    # ========== Podcasts ==========
 
     async def get_podcasts(
         self, podcast_ids: Union[str, int, List[Union[str, int]]]
     ) -> List[Podcast]:
-        """Получить подкасты по ID.
+        """Get podcasts by ID.
 
         Args:
-            podcast_ids: ID подкаста или список ID.
+            podcast_ids: Podcast ID or list of IDs.
 
         Returns:
-            Список подкастов.
+            List of podcasts.
+
+        Note (RU): Получить подкасты по ID.
         """
         ids = self._to_id_list(podcast_ids)
 
@@ -676,13 +739,15 @@ class ClientAsync:
         return Podcast.de_list(result.get("get_podcasts", []), self)
 
     async def get_podcast(self, podcast_id: Union[str, int]) -> Optional[Podcast]:
-        """Получить подкаст по ID.
+        """Get a podcast by ID.
 
         Args:
-            podcast_id: ID подкаста.
+            podcast_id: Podcast ID.
 
         Returns:
-            Подкаст или None.
+            Podcast or None.
+
+        Note (RU): Получить подкаст по ID.
         """
         podcasts = await self.get_podcasts(podcast_id)
         return podcasts[0] if podcasts else None
@@ -690,13 +755,15 @@ class ClientAsync:
     async def get_episodes(
         self, episode_ids: Union[str, int, List[Union[str, int]]]
     ) -> List[Episode]:
-        """Получить эпизоды по ID.
+        """Get episodes by ID.
 
         Args:
-            episode_ids: ID эпизода или список ID.
+            episode_ids: Episode ID or list of IDs.
 
         Returns:
-            Список эпизодов.
+            List of episodes.
+
+        Note (RU): Получить эпизоды по ID.
         """
         ids = self._to_id_list(episode_ids)
 
@@ -705,24 +772,28 @@ class ClientAsync:
         return Episode.de_list(result.get("get_episodes", []), self)
 
     async def get_episode(self, episode_id: Union[str, int]) -> Optional[Episode]:
-        """Получить эпизод по ID.
+        """Get an episode by ID.
 
         Args:
-            episode_id: ID эпизода.
+            episode_id: Episode ID.
 
         Returns:
-            Эпизод или None.
+            Episode or None.
+
+        Note (RU): Получить эпизод по ID.
         """
         episodes = await self.get_episodes(episode_id)
         return episodes[0] if episodes else None
 
-    # ========== Коллекция ==========
+    # ========== Collection ==========
 
     async def get_collection(self) -> Optional[Collection]:
-        """Получить коллекцию пользователя.
+        """Get the user's collection.
 
         Returns:
-            Коллекция с лайками.
+            Collection with likes.
+
+        Note (RU): Получить коллекцию пользователя.
         """
         gql = load_query("userCollection")
         result = await self._request.graphql(gql, "userCollection", {})
@@ -733,14 +804,16 @@ class ClientAsync:
         order_by: OrderBy = OrderBy.DATE_ADDED,
         direction: OrderDirection = OrderDirection.DESC,
     ) -> List[Track]:
-        """Получить лайкнутые треки.
+        """Get liked tracks.
 
         Args:
-            order_by: Сортировка по полю.
-            direction: Направление сортировки.
+            order_by: Sort by field.
+            direction: Sort direction.
 
         Returns:
-            Список треков.
+            List of tracks.
+
+        Note (RU): Получить лайкнутые треки.
         """
         gql = load_query("userTracks")
         result = await self._request.graphql(
@@ -752,10 +825,12 @@ class ClientAsync:
         return Track.de_list(collection_data.get("tracks", []), self)
 
     async def get_user_playlists(self) -> List[CollectionItem]:
-        """Получить плейлисты пользователя.
+        """Get user's playlists.
 
         Returns:
-            Список элементов коллекции.
+            List of collection items.
+
+        Note (RU): Получить плейлисты пользователя.
         """
         gql = load_query("userPlaylists")
         result = await self._request.graphql(gql, "userPlaylists", {})
@@ -765,14 +840,16 @@ class ClientAsync:
     async def get_user_paginated_podcasts(
         self, cursor: Optional[str] = None, count: int = 20
     ) -> Dict[str, Any]:
-        """Получить подкасты пользователя с пагинацией.
+        """Get user's podcasts with pagination.
 
         Args:
-            cursor: Курсор для пагинации.
-            count: Количество подкастов.
+            cursor: Pagination cursor.
+            count: Number of podcasts.
 
         Returns:
-            Данные с подкастами и курсором.
+            Data with podcasts and cursor.
+
+        Note (RU): Получить подкасты пользователя с пагинацией.
         """
         gql = load_query("userPaginatedPodcasts")
         variables: Dict[str, Any] = {"count": count}
@@ -786,14 +863,16 @@ class ClientAsync:
     async def add_to_collection(
         self, item_id: Union[str, int], item_type: CollectionItemType
     ) -> bool:
-        """Добавить элемент в коллекцию (лайк).
+        """Add an item to the collection (like).
 
         Args:
-            item_id: ID элемента.
-            item_type: Тип элемента.
+            item_id: Item ID.
+            item_type: Item type.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Добавить элемент в коллекцию (лайк).
         """
         gql = load_query("addItemToCollection")
         result = await self._request.graphql(
@@ -807,14 +886,16 @@ class ClientAsync:
     async def remove_from_collection(
         self, item_id: Union[str, int], item_type: CollectionItemType
     ) -> bool:
-        """Убрать элемент из коллекции.
+        """Remove an item from the collection.
 
         Args:
-            item_id: ID элемента.
-            item_type: Тип элемента.
+            item_id: Item ID.
+            item_type: Item type.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Убрать элемент из коллекции.
         """
         gql = load_query("removeItemFromCollection")
         result = await self._request.graphql(
@@ -825,64 +906,98 @@ class ClientAsync:
         collection_data: Dict[str, Any] = result.get("collection", {})
         return "remove_item" in collection_data
 
-    # Shortcut методы для лайков
+    # Shortcut methods for likes
     async def like_track(self, track_id: Union[str, int]) -> bool:
-        """Лайкнуть трек."""
+        """Like a track.
+
+        Note (RU): Лайкнуть трек.
+        """
         return await self.add_to_collection(track_id, CollectionItemType.TRACK)
 
     async def unlike_track(self, track_id: Union[str, int]) -> bool:
-        """Убрать лайк с трека."""
+        """Unlike a track.
+
+        Note (RU): Убрать лайк с трека.
+        """
         return await self.remove_from_collection(track_id, CollectionItemType.TRACK)
 
     async def like_release(self, release_id: Union[str, int]) -> bool:
-        """Лайкнуть релиз."""
+        """Like a release.
+
+        Note (RU): Лайкнуть релиз.
+        """
         return await self.add_to_collection(release_id, CollectionItemType.RELEASE)
 
     async def unlike_release(self, release_id: Union[str, int]) -> bool:
-        """Убрать лайк с релиза."""
+        """Unlike a release.
+
+        Note (RU): Убрать лайк с релиза.
+        """
         return await self.remove_from_collection(release_id, CollectionItemType.RELEASE)
 
     async def like_artist(self, artist_id: Union[str, int]) -> bool:
-        """Лайкнуть артиста."""
+        """Like an artist.
+
+        Note (RU): Лайкнуть артиста.
+        """
         return await self.add_to_collection(artist_id, CollectionItemType.ARTIST)
 
     async def unlike_artist(self, artist_id: Union[str, int]) -> bool:
-        """Убрать лайк с артиста."""
+        """Unlike an artist.
+
+        Note (RU): Убрать лайк с артиста.
+        """
         return await self.remove_from_collection(artist_id, CollectionItemType.ARTIST)
 
     async def like_playlist(self, playlist_id: Union[str, int]) -> bool:
-        """Лайкнуть плейлист."""
+        """Like a playlist.
+
+        Note (RU): Лайкнуть плейлист.
+        """
         return await self.add_to_collection(playlist_id, CollectionItemType.PLAYLIST)
 
     async def unlike_playlist(self, playlist_id: Union[str, int]) -> bool:
-        """Убрать лайк с плейлиста."""
+        """Unlike a playlist.
+
+        Note (RU): Убрать лайк с плейлиста.
+        """
         return await self.remove_from_collection(playlist_id, CollectionItemType.PLAYLIST)
 
     async def like_podcast(self, podcast_id: Union[str, int]) -> bool:
-        """Лайкнуть подкаст."""
+        """Like a podcast.
+
+        Note (RU): Лайкнуть подкаст.
+        """
         return await self.add_to_collection(podcast_id, CollectionItemType.PODCAST)
 
     async def unlike_podcast(self, podcast_id: Union[str, int]) -> bool:
-        """Убрать лайк с подкаста."""
+        """Unlike a podcast.
+
+        Note (RU): Убрать лайк с подкаста.
+        """
         return await self.remove_from_collection(podcast_id, CollectionItemType.PODCAST)
 
-    # ========== Скрытые элементы ==========
+    # ========== Hidden items ==========
 
     async def get_hidden_collection(self) -> Optional[HiddenCollection]:
-        """Получить скрытые элементы.
+        """Get hidden items.
 
         Returns:
-            Скрытая коллекция.
+            Hidden collection.
+
+        Note (RU): Получить скрытые элементы.
         """
         gql = load_query("getAllHiddenCollection")
         result = await self._request.graphql(gql, "getAllHiddenCollection", {})
         return HiddenCollection.de_json(result.get("hidden_collection", {}), self)
 
     async def get_hidden_tracks(self) -> List[CollectionItem]:
-        """Получить скрытые треки.
+        """Get hidden tracks.
 
         Returns:
-            Список скрытых треков.
+            List of hidden tracks.
+
+        Note (RU): Получить скрытые треки.
         """
         gql = load_query("getHiddenTracks")
         result = await self._request.graphql(gql, "getHiddenTracks", {})
@@ -890,14 +1005,16 @@ class ClientAsync:
         return CollectionItem.de_list(hidden_data.get("tracks", []), self)
 
     async def add_to_hidden(self, item_id: Union[str, int], item_type: CollectionItemType) -> bool:
-        """Скрыть элемент.
+        """Hide an item.
 
         Args:
-            item_id: ID элемента.
-            item_type: Тип элемента.
+            item_id: Item ID.
+            item_type: Item type.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Скрыть элемент.
         """
         gql = load_query("addItemToHidden")
         result = await self._request.graphql(
@@ -911,14 +1028,16 @@ class ClientAsync:
     async def remove_from_hidden(
         self, item_id: Union[str, int], item_type: CollectionItemType
     ) -> bool:
-        """Убрать элемент из скрытых.
+        """Remove an item from hidden.
 
         Args:
-            item_id: ID элемента.
-            item_type: Тип элемента.
+            item_id: Item ID.
+            item_type: Item type.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Убрать элемент из скрытых.
         """
         gql = load_query("removeItemFromHidden")
         result = await self._request.graphql(
@@ -930,25 +1049,33 @@ class ClientAsync:
         return "remove_item" in hidden_data
 
     async def hide_track(self, track_id: Union[str, int]) -> bool:
-        """Скрыть трек."""
+        """Hide a track.
+
+        Note (RU): Скрыть трек.
+        """
         return await self.add_to_hidden(track_id, CollectionItemType.TRACK)
 
     async def unhide_track(self, track_id: Union[str, int]) -> bool:
-        """Убрать трек из скрытых."""
+        """Remove a track from hidden.
+
+        Note (RU): Убрать трек из скрытых.
+        """
         return await self.remove_from_hidden(track_id, CollectionItemType.TRACK)
 
-    # ========== Профили ==========
+    # ========== Profiles ==========
 
     async def get_profile_followers_count(
         self, profile_ids: Union[str, int, List[Union[str, int]]]
     ) -> List[int]:
-        """Получить количество подписчиков профилей.
+        """Get profile followers count.
 
         Args:
-            profile_ids: ID профиля или список ID.
+            profile_ids: Profile ID or list of IDs.
 
         Returns:
-            Список количества подписчиков.
+            List of follower counts.
+
+        Note (RU): Получить количество подписчиков профилей.
         """
         ids = self._to_id_list(profile_ids)
 
@@ -958,13 +1085,15 @@ class ClientAsync:
         return [p.get("collection_item_data", {}).get("likes_count", 0) for p in profiles]
 
     async def get_following_count(self, profile_id: Union[str, int]) -> int:
-        """Получить количество подписок пользователя.
+        """Get the user's following count.
 
         Args:
-            profile_id: ID профиля.
+            profile_id: Profile ID.
 
         Returns:
-            Количество подписок.
+            Following count.
+
+        Note (RU): Получить количество подписок пользователя.
         """
         gql = load_query("followingCount")
         result = await self._request.graphql(gql, "followingCount", {"id": str(profile_id)})
@@ -973,13 +1102,15 @@ class ClientAsync:
         count: int = followings.get("count", 0)
         return count
 
-    # ========== История ==========
+    # ========== History ==========
 
     async def get_listening_history(self) -> List[Dict[str, Any]]:
-        """Получить историю прослушивания.
+        """Get listening history.
 
         Returns:
-            История прослушивания.
+            Listening history.
+
+        Note (RU): Получить историю прослушивания.
         """
         gql = load_query("listeningHistory")
         result = await self._request.graphql(gql, "listeningHistory", {})
@@ -987,10 +1118,12 @@ class ClientAsync:
         return history
 
     async def get_listened_episodes(self) -> List[Dict[str, Any]]:
-        """Получить прослушанные эпизоды.
+        """Get listened episodes.
 
         Returns:
-            Прослушанные эпизоды.
+            Listened episodes.
+
+        Note (RU): Получить прослушанные эпизоды.
         """
         gql = load_query("listenedEpisodes")
         result = await self._request.graphql(gql, "listenedEpisodes", {})
@@ -999,10 +1132,12 @@ class ClientAsync:
         return episodes
 
     async def has_unread_notifications(self) -> bool:
-        """Проверить наличие непрочитанных уведомлений.
+        """Check for unread notifications.
 
         Returns:
-            Есть ли непрочитанные уведомления.
+            Whether there are unread notifications.
+
+        Note (RU): Проверить наличие непрочитанных уведомлений.
         """
         gql = load_query("notificationsHasUnread")
         result = await self._request.graphql(gql, "notificationsHasUnread", {})

@@ -5,6 +5,42 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.5.2] - 2026-01-31
+
+### Исправлено
+
+- Исправлена проблема неопубликованной v0.5.1 на PyPI (auto-release не содержал build+publish на момент бампа v0.5.1)
+
+### Изменено
+
+- Все GitHub Actions объединены в один PR от dependabot (было 3 отдельных PR)
+- Расписание dependabot изменено с еженедельного на ежемесячное
+- Исключены ветки `dependabot/**` из push-триггера `tests.yml` (тестируются через `pull_request`)
+- Исключены ветки `dependabot/**` из `auto-pr.yml` (dependabot создаёт собственные PR)
+
+## [0.5.1] - 2026-01-31
+
+### Изменено
+
+- Оптимизация CI/CD: сокращение с 15 до 5 test jobs и с 3 до 2 build jobs при релизе
+- Вынесен парсинг версии в переиспользуемый composite action (`.github/actions/get-version`)
+- Упрощён `auto-release.yml`: убрана дублирующая матрица тестов, сохранены build+publish (необходимы из-за ограничения событий `GITHUB_TOKEN`)
+- Убрана дублирующая матрица тестов из `publish.yml`; оставлен как fallback для ручных релизов
+- Добавлен concurrency control в `auto-release.yml`
+- Добавлена загрузка build-артефактов в `tests.yml`
+- Обновлён `codecov-action` v4 → v5
+- Добавлен явный `--base main` в `auto-pr.yml`
+- Добавлена секция CI/CD архитектуры в CLAUDE.md
+
+## [0.5.0] - 2026-01-31
+
+### Изменено
+
+- Все docstring переведены в двуязычный формат (English + `Note (RU):` с русским текстом)
+- Все inline-комментарии и маркеры секций переведены на английский
+- Перегенерированы async-клиент и request-файлы
+- Обновлены языковые рекомендации в CLAUDE.md
+
 ## [0.4.1] - 2026-01-31
 
 ### Исправлено

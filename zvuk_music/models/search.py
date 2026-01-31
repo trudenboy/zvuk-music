@@ -1,4 +1,7 @@
-"""Модели поиска."""
+"""Search models.
+
+Note (RU): Модели поиска.
+"""
 
 from __future__ import annotations
 
@@ -21,7 +24,7 @@ if TYPE_CHECKING:
     from zvuk_music.base import ClientType
 
 
-# Type alias для cursor-based пагинации
+# Type alias for cursor-based pagination
 Cursor = str
 
 T = TypeVar("T")
@@ -29,9 +32,15 @@ T = TypeVar("T")
 
 @model
 class Page(ZvukMusicModel):
-    """Информация о пагинации.
+    """Pagination information.
 
     Attributes:
+        total: Total count.
+        prev: Previous page.
+        next: Next page.
+        cursor: Cursor for the next page.
+
+    Note (RU): Информация о пагинации.
         total: Общее количество.
         prev: Предыдущая страница.
         next: Следующая страница.
@@ -48,19 +57,30 @@ class Page(ZvukMusicModel):
         self._id_attrs = (self.total, self.cursor)
 
     def has_next(self) -> bool:
-        """Есть ли следующая страница."""
+        """Check if there is a next page.
+
+        Note (RU): Есть ли следующая страница.
+        """
         return self.next is not None or self.cursor is not None
 
     def has_prev(self) -> bool:
-        """Есть ли предыдущая страница."""
+        """Check if there is a previous page.
+
+        Note (RU): Есть ли предыдущая страница.
+        """
         return self.prev is not None
 
 
 @model
 class SearchResult(ZvukMusicModel, Generic[T]):
-    """Результат поиска.
+    """Search result.
 
     Attributes:
+        page: Pagination information.
+        score: Relevance.
+        items: Found items.
+
+    Note (RU): Результат поиска.
         page: Информация о пагинации.
         score: Релевантность.
         items: Найденные элементы.
@@ -75,7 +95,10 @@ class SearchResult(ZvukMusicModel, Generic[T]):
     def de_json_with_type(
         cls, data: JSONType, client: "ClientType", item_class: type[ZvukMusicModel]
     ) -> Optional[Self]:
-        """Десериализация с указанием типа элементов."""
+        """Deserialize with specified item type.
+
+        Note (RU): Десериализация с указанием типа элементов.
+        """
         if not cls.is_dict_model_data(data):
             return None
 
@@ -91,9 +114,20 @@ class SearchResult(ZvukMusicModel, Generic[T]):
 
 @model
 class Search(ZvukMusicModel):
-    """Результаты поиска.
+    """Search results.
 
     Attributes:
+        search_id: Search session ID.
+        tracks: Found tracks.
+        artists: Found artists.
+        releases: Found releases.
+        playlists: Found playlists.
+        profiles: Found profiles.
+        books: Found books.
+        episodes: Found episodes.
+        podcasts: Found podcasts.
+
+    Note (RU): Результаты поиска.
         search_id: ID поисковой сессии.
         tracks: Найденные треки.
         artists: Найденные артисты.
@@ -164,12 +198,25 @@ class Search(ZvukMusicModel):
 
 @model
 class QuickSearch(ZvukMusicModel):
-    """Результаты быстрого поиска.
+    """Quick search results.
 
-    API возвращает массив `content` со смешанными типами,
-    которые разделяются по полю `__typename`.
+    The API returns a `content` array with mixed types,
+    which are separated by the `__typename` field.
 
     Attributes:
+        search_session_id: Search session ID.
+        tracks: Found tracks.
+        artists: Found artists.
+        releases: Found releases.
+        playlists: Found playlists.
+        profiles: Found profiles.
+        books: Found books.
+        episodes: Found episodes.
+        podcasts: Found podcasts.
+
+    Note (RU): Результаты быстрого поиска.
+        API возвращает массив `content` со смешанными типами,
+        которые разделяются по полю `__typename`.
         search_session_id: ID поисковой сессии.
         tracks: Найденные треки.
         artists: Найденные артисты.
@@ -202,7 +249,7 @@ class QuickSearch(ZvukMusicModel):
 
         data_dict: Dict[str, Any] = data.copy()
 
-        # API возвращает content как смешанный массив с __typename
+        # API returns content as a mixed array with __typename
         if "content" in data_dict and isinstance(data_dict["content"], list):
             tracks_data = []
             artists_data = []
@@ -244,7 +291,7 @@ class QuickSearch(ZvukMusicModel):
             data_dict["podcasts"] = SimplePodcast.de_list(podcasts_data, client)
             del data_dict["content"]
         else:
-            # Fallback для старого формата (отдельные списки)
+            # Fallback for legacy format (separate lists)
             if "tracks" in data_dict:
                 data_dict["tracks"] = SimpleTrack.de_list(data_dict["tracks"], client)
             if "artists" in data_dict:

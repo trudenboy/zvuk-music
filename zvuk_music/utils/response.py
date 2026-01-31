@@ -11,15 +11,17 @@ if TYPE_CHECKING:
 
 @model
 class Response(ZvukMusicModel):
-    """Обёртка над ответом API.
+    """API response wrapper.
 
-    Поддерживает как GraphQL формат (с полем data),
-    так и REST формат (без обёртки).
+    Supports both GraphQL format (with data field)
+    and REST format (without wrapper).
 
     Attributes:
-        data: Данные ответа.
-        errors: Список ошибок GraphQL.
-        _raw_data: Исходные данные (для REST API).
+        data: Response data.
+        errors: List of GraphQL errors.
+        _raw_data: Original data (for REST API).
+
+    Note (RU): Обёртка над ответом API.
     """
 
     client: Optional["ClientType"] = None
@@ -32,14 +34,16 @@ class Response(ZvukMusicModel):
 
     @classmethod
     def de_json(cls, data: Any, client: Optional["ClientType"]) -> Optional["Response"]:
-        """Десериализация ответа API.
+        """Deserialize API response.
 
         Args:
-            data: Словарь данных от API.
-            client: Клиент.
+            data: Data dictionary from API.
+            client: Client.
 
         Returns:
-            Объект Response.
+            Response object.
+
+        Note (RU): Десериализация ответа API.
         """
         if data is None:
             return None
@@ -47,7 +51,7 @@ class Response(ZvukMusicModel):
         if not isinstance(data, dict):
             return None
 
-        # GraphQL формат: {"data": {...}, "errors": [...]}
+        # GraphQL format: {"data": {...}, "errors": [...]}
         if "data" in data:
             return cls(
                 client=client,
@@ -56,30 +60,42 @@ class Response(ZvukMusicModel):
                 _raw_data=data,
             )
 
-        # REST формат (Tiny API): {"result": {...}} или просто словарь
+        # REST format (Tiny API): {"result": {...}} or just a dictionary
         return cls(
             client=client,
-            data=data,  # Сохраняем весь ответ как data
+            data=data,  # Save entire response as data
             errors=None,
             _raw_data=data,
         )
 
     def has_errors(self) -> bool:
-        """Проверка наличия ошибок в ответе."""
+        """Check for errors in the response.
+
+        Note (RU): Проверка наличия ошибок в ответе.
+        """
         return bool(self.errors)
 
     def get_error(self) -> str:
-        """Получение текста первой ошибки."""
+        """Get the first error message.
+
+        Note (RU): Получение текста первой ошибки.
+        """
         if self.errors and len(self.errors) > 0:
             return str(self.errors[0].get("message", "Unknown GraphQL error"))
         return "Unknown error"
 
     def get_all_errors(self) -> List[str]:
-        """Получение всех ошибок."""
+        """Get all errors.
+
+        Note (RU): Получение всех ошибок.
+        """
         if not self.errors:
             return []
         return [e.get("message", str(e)) for e in self.errors]
 
     def get_result(self) -> Optional[Dict[str, Any]]:
-        """Получение данных ответа."""
+        """Get response data.
+
+        Note (RU): Получение данных ответа.
+        """
         return self.data

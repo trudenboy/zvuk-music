@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: auto-release
+  cancel-in-progress: false
+
 permissions:
   contents: write
   id-token: write
@@ -17,21 +21,13 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Get version from __init__.py
+      - name: Get version
         id: version
-        run: |
-          VERSION=$(python -c "
-          import re
-          with open('zvuk_music/__init__.py') as f:
-              match = re.search(r'__version__\s*=\s*\"(.+?)\"', f.read())
-              print(match.group(1))
-          ")
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/get-version
 
       - name: Get latest tag
         id: latest_tag
@@ -54,54 +50,34 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  test:
-    name: Test (Python ${{ matrix.python-version }})
+  # Build and publish are embedded here because releases created with
+  # GITHUB_TOKEN do not trigger other workflows (publish.yml won't fire).
+  # publish.yml remains as fallback for manually-created releases.
+  build:
+    name: Build Package
     runs-on: ubuntu-latest
     needs: release
     if: needs.release.outputs.released == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
           cache: "pip"
           cache-dependency-path: pyproject.toml
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev,async]"
+          pip install build twine -e ".[dev,async]"
 
-      - name: Run tests
-        run: pytest --cov=zvuk_music --cov-fail-under=65
-
-  build:
-    name: Build Package
-    runs-on: ubuntu-latest
-    needs: [release, test]
-    if: needs.release.outputs.released == 'true'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-          cache-dependency-path: pyproject.toml
-
-      - name: Install build tools
+      - name: Check async client consistency
         run: |
-          python -m pip install --upgrade pip
-          pip install build twine
+          python scripts/generate_async_version.py
+          git diff --exit-code
 
       - name: Build package
         run: python -m build
@@ -110,7 +86,7 @@ jobs:
         run: twine check dist/*
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dist
           path: dist/
@@ -124,7 +100,7 @@ jobs:
 
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: dist
           path: dist/

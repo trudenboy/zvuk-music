@@ -1,4 +1,7 @@
-"""Модели стриминга."""
+"""Streaming models.
+
+Note (RU): Модели стриминга.
+"""
 
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional, Tuple
@@ -14,9 +17,14 @@ if TYPE_CHECKING:
 
 @model
 class StreamUrls(ZvukMusicModel):
-    """URL для стриминга.
+    """Streaming URLs.
 
     Attributes:
+        mid: 128kbps MP3 URL (always available).
+        high: 320kbps MP3 URL (requires subscription).
+        flacdrm: FLAC URL with DRM (requires subscription).
+
+    Note (RU): URL для стриминга.
         mid: URL 128kbps MP3 (всегда доступен).
         high: URL 320kbps MP3 (требует подписку).
         flacdrm: URL FLAC с DRM (требует подписку).
@@ -31,17 +39,19 @@ class StreamUrls(ZvukMusicModel):
         self._id_attrs = (self.mid,)
 
     def get_url(self, quality: Quality = Quality.HIGH) -> str:
-        """Получить URL для указанного качества.
+        """Get URL for the specified quality.
 
         Args:
-            quality: Качество аудио.
+            quality: Audio quality.
 
         Returns:
-            URL для скачивания/стриминга.
+            URL for downloading/streaming.
 
         Raises:
-            QualityNotAvailableError: Если качество недоступно.
-            SubscriptionRequiredError: Если требуется подписка.
+            QualityNotAvailableError: If the quality is not available.
+            SubscriptionRequiredError: If a subscription is required.
+
+        Note (RU): Получить URL для указанного качества.
         """
         if quality == Quality.FLAC:
             if not self.flacdrm:
@@ -61,10 +71,12 @@ class StreamUrls(ZvukMusicModel):
         raise QualityNotAvailableError(f"Unknown quality: {quality}")
 
     def get_best_available(self) -> Tuple[Quality, str]:
-        """Получить лучшее доступное качество.
+        """Get the best available quality.
 
         Returns:
-            Кортеж (качество, URL).
+            Tuple of (quality, URL).
+
+        Note (RU): Получить лучшее доступное качество.
         """
         if self.flacdrm:
             return (Quality.FLAC, self.flacdrm)
@@ -75,9 +87,16 @@ class StreamUrls(ZvukMusicModel):
 
 @model
 class Stream(ZvukMusicModel):
-    """Информация о стриме с временем истечения.
+    """Stream information with expiration time.
 
     Attributes:
+        expire: Expiration time (ISO 8601).
+        expire_delta: Seconds until expiration.
+        mid: 128kbps MP3 URL.
+        high: 320kbps MP3 URL.
+        flacdrm: FLAC URL with DRM.
+
+    Note (RU): Информация о стриме с временем истечения.
         expire: Время истечения (ISO 8601).
         expire_delta: Секунды до истечения.
         mid: URL 128kbps MP3.
@@ -96,29 +115,34 @@ class Stream(ZvukMusicModel):
         self._id_attrs = (self.mid, self.expire)
 
     def is_expired(self) -> bool:
-        """Проверка, истёк ли срок действия URL."""
+        """Check if the URL has expired.
+
+        Note (RU): Проверка, истёк ли срок действия URL.
+        """
         if not self.expire:
             return True
 
         try:
-            # Пробуем ISO 8601
+            # Try ISO 8601
             expire_time = datetime.fromisoformat(self.expire.replace("Z", "+00:00"))
             return datetime.now(expire_time.tzinfo) > expire_time
         except (ValueError, TypeError):
             return True
 
     def get_url(self, quality: Quality = Quality.HIGH) -> str:
-        """Получить URL для указанного качества.
+        """Get URL for the specified quality.
 
         Args:
-            quality: Качество аудио.
+            quality: Audio quality.
 
         Returns:
-            URL для скачивания/стриминга.
+            URL for downloading/streaming.
 
         Raises:
-            QualityNotAvailableError: Если качество недоступно.
-            SubscriptionRequiredError: Если требуется подписка.
+            QualityNotAvailableError: If the quality is not available.
+            SubscriptionRequiredError: If a subscription is required.
+
+        Note (RU): Получить URL для указанного качества.
         """
         urls = StreamUrls(
             client=self.client,
@@ -129,10 +153,12 @@ class Stream(ZvukMusicModel):
         return urls.get_url(quality)
 
     def get_best_available(self) -> Tuple[Quality, str]:
-        """Получить лучшее доступное качество.
+        """Get the best available quality.
 
         Returns:
-            Кортеж (качество, URL).
+            Tuple of (quality, URL).
+
+        Note (RU): Получить лучшее доступное качество.
         """
         urls = StreamUrls(
             client=self.client,

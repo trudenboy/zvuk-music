@@ -9,23 +9,25 @@ GRAPHQL_DIR = Path(__file__).parent.parent / "graphql"
 
 @lru_cache(maxsize=100)
 def load_query(name: str) -> str:
-    """Загрузка GraphQL запроса из файла.
+    """Load a GraphQL query from file.
 
     Args:
-        name: Имя запроса (без расширения .graphql).
+        name: Query name (without .graphql extension).
 
     Returns:
-        Содержимое GraphQL файла.
+        GraphQL file contents.
 
     Raises:
-        FileNotFoundError: Если файл не найден.
+        FileNotFoundError: If file is not found.
+
+    Note (RU): Загрузка GraphQL запроса из файла.
     """
-    # Ищем в queries
+    # Search in queries
     query_path = GRAPHQL_DIR / "queries" / f"{name}.graphql"
     if query_path.exists():
         return query_path.read_text(encoding="utf-8")
 
-    # Ищем в mutations
+    # Search in mutations
     mutation_path = GRAPHQL_DIR / "mutations" / f"{name}.graphql"
     if mutation_path.exists():
         return mutation_path.read_text(encoding="utf-8")
@@ -34,10 +36,12 @@ def load_query(name: str) -> str:
 
 
 def get_all_queries() -> Dict[str, str]:
-    """Получение всех доступных GraphQL запросов.
+    """Get all available GraphQL queries.
 
     Returns:
-        Словарь {имя: содержимое} для всех запросов.
+        Dictionary {name: contents} for all queries.
+
+    Note (RU): Получение всех доступных GraphQL запросов.
     """
     queries: Dict[str, str] = {}
 

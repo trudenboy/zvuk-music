@@ -1,4 +1,7 @@
-"""Модели трека."""
+"""Track models.
+
+Note (RU): Модели трека.
+"""
 
 from __future__ import annotations
 
@@ -22,15 +25,17 @@ if TYPE_CHECKING:
 
 @model
 class SimpleTrack(ZvukMusicModel):
-    """Краткая информация о треке.
+    """Brief track information.
 
     Attributes:
-        id: ID трека.
-        title: Название.
-        duration: Длительность в секундах.
-        explicit: Explicit содержимое.
-        artists: Артисты.
-        release: Релиз.
+        id: Track ID.
+        title: Title.
+        duration: Duration in seconds.
+        explicit: Explicit content.
+        artists: Artists.
+        release: Release.
+
+    Note (RU): Краткая информация о треке.
     """
 
     client: Optional["ClientType"] = None
@@ -59,35 +64,44 @@ class SimpleTrack(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_duration_str(self) -> str:
-        """Получить длительность в формате MM:SS.
+        """Get duration in MM:SS format.
 
         Returns:
-            Строка длительности.
+            Duration string.
+
+        Note (RU): Получить длительность в формате MM:SS.
         """
         minutes = self.duration // 60
         seconds = self.duration % 60
         return f"{minutes}:{seconds:02d}"
 
     def get_artists_str(self) -> str:
-        """Получить строку с именами артистов.
+        """Get a string with artist names.
 
         Returns:
-            Имена артистов через запятую.
+            Artist names separated by commas.
+
+        Note (RU): Получить строку с именами артистов.
         """
         return ", ".join(a.title for a in self.artists)
 
     def get_full_info(self) -> Optional["Track"]:
-        """Получить полную информацию о треке.
+        """Get full track information.
 
         Returns:
-            Полная информация или None.
+            Full information or None.
+
+        Note (RU): Получить полную информацию о треке.
         """
         if self.valid_client(self.client):
             return self.client.get_track(self.id)
         return None
 
     async def get_full_info_async(self) -> Optional["Track"]:
-        """Получить полную информацию о треке (async)."""
+        """Get full track information (async).
+
+        Note (RU): Получить полную информацию о треке (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.get_track(self.id)
         return None
@@ -95,27 +109,29 @@ class SimpleTrack(ZvukMusicModel):
 
 @model
 class Track(ZvukMusicModel):
-    """Полная информация о треке.
+    """Full track information.
 
     Attributes:
-        id: ID трека.
-        title: Название.
-        search_title: Название для поиска.
-        position: Позиция в релизе.
-        duration: Длительность в секундах.
-        availability: Доступность.
-        artist_template: Шаблон имени артиста.
-        condition: Состояние.
-        explicit: Explicit содержимое.
-        lyrics: Текст песни.
-        zchan: Канал.
-        has_flac: Доступен ли FLAC.
-        artist_names: Имена артистов.
-        credits: Авторы.
-        genres: Жанры.
-        artists: Артисты.
-        release: Релиз.
-        collection_item_data: Данные о лайке.
+        id: Track ID.
+        title: Title.
+        search_title: Search title.
+        position: Position in the release.
+        duration: Duration in seconds.
+        availability: Availability.
+        artist_template: Artist name template.
+        condition: Condition.
+        explicit: Explicit content.
+        lyrics: Lyrics.
+        zchan: Channel.
+        has_flac: Whether FLAC is available.
+        artist_names: Artist names.
+        credits: Credits.
+        genres: Genres.
+        artists: Artists.
+        release: Release.
+        collection_item_data: Like data.
+
+    Note (RU): Полная информация о треке.
     """
 
     client: Optional["ClientType"] = None
@@ -162,60 +178,78 @@ class Track(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_duration_str(self) -> str:
-        """Получить длительность в формате MM:SS."""
+        """Get duration in MM:SS format.
+
+        Note (RU): Получить длительность в формате MM:SS.
+        """
         minutes = self.duration // 60
         seconds = self.duration % 60
         return f"{minutes}:{seconds:02d}"
 
     def get_artists_str(self) -> str:
-        """Получить строку с именами артистов."""
+        """Get a string with artist names.
+
+        Note (RU): Получить строку с именами артистов.
+        """
         if self.artists:
             return ", ".join(a.title for a in self.artists)
         return ", ".join(self.artist_names)
 
     def get_cover_url(self, size: int = 300) -> str:
-        """Получить URL обложки.
+        """Get cover URL.
 
         Args:
-            size: Размер изображения.
+            size: Image size.
 
         Returns:
-            URL обложки.
+            Cover URL.
+
+        Note (RU): Получить URL обложки.
         """
         if self.release and self.release.image:
             return self.release.image.get_url(size, size)
         return ""
 
     def is_liked(self) -> bool:
-        """Проверка, лайкнут ли трек."""
+        """Check if the track is liked.
+
+        Note (RU): Проверка, лайкнут ли трек.
+        """
         if self.collection_item_data:
             return self.collection_item_data.is_liked()
         return False
 
     def get_stream_url(self, quality: Quality = Quality.HIGH) -> str:
-        """Получить URL для стриминга.
+        """Get streaming URL.
 
         Args:
-            quality: Качество аудио.
+            quality: Audio quality.
 
         Returns:
-            URL для скачивания/стриминга.
+            Download/streaming URL.
+
+        Note (RU): Получить URL для стриминга.
         """
         if self.valid_client(self.client):
             return self.client.get_stream_url(self.id, quality)
         return ""
 
     async def get_stream_url_async(self, quality: Quality = Quality.HIGH) -> str:
-        """Получить URL для стриминга (async)."""
+        """Get streaming URL (async).
+
+        Note (RU): Получить URL для стриминга (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.get_stream_url(self.id, quality)
         return ""
 
     def get_stream(self) -> Optional["Stream"]:
-        """Получить объект Stream с URL и временем истечения.
+        """Get Stream object with URL and expiration time.
 
         Returns:
-            Объект Stream или None.
+            Stream object or None.
+
+        Note (RU): Получить объект Stream с URL и временем истечения.
         """
         if self.valid_client(self.client):
             streams = self.client.get_stream_urls([self.id])
@@ -224,7 +258,10 @@ class Track(ZvukMusicModel):
         return None
 
     async def get_stream_async(self) -> Optional["Stream"]:
-        """Получить объект Stream (async)."""
+        """Get Stream object (async).
+
+        Note (RU): Получить объект Stream (async).
+        """
         if self.valid_async_client(self.client):
             streams = await self.client.get_stream_urls([self.id])
             if streams:
@@ -232,71 +269,99 @@ class Track(ZvukMusicModel):
         return None
 
     def download(self, filename: str, quality: Quality = Quality.HIGH) -> None:
-        """Скачать трек.
+        """Download track.
 
         Args:
-            filename: Путь для сохранения.
-            quality: Качество аудио.
+            filename: Path to save.
+            quality: Audio quality.
+
+        Note (RU): Скачать трек.
         """
         if self.valid_client(self.client):
             url = self.get_stream_url(quality)
             self.client._request.download(url, filename)
 
     async def download_async(self, filename: str, quality: Quality = Quality.HIGH) -> None:
-        """Скачать трек (async).
+        """Download track (async).
 
         Args:
-            filename: Путь для сохранения.
-            quality: Качество аудио.
+            filename: Path to save.
+            quality: Audio quality.
+
+        Note (RU): Скачать трек (async).
         """
         if self.valid_async_client(self.client):
             url = await self.get_stream_url_async(quality)
             await self.client._request.download(url, filename)
 
     def like(self) -> bool:
-        """Добавить трек в коллекцию."""
+        """Add track to collection.
+
+        Note (RU): Добавить трек в коллекцию.
+        """
         if self.valid_client(self.client):
             return self.client.like_track(self.id)
         return False
 
     def unlike(self) -> bool:
-        """Убрать трек из коллекции."""
+        """Remove track from collection.
+
+        Note (RU): Убрать трек из коллекции.
+        """
         if self.valid_client(self.client):
             return self.client.unlike_track(self.id)
         return False
 
     def hide(self) -> bool:
-        """Скрыть трек."""
+        """Hide track.
+
+        Note (RU): Скрыть трек.
+        """
         if self.valid_client(self.client):
             return self.client.hide_track(self.id)
         return False
 
     def unhide(self) -> bool:
-        """Убрать трек из скрытых."""
+        """Remove track from hidden.
+
+        Note (RU): Убрать трек из скрытых.
+        """
         if self.valid_client(self.client):
             return self.client.unhide_track(self.id)
         return False
 
     async def like_async(self) -> bool:
-        """Добавить трек в коллекцию (async)."""
+        """Add track to collection (async).
+
+        Note (RU): Добавить трек в коллекцию (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.like_track(self.id)
         return False
 
     async def unlike_async(self) -> bool:
-        """Убрать трек из коллекции (async)."""
+        """Remove track from collection (async).
+
+        Note (RU): Убрать трек из коллекции (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.unlike_track(self.id)
         return False
 
     async def hide_async(self) -> bool:
-        """Скрыть трек (async)."""
+        """Hide track (async).
+
+        Note (RU): Скрыть трек (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.hide_track(self.id)
         return False
 
     async def unhide_async(self) -> bool:
-        """Убрать трек из скрытых (async)."""
+        """Remove track from hidden (async).
+
+        Note (RU): Убрать трек из скрытых (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.unhide_track(self.id)
         return False

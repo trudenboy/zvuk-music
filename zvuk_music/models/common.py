@@ -1,4 +1,7 @@
-"""Общие модели данных."""
+"""Common data models.
+
+Note (RU): Общие модели данных.
+"""
 
 from typing import TYPE_CHECKING, Any, Dict, Optional
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
@@ -15,14 +18,16 @@ if TYPE_CHECKING:
 
 @model
 class Image(ZvukMusicModel):
-    """Изображение.
+    """Image.
 
     Attributes:
-        src: URL изображения или путь /static/...
-        h: Высота.
-        w: Ширина.
-        palette: Основной цвет палитры.
-        palette_bottom: Дополнительный цвет палитры.
+        src: Image URL or /static/... path.
+        h: Height.
+        w: Width.
+        palette: Primary palette color.
+        palette_bottom: Secondary palette color.
+
+    Note (RU): Изображение.
     """
 
     client: Optional["ClientType"] = None
@@ -36,22 +41,24 @@ class Image(ZvukMusicModel):
         self._id_attrs = (self.src,)
 
     def get_url(self, width: int = 300, height: int = 300) -> str:
-        """Получить URL изображения с указанным размером.
+        """Get image URL with the specified size.
 
         Args:
-            width: Ширина изображения.
-            height: Высота изображения.
+            width: Image width.
+            height: Image height.
 
         Returns:
-            URL изображения.
+            Image URL.
+
+        Note (RU): Получить URL изображения с указанным размером.
         """
         src = self.src
 
-        # Обработка относительных путей
+        # Handle relative paths
         if src.startswith("/"):
             src = f"https://zvuk.com{src}"
 
-        # Обработка параметра size
+        # Handle size parameter
         parsed = urlparse(src)
         if "size" in parse_qs(parsed.query):
             query_dict = parse_qs(parsed.query, keep_blank_values=True)
@@ -64,11 +71,13 @@ class Image(ZvukMusicModel):
 
 @model
 class Label(ZvukMusicModel):
-    """Лейбл / мейджор.
+    """Label / major.
 
     Attributes:
-        id: ID лейбла.
-        title: Название лейбла.
+        id: Label ID.
+        title: Label name.
+
+    Note (RU): Лейбл / мейджор.
     """
 
     client: Optional["ClientType"] = None
@@ -81,12 +90,14 @@ class Label(ZvukMusicModel):
 
 @model
 class Genre(ZvukMusicModel):
-    """Жанр.
+    """Genre.
 
     Attributes:
-        id: ID жанра.
-        name: Название жанра.
-        short_name: Короткое название.
+        id: Genre ID.
+        name: Genre name.
+        short_name: Short name.
+
+    Note (RU): Жанр.
     """
 
     client: Optional["ClientType"] = None
@@ -100,13 +111,15 @@ class Genre(ZvukMusicModel):
 
 @model
 class Background(ZvukMusicModel):
-    """Фон.
+    """Background.
 
     Attributes:
-        type: Тип фона.
-        image: URL изображения.
-        color: Цвет.
-        gradient: Градиент.
+        type: Background type.
+        image: Image URL.
+        color: Color.
+        gradient: Gradient.
+
+    Note (RU): Фон.
     """
 
     client: Optional["ClientType"] = None
@@ -125,7 +138,7 @@ class Background(ZvukMusicModel):
 
         data_dict: Dict[str, Any] = data.copy()
 
-        # Конвертация type в enum
+        # Convert type to enum
         if "type" in data_dict and data_dict["type"]:
             try:
                 data_dict["type"] = BackgroundType(data_dict["type"])
@@ -137,13 +150,15 @@ class Background(ZvukMusicModel):
 
 @model
 class Animation(ZvukMusicModel):
-    """Анимация артиста.
+    """Artist animation.
 
     Attributes:
-        artist_id: ID артиста.
-        effect: Эффект.
-        image: URL изображения.
-        background: Фон.
+        artist_id: Artist ID.
+        effect: Effect.
+        image: Image URL.
+        background: Background.
+
+    Note (RU): Анимация артиста.
     """
 
     client: Optional["ClientType"] = None

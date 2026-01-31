@@ -1,4 +1,4 @@
-"""Тесты базовых классов."""
+"""Tests for base classes."""
 
 import json
 
@@ -11,7 +11,7 @@ from zvuk_music.utils import model
 
 @model
 class _SampleModel(ZvukMusicModel):
-    """Тестовая модель."""
+    """Test model."""
 
     id: str = ""
     name: str = ""
@@ -21,10 +21,10 @@ class _SampleModel(ZvukMusicModel):
 
 
 class TestCleanupData:
-    """Тесты cleanup_data."""
+    """Tests for cleanup_data."""
 
     def test_extra_fields_filtered(self, mock_client):
-        """Неизвестные поля фильтруются."""
+        """Unknown fields are filtered out."""
         data = {"id": "1", "name": "test", "unknown_field": "value", "another": 42}
         cleaned = _SampleModel.cleanup_data(data, mock_client)
         assert "id" in cleaned
@@ -33,29 +33,29 @@ class TestCleanupData:
         assert "another" not in cleaned
 
     def test_report_unknown_fields(self, mock_client):
-        """report_unknown_fields вызывает callback при неизвестных полях."""
+        """report_unknown_fields triggers callback on unknown fields."""
         mock_client.report_unknown_fields = True
         data = {"id": "1", "name": "test", "extra": "val"}
 
-        # Не должно вызывать ошибку
+        # Should not raise an error
         cleaned = _SampleModel.cleanup_data(data, mock_client)
         assert "extra" not in cleaned
         mock_client.report_unknown_fields = False
 
     def test_none_data_returns_empty(self, mock_client):
-        """None возвращает пустой словарь."""
+        """None returns an empty dictionary."""
         assert _SampleModel.cleanup_data(None, mock_client) == {}
 
     def test_empty_dict_returns_empty(self, mock_client):
-        """Пустой словарь возвращает пустой словарь."""
+        """Empty dictionary returns an empty dictionary."""
         assert _SampleModel.cleanup_data({}, mock_client) == {}
 
 
 class TestToDict:
-    """Тесты to_dict."""
+    """Tests for to_dict."""
 
     def test_excludes_client(self, mock_client):
-        """client не попадает в to_dict()."""
+        """client is not included in to_dict()."""
         obj = _SampleModel(client=mock_client, id="1", name="test")
         d = obj.to_dict()
         assert "client" not in d
@@ -63,20 +63,20 @@ class TestToDict:
         assert d["name"] == "test"
 
     def test_excludes_id_attrs(self, mock_client):
-        """_id_attrs не попадает в to_dict()."""
+        """_id_attrs is not included in to_dict()."""
         obj = _SampleModel(client=mock_client, id="1", name="test")
         d = obj.to_dict()
         assert "_id_attrs" not in d
 
     def test_for_request_camel_case(self, mock_client):
-        """to_dict(for_request=True) конвертирует ключи в camelCase."""
+        """to_dict(for_request=True) converts keys to camelCase."""
         genre = Genre(client=mock_client, id="1", name="Rock", short_name="rock")
         d = genre.to_dict(for_request=True)
         assert "shortName" in d
         assert "short_name" not in d
 
     def test_nested_models(self, mock_client):
-        """to_dict рекурсивно сериализует вложенные модели."""
+        """to_dict recursively serializes nested models."""
         data = {
             "id": "1",
             "name": "Rock",
@@ -89,10 +89,10 @@ class TestToDict:
 
 
 class TestToJson:
-    """Тесты to_json."""
+    """Tests for to_json."""
 
     def test_returns_valid_json(self, mock_client):
-        """to_json() возвращает валидный JSON."""
+        """to_json() returns valid JSON."""
         obj = _SampleModel(client=mock_client, id="1", name="test")
         json_str = obj.to_json()
         parsed = json.loads(json_str)
@@ -102,44 +102,44 @@ class TestToJson:
 
 
 class TestEquality:
-    """Тесты __eq__."""
+    """Tests for __eq__."""
 
     def test_equality_by_id_attrs(self, mock_client):
-        """__eq__ сравнивает по _id_attrs."""
+        """__eq__ compares by _id_attrs."""
         obj1 = _SampleModel(client=mock_client, id="1", name="name1")
         obj2 = _SampleModel(client=mock_client, id="1", name="name2")
         assert obj1 == obj2
 
     def test_inequality_by_id_attrs(self, mock_client):
-        """Разные _id_attrs — неравные объекты."""
+        """Different _id_attrs means unequal objects."""
         obj1 = _SampleModel(client=mock_client, id="1", name="test")
         obj2 = _SampleModel(client=mock_client, id="2", name="test")
         assert obj1 != obj2
 
     def test_inequality_different_type(self, mock_client):
-        """Разные типы — неравны."""
+        """Different types are not equal."""
         obj = _SampleModel(client=mock_client, id="1", name="test")
         assert obj != "not a model"
 
 
 class TestHash:
-    """Тесты __hash__."""
+    """Tests for __hash__."""
 
     def test_hash_by_id_attrs(self, mock_client):
-        """__hash__ стабилен для одинаковых id."""
+        """__hash__ is stable for the same id."""
         obj1 = _SampleModel(client=mock_client, id="1", name="name1")
         obj2 = _SampleModel(client=mock_client, id="1", name="name2")
         assert hash(obj1) == hash(obj2)
 
     def test_hash_different_id(self, mock_client):
-        """Разные id — разный хеш (обычно)."""
+        """Different ids produce different hashes (usually)."""
         obj1 = _SampleModel(client=mock_client, id="1", name="test")
         obj2 = _SampleModel(client=mock_client, id="2", name="test")
-        # Разные id обычно дают разный хеш
+        # Different ids usually produce different hashes
         assert hash(obj1) != hash(obj2)
 
     def test_usable_in_set(self, mock_client):
-        """Объекты можно использовать в set."""
+        """Objects can be used in a set."""
         obj1 = _SampleModel(client=mock_client, id="1", name="a")
         obj2 = _SampleModel(client=mock_client, id="1", name="b")
         obj3 = _SampleModel(client=mock_client, id="2", name="c")
@@ -148,39 +148,39 @@ class TestHash:
 
 
 class TestDeJson:
-    """Тесты базового de_json."""
+    """Tests for base de_json."""
 
     def test_de_json_valid(self, mock_client):
-        """Базовый de_json работает."""
+        """Base de_json works."""
         obj = _SampleModel.de_json({"id": "1", "name": "test"}, mock_client)
         assert obj is not None
         assert obj.id == "1"
 
     def test_de_json_none(self, mock_client):
-        """de_json(None) возвращает None."""
+        """de_json(None) returns None."""
         assert _SampleModel.de_json(None, mock_client) is None
 
     def test_de_json_empty(self, mock_client):
-        """de_json({}) возвращает None."""
+        """de_json({}) returns None."""
         assert _SampleModel.de_json({}, mock_client) is None
 
     def test_de_list_valid(self, mock_client):
-        """de_list работает со списком."""
+        """de_list works with a list."""
         data = [{"id": "1", "name": "a"}, {"id": "2", "name": "b"}]
         items = _SampleModel.de_list(data, mock_client)
         assert len(items) == 2
 
     def test_de_list_empty(self, mock_client):
-        """de_list([]) возвращает пустой список."""
+        """de_list([]) returns an empty list."""
         assert _SampleModel.de_list([], mock_client) == []
 
     def test_de_list_none(self, mock_client):
-        """de_list(None) возвращает пустой список."""
+        """de_list(None) returns an empty list."""
         assert _SampleModel.de_list(None, mock_client) == []
 
 
 class TestIsValidData:
-    """Тесты is_dict_model_data / is_array_model_data."""
+    """Tests for is_dict_model_data / is_array_model_data."""
 
     def test_is_dict_model_data_valid(self):
         assert ZvukMusicModel.is_dict_model_data({"key": "val"})

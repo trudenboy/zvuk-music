@@ -5,6 +5,42 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.2] - 2026-01-31
+
+### Fixed
+
+- Fix v0.5.1 not published to PyPI (auto-release had no build+publish at the time of v0.5.1 bump)
+
+### Changed
+
+- Group all GitHub Actions into single dependabot PR (was 3 separate PRs)
+- Change dependabot schedule from weekly to monthly
+- Exclude `dependabot/**` branches from `tests.yml` push trigger (tested via `pull_request` instead)
+- Exclude `dependabot/**` branches from `auto-pr.yml` (dependabot creates its own PRs)
+
+## [0.5.1] - 2026-01-31
+
+### Changed
+
+- Optimize CI/CD: reduce release pipeline from 15 to 5 test jobs, 3 to 2 build jobs
+- Extract version parsing into reusable composite action (`.github/actions/get-version`)
+- Simplify `auto-release.yml`: remove duplicate test matrix, keep build+publish (needed due to `GITHUB_TOKEN` event limitation)
+- Remove duplicate test matrix from `publish.yml`; keep as fallback for manual releases
+- Add concurrency control to `auto-release.yml`
+- Upload build artifacts in `tests.yml`
+- Bump `codecov-action` v4 to v5
+- Add explicit `--base main` to `auto-pr.yml`
+- Add CI/CD architecture section to CLAUDE.md
+
+## [0.5.0] - 2026-01-31
+
+### Changed
+
+- Translate all docstrings to bilingual format (English + `Note (RU):` with Russian)
+- Translate all inline comments and section markers to English
+- Regenerate async client and request files
+- Update CLAUDE.md language guidelines
+
 ## [0.4.1] - 2026-01-31
 
 ### Fixed
