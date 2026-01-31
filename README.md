@@ -2,7 +2,7 @@
 
 Unofficial Python library for the [Zvuk.com](https://zvuk.com) music streaming API.
 
-**[Документация на русском / Russian documentation](README.ru.md)**
+**[Документация на русском / Russian documentation](https://github.com/trudenboy/zvuk-music/blob/main/README.ru.md)**
 
 > **Disclaimer:** This library is not affiliated with or endorsed by Zvuk.com. It was built by analyzing the Zvuk.com web application and studying existing open-source projects (see [References](#references)).
 
