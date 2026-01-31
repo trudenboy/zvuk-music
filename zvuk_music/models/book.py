@@ -1,4 +1,7 @@
-"""Модели аудиокниг."""
+"""Audiobook models.
+
+Note (RU): Модели аудиокниг.
+"""
 
 from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
@@ -15,9 +18,14 @@ if TYPE_CHECKING:
 
 @model
 class BookAuthor(ZvukMusicModel):
-    """Автор книги.
+    """Book author.
 
     Attributes:
+        id: Author ID.
+        rname: Reversed name (Last name First name).
+        image: Image.
+
+    Note (RU): Автор книги.
         id: ID автора.
         rname: Имя в обратном порядке (Фамилия Имя).
         image: Изображение.
@@ -46,9 +54,16 @@ class BookAuthor(ZvukMusicModel):
 
 @model
 class SimpleBook(ZvukMusicModel):
-    """Краткая информация о книге.
+    """Brief book information.
 
     Attributes:
+        id: Book ID.
+        title: Title.
+        author_names: Author names.
+        book_authors: Book authors.
+        image: Cover image.
+
+    Note (RU): Краткая информация о книге.
         id: ID книги.
         title: Название.
         author_names: Имена авторов.
@@ -81,10 +96,12 @@ class SimpleBook(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_authors_str(self) -> str:
-        """Получить строку с именами авторов.
+        """Get a string with author names.
 
         Returns:
-            Имена авторов через запятую.
+            Author names separated by commas.
+
+        Note (RU): Получить строку с именами авторов.
         """
         if self.book_authors:
             return ", ".join(a.rname for a in self.book_authors)

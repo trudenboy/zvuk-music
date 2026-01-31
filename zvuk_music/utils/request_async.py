@@ -2,7 +2,10 @@
 # THIS IS AUTO GENERATED COPY. DON'T EDIT BY HANDS #
 ####################################################
 
-"""HTTP клиент для Zvuk Music API."""
+"""HTTP client for Zvuk Music API.
+
+Note (RU): HTTP клиент для Zvuk Music API.
+"""
 
 import asyncio
 import json
@@ -47,7 +50,10 @@ logger = logging.getLogger(__name__)
 
 
 class _DefaultTimeout:
-    """Заглушка для установки времени ожидания по умолчанию."""
+    """Stub for setting default timeout.
+
+    Note (RU): Заглушка для установки времени ожидания по умолчанию.
+    """
 
     pass
 
@@ -57,16 +63,18 @@ TimeoutType = Union[int, float, _DefaultTimeout]
 
 
 class Request:
-    """Вспомогательный класс для выполнения HTTP запросов.
+    """Helper class for making HTTP requests.
 
-    Предоставляет методы для выполнения POST и GET запросов,
-    GraphQL запросов, скачивания файлов.
+    Provides methods for making POST and GET requests,
+    GraphQL queries, and file downloads.
 
     Args:
-        client: Клиент Zvuk Music.
-        headers: Заголовки передаваемые с каждым запросом.
-        proxy_url: URL прокси сервера.
-        timeout: Таймаут запросов по умолчанию.
+        client: Zvuk Music client.
+        headers: Headers sent with every request.
+        proxy_url: Proxy server URL.
+        timeout: Default request timeout.
+
+    Note (RU): Вспомогательный класс для выполнения HTTP запросов.
     """
 
     def __init__(
@@ -97,10 +105,12 @@ class Request:
         self._user_agent = DEFAULT_USER_AGENT
 
     def set_timeout(self, timeout: Union[int, float, object] = default_timeout) -> None:
-        """Устанавливает время ожидания для всех запросов.
+        """Set timeout for all requests.
 
         Args:
-            timeout: Время ожидания от сервера в секундах.
+            timeout: Server response timeout in seconds.
+
+        Note (RU): Устанавливает время ожидания для всех запросов.
         """
         if isinstance(timeout, _DefaultTimeout):
             self._timeout = DEFAULT_TIMEOUT
@@ -108,31 +118,37 @@ class Request:
             self._timeout = float(timeout)  # type: ignore[arg-type]
 
     def set_user_agent(self, user_agent: str) -> None:
-        """Устанавливает User-Agent для всех запросов.
+        """Set User-Agent for all requests.
 
         Args:
-            user_agent: Строка User-Agent.
+            user_agent: User-Agent string.
+
+        Note (RU): Устанавливает User-Agent для всех запросов.
         """
         self._user_agent = user_agent
 
     def set_authorization(self, token: str) -> None:
-        """Добавляет заголовок авторизации для каждого запроса.
+        """Add authorization header to every request.
 
         Args:
-            token: Токен авторизации X-Auth-Token.
+            token: X-Auth-Token authorization token.
+
+        Note (RU): Добавляет заголовок авторизации для каждого запроса.
         """
         self.headers["X-Auth-Token"] = token
 
     def set_and_return_client(self, client: "ClientType") -> "ClientType":
-        """Принимает клиент и присваивает его текущему объекту.
+        """Accept a client and assign it to the current object.
 
-        При наличии токена добавляет заголовок авторизации.
+        Adds authorization header if token is present.
 
         Args:
-            client: Клиент Zvuk Music.
+            client: Zvuk Music client.
 
         Returns:
-            Клиент Zvuk Music.
+            Zvuk Music client.
+
+        Note (RU): Принимает клиент и присваивает его текущему объекту.
         """
         self.client = client
 
@@ -143,29 +159,32 @@ class Request:
 
     @staticmethod
     def _convert_camel_to_snake(text: str) -> str:
-        """Конвертация CamelCase в snake_case.
+        """Convert CamelCase to snake_case.
 
         Args:
-            text: Название переменной в CamelCase.
+            text: Variable name in CamelCase.
 
         Returns:
-            Название переменной в snake_case.
+            Variable name in snake_case.
+
+        Note (RU): Конвертация CamelCase в snake_case.
         """
         s = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", text)
         return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s).lower()
 
     @staticmethod
     def _object_hook(obj: "JSONType") -> "JSONType":
-        """Нормализация имён переменных пришедших с API.
+        """Normalize variable names from the API.
 
-        Конвертирует CamelCase в snake_case, обрабатывает
-        зарезервированные слова Python.
+        Converts CamelCase to snake_case, handles Python reserved words.
 
         Args:
-            obj: Словарь данных от API.
+            obj: Data dictionary from API.
 
         Returns:
-            Словарь с нормализованными ключами.
+            Dictionary with normalized keys.
+
+        Note (RU): Нормализация имён переменных пришедших с API.
         """
         if not isinstance(obj, dict):
             return obj
@@ -186,22 +205,24 @@ class Request:
         return cleaned_object
 
     def _parse(self, json_data: bytes) -> Optional[Response]:
-        """Разбор ответа от API.
+        """Parse API response.
 
         Args:
-            json_data: Ответ от API в байтах.
+            json_data: API response in bytes.
 
         Returns:
-            Объект Response.
+            Response object.
 
         Raises:
-            ZvukMusicError: При ошибке парсинга.
-            BotDetectedError: При обнаружении бот-защиты.
+            ZvukMusicError: On parsing error.
+            BotDetectedError: On bot protection detection.
+
+        Note (RU): Разбор ответа от API.
         """
         try:
             decoded_s = json_data.decode("UTF-8")
 
-            # Проверка на бот-защиту
+            # Check for bot protection
             if "bot activity" in decoded_s.lower() or "<html" in decoded_s.lower()[:100]:
                 raise BotDetectedError(
                     "API detected bot activity. Try using a different User-Agent."
@@ -213,7 +234,7 @@ class Request:
             logger.debug("Logging raw invalid UTF-8 response:\n%r", json_data)
             raise ZvukMusicError("Server response could not be decoded using UTF-8") from e
         except json.JSONDecodeError as e:
-            # Проверка HTML ответа (бот-защита)
+            # Check HTML response (bot protection)
             if b"<html" in json_data[:100].lower():
                 raise BotDetectedError(
                     "API returned HTML instead of JSON. Bot protection detected."
@@ -223,24 +244,26 @@ class Request:
         return Response.de_json(data, self.client)
 
     async def _request_wrapper(self, *args: Any, **kwargs: Any) -> bytes:
-        """Обёртка над запросом библиотеки requests.
+        """Wrapper around the requests library.
 
-        Добавляет необходимые заголовки, обрабатывает статус коды,
-        следит за таймаутом, кидает необходимые исключения.
+        Adds necessary headers, handles status codes,
+        monitors timeout, raises appropriate exceptions.
 
         Args:
-            *args: Аргументы для aiohttp.request.
-            **kwargs: Ключевые аргументы для aiohttp.request.
+            *args: Arguments for aiohttp.request.
+            **kwargs: Keyword arguments for aiohttp.request.
 
         Returns:
-            Тело ответа в байтах.
+            Response body in bytes.
 
         Raises:
-            TimedOutError: При превышении времени ожидания.
-            UnauthorizedError: При невалидном токене.
-            BadRequestError: При неправильном запросе.
-            NotFoundError: При отсутствии ресурса.
-            NetworkError: При проблемах с сетью.
+            TimedOutError: On timeout.
+            UnauthorizedError: On invalid token.
+            BadRequestError: On bad request.
+            NotFoundError: On missing resource.
+            NetworkError: On network issues.
+
+        Note (RU): Обёртка над запросом библиотеки requests.
         """
         if "headers" not in kwargs:
             kwargs["headers"] = {}
@@ -293,19 +316,21 @@ class Request:
         variables: Optional[Dict[str, Any]] = None,
         timeout: "TimeoutType" = default_timeout,
     ) -> Dict[str, Any]:
-        """Выполнение GraphQL запроса.
+        """Execute a GraphQL query.
 
         Args:
-            query: GraphQL запрос.
-            operation_name: Имя операции (опционально).
-            variables: Переменные запроса.
-            timeout: Таймаут запроса.
+            query: GraphQL query.
+            operation_name: Operation name (optional).
+            variables: Query variables.
+            timeout: Request timeout.
 
         Returns:
-            Данные ответа.
+            Response data.
 
         Raises:
-            GraphQLError: При ошибке GraphQL.
+            GraphQLError: On GraphQL error.
+
+        Note (RU): Выполнение GraphQL запроса.
         """
         payload: Dict[str, Any] = {"query": query}
 
@@ -343,16 +368,18 @@ class Request:
         timeout: "TimeoutType" = default_timeout,
         **kwargs: Any,
     ) -> Optional[Dict[str, Any]]:
-        """Отправка GET запроса.
+        """Send a GET request.
 
         Args:
-            url: Адрес для запроса.
-            params: GET параметры.
-            timeout: Таймаут запроса.
-            **kwargs: Дополнительные аргументы для requests.
+            url: Request URL.
+            params: GET parameters.
+            timeout: Request timeout.
+            **kwargs: Additional arguments for requests.
 
         Returns:
-            Данные ответа.
+            Response data.
+
+        Note (RU): Отправка GET запроса.
         """
         result = await self._request_wrapper(
             "GET",
@@ -365,7 +392,7 @@ class Request:
         response = self._parse(result)
         if response:
             data = response.get_result()
-            # Tiny API возвращает {"result": {...}}
+            # Tiny API returns {"result": {...}}
             if isinstance(data, dict) and "result" in data:
                 inner: Optional[Dict[str, Any]] = data["result"]
                 return inner
@@ -380,16 +407,18 @@ class Request:
         timeout: "TimeoutType" = default_timeout,
         **kwargs: Any,
     ) -> Optional[Dict[str, Any]]:
-        """Отправка POST запроса.
+        """Send a POST request.
 
         Args:
-            url: Адрес для запроса.
-            data: POST тело запроса.
-            timeout: Таймаут запроса.
-            **kwargs: Дополнительные аргументы для requests.
+            url: Request URL.
+            data: POST request body.
+            timeout: Request timeout.
+            **kwargs: Additional arguments for requests.
 
         Returns:
-            Данные ответа.
+            Response data.
+
+        Note (RU): Отправка POST запроса.
         """
         result = await self._request_wrapper(
             "POST",
@@ -411,15 +440,17 @@ class Request:
         timeout: "TimeoutType" = default_timeout,
         **kwargs: Any,
     ) -> bytes:
-        """GET запрос и получение сырых данных.
+        """GET request returning raw data.
 
         Args:
-            url: Адрес для запроса.
-            timeout: Таймаут запроса.
-            **kwargs: Дополнительные аргументы для requests.
+            url: Request URL.
+            timeout: Request timeout.
+            **kwargs: Additional arguments for requests.
 
         Returns:
-            Тело ответа в байтах.
+            Response body in bytes.
+
+        Note (RU): GET запрос и получение сырых данных.
         """
         return await self._request_wrapper(
             "GET",
@@ -436,13 +467,15 @@ class Request:
         timeout: "TimeoutType" = default_timeout,
         **kwargs: Any,
     ) -> None:
-        """Скачивание файла.
+        """Download a file.
 
         Args:
-            url: Адрес для скачивания.
-            filename: Путь для сохранения файла.
-            timeout: Таймаут запроса.
-            **kwargs: Дополнительные аргументы для requests.
+            url: Download URL.
+            filename: File save path.
+            timeout: Request timeout.
+            **kwargs: Additional arguments for requests.
+
+        Note (RU): Скачивание файла.
         """
         result = await self.retrieve(url, timeout=timeout, **kwargs)
         async with aiofiles.open(filename, "wb") as f:

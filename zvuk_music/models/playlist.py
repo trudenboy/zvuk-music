@@ -1,4 +1,7 @@
-"""Модели плейлиста."""
+"""Playlist models.
+
+Note (RU): Модели плейлиста.
+"""
 
 from __future__ import annotations
 
@@ -18,9 +21,13 @@ if TYPE_CHECKING:
 
 @model
 class PlaylistItem(ZvukMusicModel):
-    """Элемент плейлиста.
+    """Playlist item.
 
     Attributes:
+        type: Item type.
+        item_id: Item ID.
+
+    Note (RU): Элемент плейлиста.
         type: Тип элемента.
         item_id: ID элемента.
     """
@@ -35,9 +42,17 @@ class PlaylistItem(ZvukMusicModel):
 
 @model
 class SimplePlaylist(ZvukMusicModel):
-    """Краткая информация о плейлисте.
+    """Brief playlist information.
 
     Attributes:
+        id: Playlist ID.
+        title: Title.
+        is_public: Whether public.
+        description: Description.
+        duration: Total duration.
+        image: Cover image.
+
+    Note (RU): Краткая информация о плейлисте.
         id: ID плейлиста.
         title: Название.
         is_public: Публичный ли.
@@ -70,13 +85,19 @@ class SimplePlaylist(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_full_info(self) -> Optional["Playlist"]:
-        """Получить полную информацию о плейлисте."""
+        """Get full playlist information.
+
+        Note (RU): Получить полную информацию о плейлисте.
+        """
         if self.valid_client(self.client):
             return self.client.get_playlist(self.id)
         return None
 
     async def get_full_info_async(self) -> Optional["Playlist"]:
-        """Получить полную информацию о плейлисте (async)."""
+        """Get full playlist information (async).
+
+        Note (RU): Получить полную информацию о плейлисте (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.get_playlist(self.id)
         return None
@@ -84,9 +105,24 @@ class SimplePlaylist(ZvukMusicModel):
 
 @model
 class Playlist(ZvukMusicModel):
-    """Полная информация о плейлисте.
+    """Full playlist information.
 
     Attributes:
+        id: Playlist ID.
+        title: Title.
+        user_id: Owner ID.
+        is_public: Whether public.
+        is_deleted: Whether deleted.
+        shared: Whether shared.
+        branded: Whether branded.
+        description: Description.
+        duration: Total duration.
+        image: Cover image.
+        updated: Update date.
+        search_title: Search title.
+        tracks: Tracks.
+
+    Note (RU): Полная информация о плейлисте.
         id: ID плейлиста.
         title: Название.
         user_id: ID владельца.
@@ -135,14 +171,18 @@ class Playlist(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_tracks_paginated(self, limit: int = 50, offset: int = 0) -> List[SimpleTrack]:
-        """Получить треки с пагинацией.
+        """Get tracks with pagination.
 
         Args:
-            limit: Количество треков.
-            offset: Смещение.
+            limit: Number of tracks.
+            offset: Offset.
 
         Returns:
-            Список треков.
+            List of tracks.
+
+        Note (RU): Получить треки с пагинацией.
+            Args: limit: Количество треков. offset: Смещение.
+            Returns: Список треков.
         """
         if self.valid_client(self.client):
             return self.client.get_playlist_tracks(self.id, limit, offset)
@@ -151,19 +191,26 @@ class Playlist(ZvukMusicModel):
     async def get_tracks_paginated_async(
         self, limit: int = 50, offset: int = 0
     ) -> List[SimpleTrack]:
-        """Получить треки с пагинацией (async)."""
+        """Get tracks with pagination (async).
+
+        Note (RU): Получить треки с пагинацией (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.get_playlist_tracks(self.id, limit, offset)
         return []
 
     def rename(self, new_name: str) -> bool:
-        """Переименовать плейлист.
+        """Rename playlist.
 
         Args:
-            new_name: Новое название.
+            new_name: New name.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Переименовать плейлист.
+            Args: new_name: Новое название.
+            Returns: Успешность операции.
         """
         if self.valid_client(self.client):
             result = self.client.rename_playlist(self.id, new_name)
@@ -173,7 +220,10 @@ class Playlist(ZvukMusicModel):
         return False
 
     async def rename_async(self, new_name: str) -> bool:
-        """Переименовать плейлист (async)."""
+        """Rename playlist (async).
+
+        Note (RU): Переименовать плейлист (async).
+        """
         if self.valid_async_client(self.client):
             result = await self.client.rename_playlist(self.id, new_name)
             if result:
@@ -182,44 +232,61 @@ class Playlist(ZvukMusicModel):
         return False
 
     def delete(self) -> bool:
-        """Удалить плейлист."""
+        """Delete playlist.
+
+        Note (RU): Удалить плейлист.
+        """
         if self.valid_client(self.client):
             return self.client.delete_playlist(self.id)
         return False
 
     async def delete_async(self) -> bool:
-        """Удалить плейлист (async)."""
+        """Delete playlist (async).
+
+        Note (RU): Удалить плейлист (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.delete_playlist(self.id)
         return False
 
     def add_tracks(self, track_ids: List[str]) -> bool:
-        """Добавить треки в плейлист.
+        """Add tracks to playlist.
 
         Args:
-            track_ids: ID треков для добавления.
+            track_ids: Track IDs to add.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Добавить треки в плейлист.
+            Args: track_ids: ID треков для добавления.
+            Returns: Успешность операции.
         """
         if self.valid_client(self.client):
             return self.client.add_tracks_to_playlist(self.id, track_ids)
         return False
 
     async def add_tracks_async(self, track_ids: List[str]) -> bool:
-        """Добавить треки в плейлист (async)."""
+        """Add tracks to playlist (async).
+
+        Note (RU): Добавить треки в плейлист (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.add_tracks_to_playlist(self.id, track_ids)
         return False
 
     def set_public(self, is_public: bool) -> bool:
-        """Изменить видимость плейлиста.
+        """Change playlist visibility.
 
         Args:
-            is_public: Публичный или приватный.
+            is_public: Public or private.
 
         Returns:
-            Успешность операции.
+            Whether the operation succeeded.
+
+        Note (RU): Изменить видимость плейлиста.
+            Args: is_public: Публичный или приватный.
+            Returns: Успешность операции.
         """
         if self.valid_client(self.client):
             result = self.client.set_playlist_public(self.id, is_public)
@@ -229,7 +296,10 @@ class Playlist(ZvukMusicModel):
         return False
 
     async def set_public_async(self, is_public: bool) -> bool:
-        """Изменить видимость плейлиста (async)."""
+        """Change playlist visibility (async).
+
+        Note (RU): Изменить видимость плейлиста (async).
+        """
         if self.valid_async_client(self.client):
             result = await self.client.set_playlist_public(self.id, is_public)
             if result:
@@ -240,9 +310,15 @@ class Playlist(ZvukMusicModel):
 
 @model
 class PlaylistAuthor(ZvukMusicModel):
-    """Автор плейлиста.
+    """Playlist author.
 
     Attributes:
+        id: Author ID.
+        name: Name.
+        image: Image.
+        matches: Match (score).
+
+    Note (RU): Автор плейлиста.
         id: ID автора.
         name: Имя.
         image: Изображение.
@@ -273,9 +349,14 @@ class PlaylistAuthor(ZvukMusicModel):
 
 @model
 class SynthesisPlaylist(ZvukMusicModel):
-    """Синтез-плейлист.
+    """Synthesis playlist.
 
     Attributes:
+        id: Playlist ID.
+        tracks: Tracks.
+        authors: Authors.
+
+    Note (RU): Синтез-плейлист.
         id: ID плейлиста.
         tracks: Треки.
         authors: Авторы.

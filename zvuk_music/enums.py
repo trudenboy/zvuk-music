@@ -1,18 +1,27 @@
-"""Перечисления библиотеки Zvuk Music API."""
+"""Enumerations for the Zvuk Music API library.
+
+Note (RU): Перечисления библиотеки Zvuk Music API.
+"""
 
 from enum import Enum
 
 
 class Quality(str, Enum):
-    """Качество аудио."""
+    """Audio quality.
 
-    MID = "mid"  # 128kbps MP3, всегда доступен
-    HIGH = "high"  # 320kbps MP3, требует подписку
-    FLAC = "flacdrm"  # FLAC с DRM, требует подписку
+    Note (RU): Качество аудио.
+    """
+
+    MID = "mid"  # 128kbps MP3, always available
+    HIGH = "high"  # 320kbps MP3, requires subscription
+    FLAC = "flacdrm"  # FLAC with DRM, requires subscription
 
 
 class ReleaseType(str, Enum):
-    """Тип релиза."""
+    """Release type.
+
+    Note (RU): Тип релиза.
+    """
 
     ALBUM = "album"
     SINGLE = "single"
@@ -21,7 +30,10 @@ class ReleaseType(str, Enum):
 
 
 class CollectionItemType(str, Enum):
-    """Тип элемента коллекции."""
+    """Collection item type.
+
+    Note (RU): Тип элемента коллекции.
+    """
 
     TRACK = "track"
     RELEASE = "release"
@@ -33,28 +45,40 @@ class CollectionItemType(str, Enum):
 
 
 class CollectionItemStatus(str, Enum):
-    """Статус элемента в коллекции."""
+    """Collection item status.
+
+    Note (RU): Статус элемента в коллекции.
+    """
 
     LIKED = "liked"
 
 
 class OrderBy(str, Enum):
-    """Сортировка по полю."""
+    """Sort by field.
 
-    ALPHABET = "alphabet"  # По алфавиту
-    ARTIST = "artist"  # По имени артиста
-    DATE_ADDED = "dateAdded"  # По дате добавления
+    Note (RU): Сортировка по полю.
+    """
+
+    ALPHABET = "alphabet"  # Alphabetical
+    ARTIST = "artist"  # By artist name
+    DATE_ADDED = "dateAdded"  # By date added
 
 
 class OrderDirection(str, Enum):
-    """Направление сортировки."""
+    """Sort direction.
 
-    ASC = "asc"  # По возрастанию
-    DESC = "desc"  # По убыванию
+    Note (RU): Направление сортировки.
+    """
+
+    ASC = "asc"  # Ascending
+    DESC = "desc"  # Descending
 
 
 class Typename(str, Enum):
-    """Тип сущности GraphQL."""
+    """GraphQL entity type.
+
+    Note (RU): Тип сущности GraphQL.
+    """
 
     ARTIST = "Artist"
     TRACK = "Track"
@@ -68,6 +92,9 @@ class Typename(str, Enum):
 
 
 class BackgroundType(str, Enum):
-    """Тип фона."""
+    """Background type.
+
+    Note (RU): Тип фона.
+    """
 
     IMAGE = "image"

@@ -1,10 +1,16 @@
-"""Исключения библиотеки Zvuk Music API."""
+"""Exceptions for the Zvuk Music API library.
+
+Note (RU): Исключения библиотеки Zvuk Music API.
+"""
 
 from typing import Any, Optional
 
 
 class ZvukMusicError(Exception):
-    """Базовое исключение библиотеки."""
+    """Base exception for the library.
+
+    Note (RU): Базовое исключение библиотеки.
+    """
 
     def __init__(self, message: str = "", *args: Any) -> None:
         self.message = message
@@ -15,37 +21,55 @@ class ZvukMusicError(Exception):
 
 
 class NetworkError(ZvukMusicError):
-    """Сетевая ошибка при выполнении запроса."""
+    """Network error during request execution.
+
+    Note (RU): Сетевая ошибка при выполнении запроса.
+    """
 
     pass
 
 
 class TimedOutError(NetworkError):
-    """Превышено время ожидания запроса."""
+    """Request timed out.
+
+    Note (RU): Превышено время ожидания запроса.
+    """
 
     pass
 
 
 class BadRequestError(ZvukMusicError):
-    """Некорректный запрос (HTTP 400)."""
+    """Bad request (HTTP 400).
+
+    Note (RU): Некорректный запрос (HTTP 400).
+    """
 
     pass
 
 
 class UnauthorizedError(ZvukMusicError):
-    """Ошибка авторизации (HTTP 401/403 или невалидный токен)."""
+    """Authorization error (HTTP 401/403 or invalid token).
+
+    Note (RU): Ошибка авторизации (HTTP 401/403 или невалидный токен).
+    """
 
     pass
 
 
 class NotFoundError(ZvukMusicError):
-    """Ресурс не найден (HTTP 404)."""
+    """Resource not found (HTTP 404).
+
+    Note (RU): Ресурс не найден (HTTP 404).
+    """
 
     pass
 
 
 class GraphQLError(ZvukMusicError):
-    """Ошибка GraphQL запроса."""
+    """GraphQL query error.
+
+    Note (RU): Ошибка GraphQL запроса.
+    """
 
     def __init__(
         self,
@@ -64,18 +88,27 @@ class GraphQLError(ZvukMusicError):
 
 
 class SubscriptionRequiredError(ZvukMusicError):
-    """Требуется подписка для доступа к контенту (high/flac качество)."""
+    """Subscription required for content access (high/flac quality).
+
+    Note (RU): Требуется подписка для доступа к контенту (high/flac качество).
+    """
 
     pass
 
 
 class QualityNotAvailableError(ZvukMusicError):
-    """Запрошенное качество аудио недоступно."""
+    """Requested audio quality is not available.
+
+    Note (RU): Запрошенное качество аудио недоступно.
+    """
 
     pass
 
 
 class BotDetectedError(ZvukMusicError):
-    """API обнаружил бот-активность и заблокировал запрос."""
+    """API detected bot activity and blocked the request.
+
+    Note (RU): API обнаружил бот-активность и заблокировал запрос.
+    """
 
     pass

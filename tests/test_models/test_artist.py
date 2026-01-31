@@ -1,4 +1,4 @@
-"""Тесты модели Artist."""
+"""Tests for Artist model."""
 
 import pytest
 
@@ -6,10 +6,10 @@ from zvuk_music.models.artist import Artist, SimpleArtist
 
 
 class TestSimpleArtist:
-    """Тесты SimpleArtist."""
+    """Tests for SimpleArtist."""
 
     def test_de_json_valid(self, mock_client):
-        """Тест десериализации валидных данных."""
+        """Test deserialization of valid data."""
         data = {
             "id": "754367",
             "title": "Metallica",
@@ -24,18 +24,18 @@ class TestSimpleArtist:
         assert artist.image.src == "https://example.com/image.jpg"
 
     def test_de_json_none(self, mock_client):
-        """Тест десериализации None."""
+        """Test deserialization of None."""
         artist = SimpleArtist.de_json(None, mock_client)
         assert artist is None
 
     def test_de_json_empty_dict(self, mock_client):
-        """Тест десериализации пустого словаря возвращает None."""
+        """Test deserialization of empty dict returns None."""
         artist = SimpleArtist.de_json({}, mock_client)
-        # Пустой словарь не является валидными данными
+        # Empty dict is not valid data
         assert artist is None
 
     def test_de_list(self, mock_client):
-        """Тест десериализации списка."""
+        """Test deserialization of a list."""
         data = [
             {"id": "1", "title": "Artist 1", "image": None},
             {"id": "2", "title": "Artist 2", "image": None},
@@ -47,7 +47,7 @@ class TestSimpleArtist:
         assert artists[1].id == "2"
 
     def test_equality(self, mock_client):
-        """Тест сравнения артистов."""
+        """Test artist comparison."""
         artist1 = SimpleArtist.de_json({"id": "1", "title": "Artist", "image": None}, mock_client)
         artist2 = SimpleArtist.de_json({"id": "1", "title": "Artist", "image": None}, mock_client)
         artist3 = SimpleArtist.de_json({"id": "2", "title": "Artist", "image": None}, mock_client)
@@ -57,10 +57,10 @@ class TestSimpleArtist:
 
 
 class TestArtist:
-    """Тесты Artist."""
+    """Tests for Artist."""
 
     def test_de_json_full(self, mock_client, sample_artist_data):
-        """Тест десериализации полных данных артиста."""
+        """Test deserialization of full artist data."""
         artist = Artist.de_json(sample_artist_data, mock_client)
 
         assert artist is not None
@@ -70,7 +70,7 @@ class TestArtist:
         assert artist.has_page is True
 
     def test_de_json_with_releases(self, mock_client):
-        """Тест десериализации с релизами."""
+        """Test deserialization with releases."""
         data = {
             "id": "754367",
             "title": "Metallica",
@@ -95,7 +95,7 @@ class TestArtist:
         assert artist.releases[0].title == "Metallica"
 
     def test_de_json_with_popular_tracks(self, mock_client):
-        """Тест десериализации с популярными треками."""
+        """Test deserialization with popular tracks."""
         data = {
             "id": "754367",
             "title": "Metallica",
@@ -119,7 +119,7 @@ class TestArtist:
         assert artist.popular_tracks[0].title == "Nothing Else Matters"
 
     def test_to_dict(self, mock_client, sample_artist_data):
-        """Тест сериализации в словарь."""
+        """Test serialization to dictionary."""
         artist = Artist.de_json(sample_artist_data, mock_client)
         result = artist.to_dict()
 

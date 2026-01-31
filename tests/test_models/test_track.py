@@ -1,4 +1,4 @@
-"""Тесты модели Track."""
+"""Tests for Track model."""
 
 import pytest
 
@@ -6,10 +6,10 @@ from zvuk_music.models.track import SimpleTrack, Track
 
 
 class TestSimpleTrack:
-    """Тесты SimpleTrack."""
+    """Tests for SimpleTrack."""
 
     def test_de_json_valid(self, mock_client):
-        """Тест десериализации валидных данных."""
+        """Test deserialization of valid data."""
         data = {
             "id": "5896627",
             "title": "Nothing Else Matters",
@@ -29,18 +29,18 @@ class TestSimpleTrack:
         assert track.artists[0].title == "Metallica"
 
     def test_de_json_none(self, mock_client):
-        """Тест десериализации None."""
+        """Test deserialization of None."""
         track = SimpleTrack.de_json(None, mock_client)
         assert track is None
 
     def test_de_json_empty_dict(self, mock_client):
-        """Тест десериализации пустого словаря возвращает None."""
+        """Test deserialization of empty dict returns None."""
         track = SimpleTrack.de_json({}, mock_client)
-        # Пустой словарь не является валидными данными для трека
+        # Empty dict is not valid track data
         assert track is None
 
     def test_de_list(self, mock_client):
-        """Тест десериализации списка."""
+        """Test deserialization of a list."""
         data = [
             {"id": "1", "title": "Track 1", "duration": 100, "explicit": False},
             {"id": "2", "title": "Track 2", "duration": 200, "explicit": True},
@@ -52,7 +52,7 @@ class TestSimpleTrack:
         assert tracks[1].id == "2"
 
     def test_get_duration_str(self, mock_client):
-        """Тест форматирования длительности."""
+        """Test duration formatting."""
         track = SimpleTrack.de_json(
             {"id": "1", "title": "Test", "duration": 185, "explicit": False},
             mock_client,
@@ -60,16 +60,16 @@ class TestSimpleTrack:
         assert track.get_duration_str() == "3:05"
 
     def test_get_duration_str_long(self, mock_client):
-        """Тест форматирования длинной длительности (более 60 минут)."""
+        """Test long duration formatting (over 60 minutes)."""
         track = SimpleTrack.de_json(
             {"id": "1", "title": "Test", "duration": 3661, "explicit": False},
             mock_client,
         )
-        # Формат MM:SS для треков > 1 часа
+        # MM:SS format for tracks > 1 hour
         assert track.get_duration_str() == "61:01"
 
     def test_get_artists_str(self, mock_client):
-        """Тест получения строки артистов."""
+        """Test getting artists string."""
         data = {
             "id": "1",
             "title": "Test",
@@ -85,10 +85,10 @@ class TestSimpleTrack:
 
 
 class TestTrack:
-    """Тесты Track."""
+    """Tests for Track."""
 
     def test_de_json_full(self, mock_client, sample_track_data):
-        """Тест десериализации полных данных трека."""
+        """Test deserialization of full track data."""
         track = Track.de_json(sample_track_data, mock_client)
 
         assert track is not None
@@ -103,21 +103,21 @@ class TestTrack:
         assert track.release is not None
 
     def test_de_json_with_genres(self, mock_client, sample_track_data):
-        """Тест десериализации с жанрами."""
+        """Test deserialization with genres."""
         track = Track.de_json(sample_track_data, mock_client)
 
         assert len(track.genres) == 1
         assert track.genres[0].name == "Rock"
 
     def test_de_json_with_release(self, mock_client, sample_track_data):
-        """Тест десериализации с релизом."""
+        """Test deserialization with release."""
         track = Track.de_json(sample_track_data, mock_client)
 
         assert track.release is not None
         assert track.release.title == "Metallica"
 
     def test_to_dict(self, mock_client, sample_track_data):
-        """Тест сериализации в словарь."""
+        """Test serialization to dictionary."""
         track = Track.de_json(sample_track_data, mock_client)
         result = track.to_dict()
 

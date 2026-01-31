@@ -1,4 +1,4 @@
-"""Пример использования асинхронного клиента."""
+"""Example of using the asynchronous client."""
 
 import asyncio
 
@@ -6,51 +6,51 @@ from zvuk_music import Client, ClientAsync
 
 
 async def main() -> None:
-    # Получаем анонимный токен (синхронный метод)
-    print("=== Получение токена ===")
+    # Get anonymous token (synchronous method)
+    print("=== Getting token ===")
     token = Client.get_anonymous_token()
-    print(f"Токен: {token[:20]}...")
+    print(f"Token: {token[:20]}...")
 
-    # Создаём async клиент
+    # Create async client
     client = ClientAsync(token=token)
 
-    # Быстрый поиск
-    print("\n=== Async быстрый поиск 'Metallica' ===")
+    # Quick search
+    print("\n=== Async quick search 'Metallica' ===")
     results = await client.quick_search("Metallica", limit=5)
 
-    print(f"Найдено треков: {len(results.tracks)}")
+    print(f"Tracks found: {len(results.tracks)}")
     for track in results.tracks:
         print(f"  - {track.title} - {track.get_artists_str()}")
 
-    print(f"Найдено артистов: {len(results.artists)}")
+    print(f"Artists found: {len(results.artists)}")
     for artist in results.artists:
         print(f"  - {artist.title}")
 
-    # Получение нескольких треков параллельно
-    print("\n=== Параллельное получение данных ===")
+    # Fetch multiple items in parallel
+    print("\n=== Parallel data fetching ===")
 
-    # Запускаем несколько запросов параллельно
+    # Launch several requests in parallel
     track_task = client.get_track(5896627)
     artist_task = client.get_artist(754367, with_popular_tracks=True, tracks_limit=3)
     search_task = client.search("Nothing Else Matters", limit=3)
 
     track, artist, search = await asyncio.gather(track_task, artist_task, search_task)
 
-    print(f"\nТрек: {track.title if track else 'N/A'}")
-    print(f"Артист: {artist.title if artist else 'N/A'}")
+    print(f"\nTrack: {track.title if track else 'N/A'}")
+    print(f"Artist: {artist.title if artist else 'N/A'}")
     if artist:
-        print(f"  Популярных треков: {len(artist.popular_tracks)}")
+        print(f"  Popular tracks: {len(artist.popular_tracks)}")
     if search and search.tracks:
-        print(f"Найдено в поиске: {len(search.tracks.items)} треков")
+        print(f"Found in search: {len(search.tracks.items)} tracks")
 
-    # Получение стрима
-    print("\n=== Получение URL стрима ===")
+    # Get stream
+    print("\n=== Getting stream URLs ===")
     streams = await client.get_stream_urls([5896627, 5896623])
-    print(f"Получено {len(streams)} стримов")
+    print(f"Got {len(streams)} streams")
     for stream in streams:
-        print(f"  Mid URL доступен: {'да' if stream.mid else 'нет'}")
+        print(f"  Mid URL available: {'yes' if stream.mid else 'no'}")
 
-    print("\n=== Async тесты завершены ===")
+    print("\n=== Async tests completed ===")
 
 
 if __name__ == "__main__":

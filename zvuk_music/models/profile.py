@@ -1,4 +1,7 @@
-"""Модели профиля."""
+"""Profile models.
+
+Note (RU): Модели профиля.
+"""
 
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
@@ -14,9 +17,15 @@ if TYPE_CHECKING:
 
 @model
 class SimpleProfile(ZvukMusicModel):
-    """Краткая информация о профиле.
+    """Brief profile information.
 
     Attributes:
+        id: Profile ID.
+        name: Name.
+        description: Description.
+        image: Image.
+
+    Note (RU): Краткая информация о профиле.
         id: ID профиля.
         name: Имя.
         description: Описание.
@@ -47,9 +56,20 @@ class SimpleProfile(ZvukMusicModel):
 
 @model
 class ExternalProfile(ZvukMusicModel):
-    """Внешний профиль (External ID).
+    """External profile (External ID).
 
     Attributes:
+        birthday: Birthday (timestamp).
+        email: Email.
+        external_id: ID in external system.
+        first_name: First name.
+        last_name: Last name.
+        middle_name: Middle name.
+        gender: Gender.
+        phone: Phone.
+        type: Profile type.
+
+    Note (RU): Внешний профиль (External ID).
         birthday: День рождения (timestamp).
         email: Email.
         external_id: ID во внешней системе.
@@ -78,9 +98,29 @@ class ExternalProfile(ZvukMusicModel):
 
 @model
 class ProfileResult(ZvukMusicModel):
-    """Результат запроса профиля.
+    """Profile query result.
 
     Attributes:
+        is_anonymous: Whether the user is anonymous.
+        allow_explicit: Whether explicit content is allowed.
+        birthday: Birthday (timestamp).
+        created: Creation date (timestamp).
+        email: Email.
+        external_profile: External profile.
+        gender: Gender.
+        id: User ID.
+        image: Image.
+        is_active: Whether active.
+        is_agreement: Whether agreement is accepted.
+        is_editor: Whether editor.
+        is_registered: Whether registered.
+        name: Name.
+        phone: Phone.
+        registered: Registration date (timestamp).
+        token: Authorization token.
+        username: Username.
+
+    Note (RU): Результат запроса профиля.
         is_anonymous: Анонимный ли пользователь.
         allow_explicit: Разрешён ли explicit контент.
         birthday: День рождения (timestamp).
@@ -141,15 +181,21 @@ class ProfileResult(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def is_authorized(self) -> bool:
-        """Проверка, авторизован ли пользователь (не анонимный)."""
+        """Check if the user is authorized (not anonymous).
+
+        Note (RU): Проверка, авторизован ли пользователь (не анонимный).
+        """
         return not self.is_anonymous
 
 
 @model
 class Profile(ZvukMusicModel):
-    """Профиль пользователя.
+    """User profile.
 
     Attributes:
+        result: Profile data.
+
+    Note (RU): Профиль пользователя.
         result: Данные профиля.
     """
 
@@ -172,14 +218,20 @@ class Profile(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def is_authorized(self) -> bool:
-        """Проверка, авторизован ли пользователь."""
+        """Check if the user is authorized.
+
+        Note (RU): Проверка, авторизован ли пользователь.
+        """
         if self.result:
             return self.result.is_authorized()
         return False
 
     @property
     def token(self) -> str:
-        """Токен авторизации."""
+        """Authorization token.
+
+        Note (RU): Токен авторизации.
+        """
         if self.result:
             return self.result.token
         return ""

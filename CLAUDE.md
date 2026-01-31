@@ -63,7 +63,7 @@ python scripts/generate_async_version.py
 - **Line length**: 100 characters
 - **Formatting**: Ruff (double quotes, 4-space indent)
 - **Type hints**: Full mypy compliance required
-- **Language**: Russian for documentation and comments
+- **Language**: English for code comments; bilingual (EN + RU) for docstrings
 - **Import sorting**: isort via Ruff
 
 ## Testing

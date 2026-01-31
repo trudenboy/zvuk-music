@@ -1,4 +1,7 @@
-"""Модели подкастов."""
+"""Podcast models.
+
+Note (RU): Модели подкастов.
+"""
 
 from __future__ import annotations
 
@@ -19,9 +22,13 @@ if TYPE_CHECKING:
 
 @model
 class PodcastAuthor(ZvukMusicModel):
-    """Автор подкаста.
+    """Podcast author.
 
     Attributes:
+        id: Author ID.
+        name: Name.
+
+    Note (RU): Автор подкаста.
         id: ID автора.
         name: Имя.
     """
@@ -36,9 +43,16 @@ class PodcastAuthor(ZvukMusicModel):
 
 @model
 class SimplePodcast(ZvukMusicModel):
-    """Краткая информация о подкасте.
+    """Brief podcast information.
 
     Attributes:
+        id: Podcast ID.
+        title: Title.
+        explicit: Explicit content.
+        image: Cover image.
+        authors: Authors.
+
+    Note (RU): Краткая информация о подкасте.
         id: ID подкаста.
         title: Название.
         explicit: Explicit содержимое.
@@ -71,13 +85,19 @@ class SimplePodcast(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_full_info(self) -> Optional["Podcast"]:
-        """Получить полную информацию о подкасте."""
+        """Get full podcast information.
+
+        Note (RU): Получить полную информацию о подкасте.
+        """
         if self.valid_client(self.client):
             return self.client.get_podcast(self.id)
         return None
 
     async def get_full_info_async(self) -> Optional["Podcast"]:
-        """Получить полную информацию о подкасте (async)."""
+        """Get full podcast information (async).
+
+        Note (RU): Получить полную информацию о подкасте (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.get_podcast(self.id)
         return None
@@ -85,9 +105,22 @@ class SimplePodcast(ZvukMusicModel):
 
 @model
 class Podcast(ZvukMusicModel):
-    """Полная информация о подкасте.
+    """Full podcast information.
 
     Attributes:
+        id: Podcast ID.
+        title: Title.
+        explicit: Explicit content.
+        description: Description.
+        updated_date: Update date.
+        availability: Availability.
+        type: Podcast type.
+        image: Cover image.
+        authors: Authors.
+        episodes: Episodes (IDs only).
+        collection_item_data: Like data.
+
+    Note (RU): Полная информация о подкасте.
         id: ID подкаста.
         title: Название.
         explicit: Explicit содержимое.
@@ -136,31 +169,46 @@ class Podcast(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def is_liked(self) -> bool:
-        """Проверка, лайкнут ли подкаст."""
+        """Check if the podcast is liked.
+
+        Note (RU): Проверка, лайкнут ли подкаст.
+        """
         if self.collection_item_data:
             return self.collection_item_data.is_liked()
         return False
 
     def like(self) -> bool:
-        """Добавить подкаст в коллекцию."""
+        """Add podcast to collection.
+
+        Note (RU): Добавить подкаст в коллекцию.
+        """
         if self.valid_client(self.client):
             return self.client.like_podcast(self.id)
         return False
 
     def unlike(self) -> bool:
-        """Убрать подкаст из коллекции."""
+        """Remove podcast from collection.
+
+        Note (RU): Убрать подкаст из коллекции.
+        """
         if self.valid_client(self.client):
             return self.client.unlike_podcast(self.id)
         return False
 
     async def like_async(self) -> bool:
-        """Добавить подкаст в коллекцию (async)."""
+        """Add podcast to collection (async).
+
+        Note (RU): Добавить подкаст в коллекцию (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.like_podcast(self.id)
         return False
 
     async def unlike_async(self) -> bool:
-        """Убрать подкаст из коллекции (async)."""
+        """Remove podcast from collection (async).
+
+        Note (RU): Убрать подкаст из коллекции (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.unlike_podcast(self.id)
         return False
@@ -168,9 +216,17 @@ class Podcast(ZvukMusicModel):
 
 @model
 class SimpleEpisode(ZvukMusicModel):
-    """Краткая информация об эпизоде.
+    """Brief episode information.
 
     Attributes:
+        id: Episode ID.
+        title: Title.
+        explicit: Explicit content.
+        duration: Duration in seconds.
+        publication_date: Publication date.
+        image: Cover image.
+
+    Note (RU): Краткая информация об эпизоде.
         id: ID эпизода.
         title: Название.
         explicit: Explicit содержимое.
@@ -203,13 +259,19 @@ class SimpleEpisode(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_full_info(self) -> Optional["Episode"]:
-        """Получить полную информацию об эпизоде."""
+        """Get full episode information.
+
+        Note (RU): Получить полную информацию об эпизоде.
+        """
         if self.valid_client(self.client):
             return self.client.get_episode(self.id)
         return None
 
     async def get_full_info_async(self) -> Optional["Episode"]:
-        """Получить полную информацию об эпизоде (async)."""
+        """Get full episode information (async).
+
+        Note (RU): Получить полную информацию об эпизоде (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.get_episode(self.id)
         return None
@@ -217,9 +279,21 @@ class SimpleEpisode(ZvukMusicModel):
 
 @model
 class Episode(ZvukMusicModel):
-    """Полная информация об эпизоде.
+    """Full episode information.
 
     Attributes:
+        id: Episode ID.
+        title: Title.
+        explicit: Explicit content.
+        description: Description.
+        duration: Duration in seconds.
+        availability: Availability.
+        publication_date: Publication date.
+        image: Cover image.
+        podcast: Podcast.
+        collection_item_data: Like data.
+
+    Note (RU): Полная информация об эпизоде.
         id: ID эпизода.
         title: Название.
         explicit: Explicit содержимое.
@@ -266,43 +340,56 @@ class Episode(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_duration_str(self) -> str:
-        """Получить длительность в формате MM:SS."""
+        """Get duration in MM:SS format.
+
+        Note (RU): Получить длительность в формате MM:SS.
+        """
         minutes = self.duration // 60
         seconds = self.duration % 60
         return f"{minutes}:{seconds:02d}"
 
     def get_stream_url(self, quality: Quality = Quality.HIGH) -> str:
-        """Получить URL для стриминга.
+        """Get streaming URL.
 
         Args:
-            quality: Качество аудио.
+            quality: Audio quality.
 
         Returns:
-            URL для скачивания/стриминга.
+            URL for downloading/streaming.
+
+        Note (RU): Получить URL для стриминга.
         """
         if self.valid_client(self.client):
             return self.client.get_stream_url(self.id, quality)
         return ""
 
     async def get_stream_url_async(self, quality: Quality = Quality.HIGH) -> str:
-        """Получить URL для стриминга (async)."""
+        """Get streaming URL (async).
+
+        Note (RU): Получить URL для стриминга (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.get_stream_url(self.id, quality)
         return ""
 
     def download(self, filename: str, quality: Quality = Quality.HIGH) -> None:
-        """Скачать эпизод.
+        """Download episode.
 
         Args:
-            filename: Путь для сохранения.
-            quality: Качество аудио.
+            filename: Path to save to.
+            quality: Audio quality.
+
+        Note (RU): Скачать эпизод.
         """
         if self.valid_client(self.client):
             url = self.get_stream_url(quality)
             self.client._request.download(url, filename)
 
     async def download_async(self, filename: str, quality: Quality = Quality.HIGH) -> None:
-        """Скачать эпизод (async)."""
+        """Download episode (async).
+
+        Note (RU): Скачать эпизод (async).
+        """
         if self.valid_async_client(self.client):
             url = await self.get_stream_url_async(quality)
             await self.client._request.download(url, filename)

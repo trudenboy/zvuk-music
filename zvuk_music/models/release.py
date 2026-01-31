@@ -1,4 +1,7 @@
-"""Модели релиза."""
+"""Release models.
+
+Note (RU): Модели релиза.
+"""
 
 from __future__ import annotations
 
@@ -21,9 +24,18 @@ if TYPE_CHECKING:
 
 @model
 class SimpleRelease(ZvukMusicModel):
-    """Краткая информация о релизе.
+    """Brief release information.
 
     Attributes:
+        id: Release ID.
+        title: Title.
+        date: Release date (ISO 8601).
+        type: Release type.
+        image: Cover image.
+        explicit: Explicit content.
+        artists: Artists.
+
+    Note (RU): Краткая информация о релизе.
         id: ID релиза.
         title: Название.
         date: Дата выхода (ISO 8601).
@@ -65,10 +77,13 @@ class SimpleRelease(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_year(self) -> Optional[int]:
-        """Получить год выхода.
+        """Get release year.
 
         Returns:
-            Год выхода или None.
+            Release year or None.
+
+        Note (RU): Получить год выхода.
+            Returns: Год выхода или None.
         """
         if self.date:
             try:
@@ -78,17 +93,23 @@ class SimpleRelease(ZvukMusicModel):
         return None
 
     def get_full_info(self) -> Optional["Release"]:
-        """Получить полную информацию о релизе.
+        """Get full release information.
 
         Returns:
-            Полная информация или None.
+            Full information or None.
+
+        Note (RU): Получить полную информацию о релизе.
+            Returns: Полная информация или None.
         """
         if self.valid_client(self.client):
             return self.client.get_release(self.id)
         return None
 
     async def get_full_info_async(self) -> Optional["Release"]:
-        """Получить полную информацию о релизе (async)."""
+        """Get full release information (async).
+
+        Note (RU): Получить полную информацию о релизе (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.get_release(self.id)
         return None
@@ -96,9 +117,26 @@ class SimpleRelease(ZvukMusicModel):
 
 @model
 class Release(ZvukMusicModel):
-    """Полная информация о релизе.
+    """Full release information.
 
     Attributes:
+        id: Release ID.
+        title: Title.
+        search_title: Search title.
+        date: Release date.
+        type: Release type.
+        image: Cover image.
+        explicit: Explicit content.
+        availability: Availability.
+        artist_template: Artist name template.
+        genres: Genres.
+        label: Label.
+        artists: Artists.
+        tracks: Tracks.
+        related: Related releases.
+        collection_item_data: Like data.
+
+    Note (RU): Полная информация о релизе.
         id: ID релиза.
         title: Название.
         search_title: Название для поиска.
@@ -170,7 +208,10 @@ class Release(ZvukMusicModel):
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
     def get_year(self) -> Optional[int]:
-        """Получить год выхода."""
+        """Get release year.
+
+        Note (RU): Получить год выхода.
+        """
         if self.date:
             try:
                 return int(self.date[:4])
@@ -179,44 +220,63 @@ class Release(ZvukMusicModel):
         return None
 
     def get_cover_url(self, size: int = 300) -> str:
-        """Получить URL обложки.
+        """Get cover image URL.
 
         Args:
-            size: Размер изображения.
+            size: Image size.
 
         Returns:
-            URL обложки.
+            Cover image URL.
+
+        Note (RU): Получить URL обложки.
+            Args: size: Размер изображения.
+            Returns: URL обложки.
         """
         if self.image:
             return self.image.get_url(size, size)
         return ""
 
     def is_liked(self) -> bool:
-        """Проверка, лайкнут ли релиз."""
+        """Check if release is liked.
+
+        Note (RU): Проверка, лайкнут ли релиз.
+        """
         if self.collection_item_data:
             return self.collection_item_data.is_liked()
         return False
 
     def like(self) -> bool:
-        """Добавить релиз в коллекцию."""
+        """Add release to collection.
+
+        Note (RU): Добавить релиз в коллекцию.
+        """
         if self.valid_client(self.client):
             return self.client.like_release(self.id)
         return False
 
     def unlike(self) -> bool:
-        """Убрать релиз из коллекции."""
+        """Remove release from collection.
+
+        Note (RU): Убрать релиз из коллекции.
+        """
         if self.valid_client(self.client):
             return self.client.unlike_release(self.id)
         return False
 
     async def like_async(self) -> bool:
-        """Добавить релиз в коллекцию (async)."""
+        """Add release to collection (async).
+
+        Note (RU): Добавить релиз в коллекцию (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.like_release(self.id)
         return False
 
     async def unlike_async(self) -> bool:
-        """Убрать релиз из коллекции (async)."""
+        """Remove release from collection (async).
+
+        Note (RU): Убрать релиз из коллекции (async).
+        """
         if self.valid_async_client(self.client):
             return await self.client.unlike_release(self.id)
         return False
