@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Optimize CI/CD: reduce release pipeline from 15 to 5 test jobs, 3 to 2 build jobs
 - Extract version parsing into reusable composite action (`.github/actions/get-version`)
-- Simplify `auto-release.yml` to only create releases (remove duplicate test/build/publish)
-- Remove duplicate test matrix from `publish.yml` (trusts `tests.yml`)
+- Simplify `auto-release.yml`: remove duplicate test matrix, keep build+publish (needed due to `GITHUB_TOKEN` event limitation)
+- Remove duplicate test matrix from `publish.yml`; keep as fallback for manual releases
 - Add concurrency control to `auto-release.yml`
 - Upload build artifacts in `tests.yml`
 - Bump `codecov-action` v4 to v5

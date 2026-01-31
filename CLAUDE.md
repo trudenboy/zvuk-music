@@ -71,8 +71,8 @@ python scripts/generate_async_version.py
 GitHub Actions workflows in `.github/workflows/`:
 
 - **`tests.yml`** — Runs on every push/PR. Jobs: lint (ruff + mypy), build (package + upload artifact), async-check (regenerate & diff), test matrix (Python 3.9–3.13, 65% coverage threshold). Codecov upload on 3.12.
-- **`auto-release.yml`** — Runs on push to main. Compares `__version__` with latest git tag; creates a GitHub release if changed. Lightweight (single job, no tests — trusts `tests.yml`).
-- **`publish.yml`** — Triggered by `release: published` event. Jobs: version-check (tag matches `__version__`), build (with async-check), publish to PyPI via OIDC.
+- **`auto-release.yml`** — Runs on push to main. Compares `__version__` with latest git tag; if changed: creates GitHub release, builds package (with async-check), publishes to PyPI. Build and publish are embedded because `GITHUB_TOKEN`-created releases don't trigger other workflows.
+- **`publish.yml`** — Fallback for manually-created releases. Triggered by `release: published` event. Jobs: version-check (tag matches `__version__`), build (with async-check), publish to PyPI via OIDC.
 - **`auto-pr.yml`** — Runs on push to non-main branches. Creates PR with `--base main` and enables auto-merge (squash).
 - **`dependabot.yml`** — Weekly updates for pip (dev deps grouped) and GitHub Actions.
 

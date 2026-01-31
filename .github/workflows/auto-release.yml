@@ -10,11 +10,15 @@ concurrency:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   release:
     name: Create Release if Version Changed
     runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.compare.outputs.released }}
+      tag: ${{ steps.version.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v4
@@ -31,8 +35,75 @@ jobs:
           LATEST=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
           echo "tag=$LATEST" >> "$GITHUB_OUTPUT"
 
+      - name: Compare versions
+        id: compare
+        run: |
+          if [ "${{ steps.version.outputs.tag }}" != "${{ steps.latest_tag.outputs.tag }}" ]; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create release
-        if: steps.version.outputs.tag != steps.latest_tag.outputs.tag
+        if: steps.compare.outputs.released == 'true'
         run: gh release create "${{ steps.version.outputs.tag }}" --generate-notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Build and publish are embedded here because releases created with
+  # GITHUB_TOKEN do not trigger other workflows (publish.yml won't fire).
+  # publish.yml remains as fallback for manually-created releases.
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: release
+    if: needs.release.outputs.released == 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine -e ".[dev,async]"
+
+      - name: Check async client consistency
+        run: |
+          python scripts/generate_async_version.py
+          git diff --exit-code
+
+      - name: Build package
+        run: python -m build
+
+      - name: Check package
+        run: twine check dist/*
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: [release, build]
+    if: needs.release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    environment: pypi
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

@@ -11,8 +11,8 @@
 
 - Оптимизация CI/CD: сокращение с 15 до 5 test jobs и с 3 до 2 build jobs при релизе
 - Вынесен парсинг версии в переиспользуемый composite action (`.github/actions/get-version`)
-- Упрощён `auto-release.yml` — только создание релиза (убраны дублирующие test/build/publish)
-- Убрана дублирующая матрица тестов из `publish.yml` (полагается на `tests.yml`)
+- Упрощён `auto-release.yml`: убрана дублирующая матрица тестов, сохранены build+publish (необходимы из-за ограничения событий `GITHUB_TOKEN`)
+- Убрана дублирующая матрица тестов из `publish.yml`; оставлен как fallback для ручных релизов
 - Добавлен concurrency control в `auto-release.yml`
 - Добавлена загрузка build-артефактов в `tests.yml`
 - Обновлён `codecov-action` v4 → v5
