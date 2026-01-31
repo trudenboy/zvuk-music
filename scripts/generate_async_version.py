@@ -123,9 +123,10 @@ if __name__ == '__main__':
     print(f"Generating {client_filename}...")
     gen_client(client_filename)
 
-    # Try to format with ruff if available (skip auto-fix which can break imports)
+    # Fix import sorting and format with ruff if available
     try:
         for file in (request_filename, client_filename):
+            subprocess.run(['ruff', 'check', '--fix', '--select', 'I', '--quiet', file], check=False)
             subprocess.run(['ruff', 'format', '--quiet', file], check=False)
         print("Files formatted with ruff.")
     except FileNotFoundError:
