@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
@@ -114,12 +115,10 @@ class Playlist(ZvukMusicModel):
     image: Optional[Image] = None
     updated: Optional[str] = None
     search_title: Optional[str] = None
-    tracks: List[SimpleTrack] = None  # type: ignore[assignment]
+    tracks: List[SimpleTrack] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.tracks is None:
-            self.tracks = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:
@@ -284,15 +283,11 @@ class SynthesisPlaylist(ZvukMusicModel):
 
     client: Optional["ClientType"] = None
     id: str = ""
-    tracks: List[SimpleTrack] = None  # type: ignore[assignment]
-    authors: List[PlaylistAuthor] = None  # type: ignore[assignment]
+    tracks: List[SimpleTrack] = field(default_factory=list)
+    authors: List[PlaylistAuthor] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.tracks is None:
-            self.tracks = []
-        if self.authors is None:
-            self.authors = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:

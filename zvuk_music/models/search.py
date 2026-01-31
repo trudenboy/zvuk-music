@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, Generic, List, Optional, TypeVar
 
 from typing_extensions import Self
@@ -68,11 +69,7 @@ class SearchResult(ZvukMusicModel, Generic[T]):
     client: Optional["ClientType"] = None
     page: Optional[Page] = None
     score: float = 0.0
-    items: List[T] = None  # type: ignore[assignment]
-
-    def __post_init__(self) -> None:
-        if self.items is None:
-            self.items = []
+    items: List[T] = field(default_factory=list)
 
     @classmethod
     def de_json_with_type(
@@ -186,33 +183,17 @@ class QuickSearch(ZvukMusicModel):
 
     client: Optional["ClientType"] = None
     search_session_id: str = ""
-    tracks: List[SimpleTrack] = None  # type: ignore[assignment]
-    artists: List[SimpleArtist] = None  # type: ignore[assignment]
-    releases: List[SimpleRelease] = None  # type: ignore[assignment]
-    playlists: List[SimplePlaylist] = None  # type: ignore[assignment]
-    profiles: List[SimpleProfile] = None  # type: ignore[assignment]
-    books: List[SimpleBook] = None  # type: ignore[assignment]
-    episodes: List[SimpleEpisode] = None  # type: ignore[assignment]
-    podcasts: List[SimplePodcast] = None  # type: ignore[assignment]
+    tracks: List[SimpleTrack] = field(default_factory=list)
+    artists: List[SimpleArtist] = field(default_factory=list)
+    releases: List[SimpleRelease] = field(default_factory=list)
+    playlists: List[SimplePlaylist] = field(default_factory=list)
+    profiles: List[SimpleProfile] = field(default_factory=list)
+    books: List[SimpleBook] = field(default_factory=list)
+    episodes: List[SimpleEpisode] = field(default_factory=list)
+    podcasts: List[SimplePodcast] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.search_session_id,)
-        if self.tracks is None:
-            self.tracks = []
-        if self.artists is None:
-            self.artists = []
-        if self.releases is None:
-            self.releases = []
-        if self.playlists is None:
-            self.playlists = []
-        if self.profiles is None:
-            self.profiles = []
-        if self.books is None:
-            self.books = []
-        if self.episodes is None:
-            self.episodes = []
-        if self.podcasts is None:
-            self.podcasts = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:

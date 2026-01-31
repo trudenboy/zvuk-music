@@ -41,6 +41,20 @@ class Client:
         >>> client = Client(token="ваш_токен")
     """
 
+    @staticmethod
+    def _to_id_list(ids: Union[str, int, List[Union[str, int]]]) -> List[str]:
+        """Нормализация ID в список строк.
+
+        Args:
+            ids: ID или список ID.
+
+        Returns:
+            Список строковых ID.
+        """
+        if not isinstance(ids, list):
+            ids = [ids]
+        return [str(i) for i in ids]
+
     def __init__(
         self,
         token: Optional[str] = None,
@@ -225,9 +239,7 @@ class Client:
         Returns:
             Список треков.
         """
-        if not isinstance(track_ids, list):
-            track_ids = [track_ids]
-        ids = [str(i) for i in track_ids]
+        ids = self._to_id_list(track_ids)
 
         gql = load_query("getTracks")
         result = self._request.graphql(gql, "getTracks", {"ids": ids})
@@ -261,9 +273,7 @@ class Client:
         Returns:
             Список треков с полной информацией.
         """
-        if not isinstance(track_ids, list):
-            track_ids = [track_ids]
-        ids = [str(i) for i in track_ids]
+        ids = self._to_id_list(track_ids)
 
         gql = load_query("getFullTrack")
         result = self._request.graphql(
@@ -282,9 +292,7 @@ class Client:
         Returns:
             Список объектов Stream с URL.
         """
-        if not isinstance(track_ids, list):
-            track_ids = [track_ids]
-        ids = [str(i) for i in track_ids]
+        ids = self._to_id_list(track_ids)
 
         gql = load_query("getStream")
         result = self._request.graphql(gql, "getStream", {"ids": ids})
@@ -332,9 +340,7 @@ class Client:
         Returns:
             Список релизов.
         """
-        if not isinstance(release_ids, list):
-            release_ids = [release_ids]
-        ids = [str(i) for i in release_ids]
+        ids = self._to_id_list(release_ids)
 
         gql = load_query("getReleases")
         result = self._request.graphql(
@@ -386,9 +392,7 @@ class Client:
         Returns:
             Список артистов.
         """
-        if not isinstance(artist_ids, list):
-            artist_ids = [artist_ids]
-        ids = [str(i) for i in artist_ids]
+        ids = self._to_id_list(artist_ids)
 
         gql = load_query("getArtists")
         result = self._request.graphql(
@@ -433,9 +437,7 @@ class Client:
         Returns:
             Список плейлистов.
         """
-        if not isinstance(playlist_ids, list):
-            playlist_ids = [playlist_ids]
-        ids = [str(i) for i in playlist_ids]
+        ids = self._to_id_list(playlist_ids)
 
         gql = load_query("getPlaylists")
         result = self._request.graphql(gql, "getPlaylists", {"ids": ids})
@@ -464,9 +466,7 @@ class Client:
         Returns:
             Список плейлистов.
         """
-        if not isinstance(playlist_ids, list):
-            playlist_ids = [playlist_ids]
-        ids = [str(i) for i in playlist_ids]
+        ids = self._to_id_list(playlist_ids)
 
         gql = load_query("getShortPlaylist")
         result = self._request.graphql(gql, "getShortPlaylist", {"ids": ids})
@@ -655,9 +655,7 @@ class Client:
         Returns:
             Список подкастов.
         """
-        if not isinstance(podcast_ids, list):
-            podcast_ids = [podcast_ids]
-        ids = [str(i) for i in podcast_ids]
+        ids = self._to_id_list(podcast_ids)
 
         gql = load_query("getPodcasts")
         result = self._request.graphql(gql, "getPodcasts", {"ids": ids})
@@ -684,9 +682,7 @@ class Client:
         Returns:
             Список эпизодов.
         """
-        if not isinstance(episode_ids, list):
-            episode_ids = [episode_ids]
-        ids = [str(i) for i in episode_ids]
+        ids = self._to_id_list(episode_ids)
 
         gql = load_query("getEpisodes")
         result = self._request.graphql(gql, "getEpisodes", {"ids": ids})
@@ -934,9 +930,7 @@ class Client:
         Returns:
             Список количества подписчиков.
         """
-        if not isinstance(profile_ids, list):
-            profile_ids = [profile_ids]
-        ids = [str(i) for i in profile_ids]
+        ids = self._to_id_list(profile_ids)
 
         gql = load_query("profileFollowersCount")
         result = self._request.graphql(gql, "profileFollowersCount", {"ids": ids})

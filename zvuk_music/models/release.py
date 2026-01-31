@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
@@ -39,12 +40,10 @@ class SimpleRelease(ZvukMusicModel):
     type: Optional[ReleaseType] = None
     image: Optional[Image] = None
     explicit: bool = False
-    artists: List[SimpleArtist] = None  # type: ignore[assignment]
+    artists: List[SimpleArtist] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.artists is None:
-            self.artists = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:
@@ -127,23 +126,15 @@ class Release(ZvukMusicModel):
     explicit: bool = False
     availability: int = 0
     artist_template: Optional[str] = None
-    genres: List[Genre] = None  # type: ignore[assignment]
+    genres: List[Genre] = field(default_factory=list)
     label: Optional[Label] = None
-    artists: List[SimpleArtist] = None  # type: ignore[assignment]
-    tracks: List["SimpleTrack"] = None  # type: ignore[assignment]
-    related: List[SimpleRelease] = None  # type: ignore[assignment]
+    artists: List[SimpleArtist] = field(default_factory=list)
+    tracks: List["SimpleTrack"] = field(default_factory=list)
+    related: List[SimpleRelease] = field(default_factory=list)
     collection_item_data: Optional[CollectionItem] = None
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.genres is None:
-            self.genres = []
-        if self.artists is None:
-            self.artists = []
-        if self.tracks is None:
-            self.tracks = []
-        if self.related is None:
-            self.related = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:

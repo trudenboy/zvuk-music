@@ -1,5 +1,6 @@
 """Модели аудиокниг."""
 
+from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
@@ -58,16 +59,12 @@ class SimpleBook(ZvukMusicModel):
     client: Optional["ClientType"] = None
     id: str = ""
     title: str = ""
-    author_names: List[str] = None  # type: ignore[assignment]
-    book_authors: List[BookAuthor] = None  # type: ignore[assignment]
+    author_names: List[str] = field(default_factory=list)
+    book_authors: List[BookAuthor] = field(default_factory=list)
     image: Optional[Image] = None
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.author_names is None:
-            self.author_names = []
-        if self.book_authors is None:
-            self.book_authors = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:

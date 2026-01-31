@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
@@ -50,12 +51,10 @@ class SimplePodcast(ZvukMusicModel):
     title: str = ""
     explicit: bool = False
     image: Optional[Image] = None
-    authors: List[PodcastAuthor] = None  # type: ignore[assignment]
+    authors: List[PodcastAuthor] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.authors is None:
-            self.authors = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:
@@ -111,16 +110,12 @@ class Podcast(ZvukMusicModel):
     availability: int = 0
     type: Optional[str] = None
     image: Optional[Image] = None
-    authors: List[PodcastAuthor] = None  # type: ignore[assignment]
-    episodes: List[Dict[str, Any]] = None  # type: ignore[assignment]
+    authors: List[PodcastAuthor] = field(default_factory=list)
+    episodes: List[Dict[str, Any]] = field(default_factory=list)
     collection_item_data: Optional[CollectionItem] = None
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.authors is None:
-            self.authors = []
-        if self.episodes is None:
-            self.episodes = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:

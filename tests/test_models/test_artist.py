@@ -48,15 +48,9 @@ class TestSimpleArtist:
 
     def test_equality(self, mock_client):
         """Тест сравнения артистов."""
-        artist1 = SimpleArtist.de_json(
-            {"id": "1", "title": "Artist", "image": None}, mock_client
-        )
-        artist2 = SimpleArtist.de_json(
-            {"id": "1", "title": "Artist", "image": None}, mock_client
-        )
-        artist3 = SimpleArtist.de_json(
-            {"id": "2", "title": "Artist", "image": None}, mock_client
-        )
+        artist1 = SimpleArtist.de_json({"id": "1", "title": "Artist", "image": None}, mock_client)
+        artist2 = SimpleArtist.de_json({"id": "1", "title": "Artist", "image": None}, mock_client)
+        artist3 = SimpleArtist.de_json({"id": "2", "title": "Artist", "image": None}, mock_client)
 
         assert artist1 == artist2
         assert artist1 != artist3

@@ -40,9 +40,34 @@ class TestQuickSearch:
             "search_session_id": "test",
             "content": [
                 {"__typename": "Artist", "id": "1", "title": "Artist 1", "image": None},
-                {"__typename": "Track", "id": "2", "title": "Track 1", "duration": 100, "explicit": False, "artists": [], "release": None},
-                {"__typename": "Release", "id": "3", "title": "Release 1", "date": None, "type": None, "image": None, "explicit": False, "artists": []},
-                {"__typename": "Playlist", "id": "4", "title": "Playlist 1", "is_public": True, "description": None, "duration": 0, "image": None},
+                {
+                    "__typename": "Track",
+                    "id": "2",
+                    "title": "Track 1",
+                    "duration": 100,
+                    "explicit": False,
+                    "artists": [],
+                    "release": None,
+                },
+                {
+                    "__typename": "Release",
+                    "id": "3",
+                    "title": "Release 1",
+                    "date": None,
+                    "type": None,
+                    "image": None,
+                    "explicit": False,
+                    "artists": [],
+                },
+                {
+                    "__typename": "Playlist",
+                    "id": "4",
+                    "title": "Playlist 1",
+                    "is_public": True,
+                    "description": None,
+                    "duration": 0,
+                    "image": None,
+                },
             ],
         }
         result = QuickSearch.de_json(data, mock_client)
@@ -78,8 +103,22 @@ class TestSearchResult:
             "page": {"total": 100, "prev": None, "next": 2, "cursor": "abc123"},
             "score": 0.95,
             "items": [
-                {"id": "1", "title": "Track 1", "duration": 100, "explicit": False, "artists": [], "release": None},
-                {"id": "2", "title": "Track 2", "duration": 200, "explicit": True, "artists": [], "release": None},
+                {
+                    "id": "1",
+                    "title": "Track 1",
+                    "duration": 100,
+                    "explicit": False,
+                    "artists": [],
+                    "release": None,
+                },
+                {
+                    "id": "2",
+                    "title": "Track 2",
+                    "duration": 200,
+                    "explicit": True,
+                    "artists": [],
+                    "release": None,
+                },
             ],
         }
         result = SearchResult.de_json_with_type(data, mock_client, SimpleTrack)

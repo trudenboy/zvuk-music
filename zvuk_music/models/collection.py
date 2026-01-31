@@ -1,5 +1,6 @@
 """Модели коллекции (лайки, скрытые)."""
 
+from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
@@ -72,32 +73,14 @@ class Collection(ZvukMusicModel):
     """
 
     client: Optional["ClientType"] = None
-    artists: List[CollectionItem] = None  # type: ignore[assignment]
-    episodes: List[CollectionItem] = None  # type: ignore[assignment]
-    podcasts: List[CollectionItem] = None  # type: ignore[assignment]
-    playlists: List[CollectionItem] = None  # type: ignore[assignment]
-    synthesis_playlists: List[CollectionItem] = None  # type: ignore[assignment]
-    profiles: List[CollectionItem] = None  # type: ignore[assignment]
-    releases: List[CollectionItem] = None  # type: ignore[assignment]
-    tracks: List[CollectionItem] = None  # type: ignore[assignment]
-
-    def __post_init__(self) -> None:
-        if self.artists is None:
-            self.artists = []
-        if self.episodes is None:
-            self.episodes = []
-        if self.podcasts is None:
-            self.podcasts = []
-        if self.playlists is None:
-            self.playlists = []
-        if self.synthesis_playlists is None:
-            self.synthesis_playlists = []
-        if self.profiles is None:
-            self.profiles = []
-        if self.releases is None:
-            self.releases = []
-        if self.tracks is None:
-            self.tracks = []
+    artists: List[CollectionItem] = field(default_factory=list)
+    episodes: List[CollectionItem] = field(default_factory=list)
+    podcasts: List[CollectionItem] = field(default_factory=list)
+    playlists: List[CollectionItem] = field(default_factory=list)
+    synthesis_playlists: List[CollectionItem] = field(default_factory=list)
+    profiles: List[CollectionItem] = field(default_factory=list)
+    releases: List[CollectionItem] = field(default_factory=list)
+    tracks: List[CollectionItem] = field(default_factory=list)
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:
@@ -106,7 +89,7 @@ class Collection(ZvukMusicModel):
 
         data_dict: Dict[str, Any] = data.copy()
 
-        for field in [
+        for field_name in [
             "artists",
             "episodes",
             "podcasts",
@@ -116,8 +99,8 @@ class Collection(ZvukMusicModel):
             "releases",
             "tracks",
         ]:
-            if field in data_dict:
-                data_dict[field] = CollectionItem.de_list(data_dict[field], client)
+            if field_name in data_dict:
+                data_dict[field_name] = CollectionItem.de_list(data_dict[field_name], client)
 
         return cls(client=client, **cls.cleanup_data(data_dict, client))
 
@@ -132,14 +115,8 @@ class HiddenCollection(ZvukMusicModel):
     """
 
     client: Optional["ClientType"] = None
-    tracks: List[CollectionItem] = None  # type: ignore[assignment]
-    artists: List[CollectionItem] = None  # type: ignore[assignment]
-
-    def __post_init__(self) -> None:
-        if self.tracks is None:
-            self.tracks = []
-        if self.artists is None:
-            self.artists = []
+    tracks: List[CollectionItem] = field(default_factory=list)
+    artists: List[CollectionItem] = field(default_factory=list)
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:

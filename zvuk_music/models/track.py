@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from typing_extensions import Self
@@ -37,13 +38,11 @@ class SimpleTrack(ZvukMusicModel):
     title: str = ""
     duration: int = 0
     explicit: bool = False
-    artists: List[SimpleArtist] = None  # type: ignore[assignment]
+    artists: List[SimpleArtist] = field(default_factory=list)
     release: Optional[SimpleRelease] = None
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.artists is None:
-            self.artists = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:
@@ -132,21 +131,15 @@ class Track(ZvukMusicModel):
     lyrics: Optional[Any] = None
     zchan: Optional[str] = None
     has_flac: bool = False
-    artist_names: List[str] = None  # type: ignore[assignment]
+    artist_names: List[str] = field(default_factory=list)
     credits: Optional[str] = None
-    genres: List[Genre] = None  # type: ignore[assignment]
-    artists: List[SimpleArtist] = None  # type: ignore[assignment]
+    genres: List[Genre] = field(default_factory=list)
+    artists: List[SimpleArtist] = field(default_factory=list)
     release: Optional[SimpleRelease] = None
     collection_item_data: Optional[CollectionItem] = None
 
     def __post_init__(self) -> None:
         self._id_attrs = (self.id,)
-        if self.artist_names is None:
-            self.artist_names = []
-        if self.genres is None:
-            self.genres = []
-        if self.artists is None:
-            self.artists = []
 
     @classmethod
     def de_json(cls, data: JSONType, client: "ClientType") -> Optional[Self]:
