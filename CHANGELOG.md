@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-01-31
+
+### Changed
+
+- Translate all docstrings to bilingual format (English + `Note (RU):` with Russian)
+- Translate all inline comments and section markers to English
+- Regenerate async client and request files
+- Update CLAUDE.md language guidelines
+
 ## [0.4.1] - 2026-01-31
 
 ### Fixed
