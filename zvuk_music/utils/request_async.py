@@ -4,15 +4,15 @@
 
 """HTTP клиент для Zvuk Music API."""
 
-import asyncio
 import json
 import keyword
 import logging
 import re
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
-import aiofiles
+import asyncio
 import aiohttp
+import aiofiles
 
 from zvuk_music.exceptions import (
     BadRequestError,

@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] - 2026-01-31
+
+### Fixed
+
+- Fix async client consistency (regenerate `request_async.py` import order)
+- Fix auto-release not triggering PyPI publish (`GITHUB_TOKEN` event limitation)
+
 ## [0.4.0] - 2026-01-31
 
 ### Added
