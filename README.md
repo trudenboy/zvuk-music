@@ -6,6 +6,9 @@ Unofficial Python library for the [Zvuk.com](https://zvuk.com) music streaming A
 
 > **Disclaimer:** This library is not affiliated with or endorsed by Zvuk.com. It was built by analyzing the Zvuk.com web application and studying existing open-source projects (see [References](#references)).
 
+> [!IMPORTANT]
+> You must have zvuk.com account and paid subscription to use this tool.
+
 ## Installation
 
 ```bash
