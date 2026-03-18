@@ -23,11 +23,13 @@ from zvuk_music.exceptions import (
     GraphQLError,
     NetworkError,
     NotFoundError,
+    RateLimitError,
     TimedOutError,
     UnauthorizedError,
     ZvukMusicError,
 )
 from zvuk_music.utils.response import Response
+from zvuk_music.utils.throttler import Throttler
 
 if TYPE_CHECKING:
     from zvuk_music.base import ClientType, JSONType
@@ -83,6 +85,7 @@ class Request:
         headers: Optional[Dict[str, str]] = None,
         proxy_url: Optional[str] = None,
         timeout: "TimeoutType" = default_timeout,
+        throttler: Optional["Throttler"] = None,
     ) -> None:
         self.headers = DEFAULT_HEADERS.copy()
         if headers:
@@ -103,6 +106,7 @@ class Request:
         self.proxies = {"http": proxy_url, "https": proxy_url} if proxy_url else None
 
         self._user_agent = DEFAULT_USER_AGENT
+        self._throttler = throttler
 
     def set_timeout(self, timeout: Union[int, float, object] = default_timeout) -> None:
         """Set timeout for all requests.
@@ -261,10 +265,14 @@ class Request:
             UnauthorizedError: On invalid token.
             BadRequestError: On bad request.
             NotFoundError: On missing resource.
+            RateLimitError: On rate limit exceeded (HTTP 429).
             NetworkError: On network issues.
 
         Note (RU): Обёртка над запросом библиотеки requests.
         """
+        if self._throttler is not None:
+            await self._throttler.async_acquire()
+
         if "headers" not in kwargs:
             kwargs["headers"] = {}
 
@@ -302,6 +310,14 @@ class Request:
             raise BadRequestError(message)
         if resp.status == 404:
             raise NotFoundError(message)
+        if resp.status == 429:
+            retry_after = None
+            if "retry-after" in resp.headers:
+                try:
+                    retry_after = int(resp.headers["retry-after"])
+                except (ValueError, TypeError):
+                    pass
+            raise RateLimitError(message, retry_after=retry_after)
         if resp.status in (409, 413):
             raise NetworkError(message)
         if resp.status == 502:

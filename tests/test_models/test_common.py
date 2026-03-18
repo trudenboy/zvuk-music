@@ -34,14 +34,25 @@ class TestImage:
         url = image.get_url()
         assert url.startswith("https://zvuk.com/static/img/default.png")
 
-    def test_get_url_no_size_param(self, mock_client):
-        """URL без параметра size возвращается как есть."""
+    def test_get_url_no_size_param_adds_size(self, mock_client):
+        """URL без параметра size получает ?size=WxH."""
         image = Image.de_json(
             {"src": "https://cdn-image.zvuk.com/pic?id=123&type=artist"},
             mock_client,
         )
         url = image.get_url(300, 300)
-        assert url == "https://cdn-image.zvuk.com/pic?id=123&type=artist"
+        assert "size=300x300" in url
+        assert "id=123" in url
+        assert "type=artist" in url
+
+    def test_get_url_no_query_params(self, mock_client):
+        """URL без query params получает ?size=WxH."""
+        image = Image.de_json(
+            {"src": "https://cdn-image.zvuk.com/pic"},
+            mock_client,
+        )
+        url = image.get_url(600, 600)
+        assert url == "https://cdn-image.zvuk.com/pic?size=600x600"
 
 
 class TestGenre:

@@ -2,7 +2,7 @@
 # THIS IS AUTO GENERATED COPY. DON'T EDIT BY HANDS #
 ####################################################
 
-"""Synchronous Zvuk Music API client.
+"""Asynchronous Zvuk Music API client.
 
 Note (RU): Асинхронный клиент Zvuk Music API.
 """
@@ -11,10 +11,13 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 
-from zvuk_music.enums import CollectionItemType, OrderBy, OrderDirection, Quality
+from zvuk_music.enums import CollectionItemType, OrderBy, OrderDirection, Quality, StreamQuality
 from zvuk_music.exceptions import QualityNotAvailableError
 from zvuk_music.models.artist import Artist
 from zvuk_music.models.collection import Collection, CollectionItem, HiddenCollection
+from zvuk_music.models.direct_stream import DirectStream
+from zvuk_music.models.grid import GridContentItem
+from zvuk_music.models.lyrics import Lyrics
 from zvuk_music.models.playlist import Playlist, SimplePlaylist, SimpleTrack, SynthesisPlaylist
 from zvuk_music.models.podcast import Episode, Podcast
 from zvuk_music.models.profile import Profile, ProfileResult
@@ -24,10 +27,11 @@ from zvuk_music.models.stream import Stream
 from zvuk_music.models.track import Track
 from zvuk_music.utils.graphql import load_query
 from zvuk_music.utils.request_async import TINY_API_URL, Request
+from zvuk_music.utils.throttler import Throttler
 
 
 class ClientAsync:
-    """Synchronous Zvuk Music API client.
+    """Asynchronous Zvuk Music API client.
 
     Args:
         token: Authorization token (obtain via get_anonymous_token() or from browser).
@@ -73,14 +77,20 @@ class ClientAsync:
         proxy_url: Optional[str] = None,
         user_agent: Optional[str] = None,
         report_unknown_fields: bool = False,
+        rate_limit: Optional[int] = None,
     ) -> None:
         self.token = token or ""
         self.report_unknown_fields = report_unknown_fields
+
+        if rate_limit is not None and rate_limit <= 0:
+            raise ValueError("rate_limit must be a positive integer")
+        throttler = Throttler(rate_limit=rate_limit) if rate_limit else None
 
         self._request = Request(
             client=self,
             proxy_url=proxy_url,
             timeout=timeout,
+            throttler=throttler,
         )
 
         if user_agent:
@@ -360,6 +370,57 @@ class ClientAsync:
         if not streams:
             raise QualityNotAvailableError("Stream URLs not available")
         return streams[0].get_url(quality)
+
+    async def get_direct_stream_url(
+        self,
+        track_id: Union[str, int],
+        quality: StreamQuality = StreamQuality.HIGH,
+    ) -> Optional[DirectStream]:
+        """Get direct (non-DRM) stream URL via Tiny API.
+
+        Unlike get_stream_url() which returns DRM-wrapped URLs from GraphQL,
+        this method returns direct playable URLs without DRM.
+
+        Args:
+            track_id: Track ID.
+            quality: Stream quality (mid/high/flac).
+
+        Returns:
+            DirectStream object or None if unavailable.
+
+        Note (RU): Получить прямой URL стрима (без DRM) через Tiny API.
+        """
+        result = await self._request.get(
+            f"{TINY_API_URL}/track/stream",
+            params={"id": str(track_id), "quality": quality.value},
+        )
+        if not result:
+            return None
+        stream_url = result.get("stream")
+        if not stream_url:
+            return None
+        return DirectStream.de_json({"stream": str(stream_url), "quality": quality.value}, self)
+
+    # ========== Lyrics ==========
+
+    async def get_lyrics(self, track_id: Union[str, int]) -> Optional[Lyrics]:
+        """Get lyrics for a track.
+
+        Args:
+            track_id: Track ID.
+
+        Returns:
+            Lyrics object or None if no lyrics available.
+
+        Note (RU): Получить текст песни.
+        """
+        result = await self._request.get(
+            f"{TINY_API_URL}/lyrics",
+            params={"track_id": str(track_id)},
+        )
+        if not result or not result.get("lyrics"):
+            return None
+        return Lyrics.de_json(result, self)
 
     # ========== Releases ==========
 
@@ -716,6 +777,47 @@ class ClientAsync:
         gql = load_query("synthesisPlaylist")
         result = await self._request.graphql(gql, "synthesisPlaylist", {"ids": ids})
         return SynthesisPlaylist.de_list(result.get("synthesis_playlist", []), self)
+
+    # ========== Editorial / Grid Content ==========
+
+    async def get_grid_content(
+        self,
+        name: str = "editorial_playlist",
+        ranker_enabled: bool = True,
+    ) -> List[GridContentItem]:
+        """Get grid content items from Tiny API.
+
+        Args:
+            name: Grid name (e.g., "editorial_playlist").
+            ranker_enabled: Whether to enable ranker.
+
+        Returns:
+            List of GridContentItem objects.
+
+        Note (RU): Получить элементы сетки контента из Tiny API.
+        """
+        result = await self._request.get(
+            f"{TINY_API_URL}/grid/content",
+            params={
+                "name": name,
+                "ranker_enabled": str(ranker_enabled).lower(),
+            },
+        )
+        if not result:
+            return []
+        data = result.get("page", {}).get("data", [])
+        return GridContentItem.de_list(data, self)
+
+    async def get_editorial_playlist_ids(self) -> List[str]:
+        """Get editorial (curated) playlist IDs.
+
+        Returns:
+            List of playlist ID strings.
+
+        Note (RU): Получить ID редакторских (кураторских) плейлистов.
+        """
+        items = await self.get_grid_content("editorial_playlist")
+        return [item.id for item in items if item.type == "playlist"]
 
     # ========== Podcasts ==========
 

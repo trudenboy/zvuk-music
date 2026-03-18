@@ -6,8 +6,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from zvuk_music import Client
-from zvuk_music.enums import CollectionItemType, OrderBy, OrderDirection, Quality
+from zvuk_music.enums import CollectionItemType, OrderBy, OrderDirection, Quality, StreamQuality
 from zvuk_music.exceptions import QualityNotAvailableError
+from zvuk_music.models.direct_stream import DirectStream
+from zvuk_music.models.grid import GridContentItem
+from zvuk_music.models.lyrics import Lyrics
 
 
 @pytest.fixture
@@ -65,6 +68,39 @@ class TestClientAuth:
     def test_to_id_list_list(self):
         """_to_id_list со списком."""
         assert Client._to_id_list(["1", 2, "3"]) == ["1", "2", "3"]
+
+
+class TestClientRateLimit:
+    """Тесты rate_limit."""
+
+    def test_rate_limit_creates_throttler(self):
+        """Client(rate_limit=N) создаёт throttler."""
+        with patch.object(Client, "get_anonymous_token", return_value="tok"):
+            client = Client(token="tok", rate_limit=10)
+        assert client._request._throttler is not None
+        assert client._request._throttler.rate_limit == 10
+
+    def test_default_rate_limit_no_throttler(self):
+        """По умолчанию throttler не создаётся."""
+        with patch.object(Client, "get_anonymous_token", return_value="tok"):
+            client = Client(token="tok")
+        assert client._request._throttler is None
+
+    def test_negative_rate_limit_raises(self):
+        """rate_limit=-1 вызывает ValueError."""
+        with (
+            patch.object(Client, "get_anonymous_token", return_value="tok"),
+            pytest.raises(ValueError, match="rate_limit must be a positive integer"),
+        ):
+            Client(token="tok", rate_limit=-1)
+
+    def test_zero_rate_limit_raises(self):
+        """rate_limit=0 вызывает ValueError."""
+        with (
+            patch.object(Client, "get_anonymous_token", return_value="tok"),
+            pytest.raises(ValueError, match="rate_limit must be a positive integer"),
+        ):
+            Client(token="tok", rate_limit=0)
 
 
 class TestClientSearch:
@@ -606,3 +642,173 @@ class TestClientUserCollections:
         }
         result = client_with_mock.get_user_paginated_podcasts(count=10)
         assert isinstance(result, dict)
+
+
+class TestGetDirectStreamUrl:
+    """Тесты get_direct_stream_url."""
+
+    def test_returns_direct_stream(self, client_with_mock):
+        """get_direct_stream_url возвращает DirectStream."""
+        client_with_mock._request.get = MagicMock(
+            return_value={"stream": "https://cdn.zvuk.com/track/123/direct"}
+        )
+        result = client_with_mock.get_direct_stream_url("123", StreamQuality.HIGH)
+
+        assert isinstance(result, DirectStream)
+        assert result.stream == "https://cdn.zvuk.com/track/123/direct"
+        assert result.quality == "high"
+
+    def test_passes_correct_params(self, client_with_mock):
+        """Проверка параметров запроса."""
+        client_with_mock._request.get = MagicMock(return_value={"stream": "url"})
+        client_with_mock.get_direct_stream_url("456", StreamQuality.FLAC)
+
+        call_args = client_with_mock._request.get.call_args
+        assert call_args[1]["params"] == {"id": "456", "quality": "flac"}
+
+    def test_returns_none_on_empty(self, client_with_mock):
+        """Возвращает None если ответ пустой."""
+        client_with_mock._request.get = MagicMock(return_value=None)
+        result = client_with_mock.get_direct_stream_url("123")
+        assert result is None
+
+    def test_returns_none_on_no_stream(self, client_with_mock):
+        """Возвращает None если в ответе нет stream."""
+        client_with_mock._request.get = MagicMock(return_value={"other": "data"})
+        result = client_with_mock.get_direct_stream_url("123")
+        assert result is None
+
+    def test_default_quality_is_high(self, client_with_mock):
+        """Качество по умолчанию — HIGH."""
+        client_with_mock._request.get = MagicMock(return_value={"stream": "url"})
+        client_with_mock.get_direct_stream_url("123")
+
+        call_args = client_with_mock._request.get.call_args
+        assert call_args[1]["params"]["quality"] == "high"
+
+
+class TestGetLyrics:
+    """Тесты get_lyrics."""
+
+    def test_returns_lyrics(self, client_with_mock):
+        """get_lyrics возвращает Lyrics."""
+        client_with_mock._request.get = MagicMock(
+            return_value={
+                "lyrics": "[00:12.00]Hello world",
+                "type": "subtitle",
+                "translation": "Привет мир",
+            }
+        )
+        result = client_with_mock.get_lyrics("789")
+
+        assert isinstance(result, Lyrics)
+        assert result.lyrics == "[00:12.00]Hello world"
+        assert result.type == "subtitle"
+        assert result.translation == "Привет мир"
+
+    def test_passes_correct_params(self, client_with_mock):
+        """Проверка параметров запроса."""
+        client_with_mock._request.get = MagicMock(
+            return_value={"lyrics": "text", "type": "lyrics"}
+        )
+        client_with_mock.get_lyrics("999")
+
+        call_args = client_with_mock._request.get.call_args
+        assert call_args[1]["params"] == {"track_id": "999"}
+
+    def test_returns_none_on_empty(self, client_with_mock):
+        """Возвращает None если ответ пустой."""
+        client_with_mock._request.get = MagicMock(return_value=None)
+        result = client_with_mock.get_lyrics("123")
+        assert result is None
+
+    def test_returns_none_on_no_lyrics(self, client_with_mock):
+        """Возвращает None если в ответе нет lyrics."""
+        client_with_mock._request.get = MagicMock(return_value={"type": "lyrics"})
+        result = client_with_mock.get_lyrics("123")
+        assert result is None
+
+
+class TestGetGridContent:
+    """Тесты get_grid_content."""
+
+    def test_returns_grid_items(self, client_with_mock):
+        """get_grid_content возвращает список GridContentItem."""
+        client_with_mock._request.get = MagicMock(
+            return_value={
+                "page": {
+                    "data": [
+                        {"id": "100", "type": "playlist"},
+                        {"id": "200", "type": "artist"},
+                    ]
+                }
+            }
+        )
+        result = client_with_mock.get_grid_content()
+
+        assert len(result) == 2
+        assert isinstance(result[0], GridContentItem)
+        assert result[0].id == "100"
+
+    def test_passes_correct_params(self, client_with_mock):
+        """Проверка параметров запроса по умолчанию."""
+        client_with_mock._request.get = MagicMock(return_value={"page": {"data": []}})
+        client_with_mock.get_grid_content()
+
+        call_args = client_with_mock._request.get.call_args
+        assert call_args[1]["params"] == {
+            "name": "editorial_playlist",
+            "ranker_enabled": "true",
+        }
+
+    def test_custom_params(self, client_with_mock):
+        """Проверка пользовательских параметров."""
+        client_with_mock._request.get = MagicMock(return_value={"page": {"data": []}})
+        client_with_mock.get_grid_content(name="custom", ranker_enabled=False)
+
+        call_args = client_with_mock._request.get.call_args
+        assert call_args[1]["params"] == {
+            "name": "custom",
+            "ranker_enabled": "false",
+        }
+
+    def test_returns_empty_on_none(self, client_with_mock):
+        """Возвращает пустой список если ответ None."""
+        client_with_mock._request.get = MagicMock(return_value=None)
+        result = client_with_mock.get_grid_content()
+        assert result == []
+
+
+class TestGetEditorialPlaylistIds:
+    """Тесты get_editorial_playlist_ids."""
+
+    def test_returns_playlist_ids_only(self, client_with_mock):
+        """Возвращает только ID элементов с type=playlist."""
+        client_with_mock._request.get = MagicMock(
+            return_value={
+                "page": {
+                    "data": [
+                        {"id": "100", "type": "playlist"},
+                        {"id": "200", "type": "artist"},
+                        {"id": "300", "type": "playlist"},
+                    ]
+                }
+            }
+        )
+        result = client_with_mock.get_editorial_playlist_ids()
+
+        assert result == ["100", "300"]
+
+    def test_returns_empty_on_no_playlists(self, client_with_mock):
+        """Возвращает пустой список если нет плейлистов."""
+        client_with_mock._request.get = MagicMock(
+            return_value={"page": {"data": [{"id": "1", "type": "artist"}]}}
+        )
+        result = client_with_mock.get_editorial_playlist_ids()
+        assert result == []
+
+    def test_returns_empty_on_empty_response(self, client_with_mock):
+        """Возвращает пустой список если ответ пустой."""
+        client_with_mock._request.get = MagicMock(return_value=None)
+        result = client_with_mock.get_editorial_playlist_ids()
+        assert result == []

@@ -42,6 +42,12 @@ def gen_request(output_request_filename: str) -> None:
         f"kwargs['timeout'] = aiohttp.ClientTimeout(total=self._timeout)\n{' ' * 8}else:\n{' ' * 12}kwargs['timeout'] = aiohttp.ClientTimeout(total=kwargs['timeout'])",
     )
 
+    # throttler: sync acquire -> async acquire
+    code = code.replace(
+        'self._throttler.acquire()',
+        'await self._throttler.async_acquire()',
+    )
+
     # download method
     code = code.replace('with open', 'async with aiofiles.open')
     code = code.replace('f.write', 'await f.write')
@@ -85,6 +91,7 @@ def gen_client(output_client_filename: str) -> None:
         'get_artists', 'get_playlists', 'get_podcasts', 'get_episodes',
         'add_to_collection', 'remove_from_collection',
         'add_to_hidden', 'remove_from_hidden',
+        'get_grid_content',
     ]
     for method in internal_methods:
         # Handle assignment, return, and standalone call patterns
@@ -99,8 +106,12 @@ def gen_client(output_client_filename: str) -> None:
         '"""Асинхронный клиент Zvuk Music API."""\n\nimport asyncio'
     )
 
-    # Fix docstring
+    # Fix docstrings
     code = code.replace('Синхронный клиент', 'Асинхронный клиент')
+    code = code.replace(
+        'Synchronous Zvuk Music API client',
+        'Asynchronous Zvuk Music API client',
+    )
     code = code.replace('"Client"', '"ClientAsync"')
 
     code = DISCLAIMER + code

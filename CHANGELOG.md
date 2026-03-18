@@ -5,6 +5,48 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.1] - 2026-03-18
+
+### Fixed
+
+- Fix `Throttler(rate_limit=0)` causing `ZeroDivisionError` and negative values causing infinite loop — added input validation
+- Fix `Client(rate_limit=-1)` silently creating a broken throttler — added early guard
+- Fix async client docstring saying "Synchronous" instead of "Asynchronous" in generated `client_async.py`
+- Fix `_request_wrapper` docstring missing `RateLimitError` in `Raises:` section
+- Fix flaky timing-dependent throttler tests by widening upper bounds for CI tolerance
+- Fix `get_direct_stream_url` using manual construction instead of `DirectStream.de_json` pattern
+
+### Added
+
+- `RateLimitError.__str__` now shows `retry_after` value when present
+- Input validation for `Image.get_url()` width/height (must be positive)
+- Cross-reference docstrings between `Quality` and `StreamQuality` to prevent misuse
+- Warning in `Throttler` docstring about not mixing sync/async on same instance
+- Tests: throttler validation (zero/negative), client rate_limit wiring, non-integer `Retry-After` header
+
+## [0.6.0] - 2026-03-18
+
+### Added
+
+- `RateLimitError` exception for HTTP 429 responses with optional `retry_after` field
+- `StreamQuality` enum for direct (non-DRM) stream quality via Tiny API
+- `LyricsType` enum for lyrics format type (synced LRC / plain text)
+- `Lyrics` model with `is_synced` and `lyrics_type` properties
+- `DirectStream` model for direct (non-DRM) stream URLs
+- `GridContentItem` model for editorial content grid items
+- `Client.get_direct_stream_url()` — get direct playable stream URL via Tiny API
+- `Client.get_lyrics()` — get track lyrics (LRC or plain text)
+- `Client.get_grid_content()` — get editorial grid content items
+- `Client.get_editorial_playlist_ids()` — convenience method for curated playlist IDs
+- Built-in optional rate limiter via `Client(rate_limit=N)` using token bucket algorithm
+- `Throttler` utility class with both sync and async support
+- HTTP 429 handling in request layer with `Retry-After` header parsing
+
+### Changed
+
+- `Image.get_url()` now always sets `?size=WxH` parameter (previously only updated existing ones)
+- Version bump from 0.5.3 to 0.6.0
+
 ## [0.5.2] - 2026-01-31
 
 ### Fixed

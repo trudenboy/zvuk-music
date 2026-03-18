@@ -5,6 +5,48 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.6.1] - 2026-03-18
+
+### Исправлено
+
+- Исправлен `Throttler(rate_limit=0)`, вызывавший `ZeroDivisionError`, и отрицательные значения, вызывавшие бесконечный цикл — добавлена валидация параметров
+- Исправлен `Client(rate_limit=-1)`, молча создававший сломанный throttler — добавлена ранняя проверка
+- Исправлен docstring async-клиента, ошибочно указывавший «Synchronous» вместо «Asynchronous» в сгенерированном `client_async.py`
+- Исправлен docstring `_request_wrapper` — добавлен `RateLimitError` в секцию `Raises:`
+- Исправлены нестабильные тесты throttler с жёсткими таймингами — расширены верхние границы для CI
+- Исправлен `get_direct_stream_url` — теперь используется паттерн `DirectStream.de_json` вместо ручного создания
+
+### Добавлено
+
+- `RateLimitError.__str__` теперь показывает значение `retry_after`
+- Валидация width/height в `Image.get_url()` (должны быть положительными)
+- Перекрёстные ссылки в docstring между `Quality` и `StreamQuality` для предотвращения путаницы
+- Предупреждение в docstring `Throttler` о недопустимости смешивания sync/async на одном экземпляре
+- Тесты: валидация throttler (ноль/отрицательные), подключение rate_limit в клиенте, нецелочисленный заголовок `Retry-After`
+
+## [0.6.0] - 2026-03-18
+
+### Добавлено
+
+- Исключение `RateLimitError` для HTTP 429 ответов с опциональным полем `retry_after`
+- Enum `StreamQuality` для качества прямого стрима (без DRM) через Tiny API
+- Enum `LyricsType` для типа формата текста песни (синхронизированный LRC / обычный текст)
+- Модель `Lyrics` со свойствами `is_synced` и `lyrics_type`
+- Модель `DirectStream` для прямых URL стримов (без DRM)
+- Модель `GridContentItem` для элементов сетки редакторского контента
+- `Client.get_direct_stream_url()` — получение прямого URL стрима через Tiny API
+- `Client.get_lyrics()` — получение текста песни (LRC или обычный текст)
+- `Client.get_grid_content()` — получение элементов сетки редакторского контента
+- `Client.get_editorial_playlist_ids()` — удобный метод для получения ID кураторских плейлистов
+- Встроенный опциональный ограничитель частоты через `Client(rate_limit=N)` на основе алгоритма корзины токенов
+- Утилитный класс `Throttler` с поддержкой sync и async
+- Обработка HTTP 429 в слое запросов с парсингом заголовка `Retry-After`
+
+### Изменено
+
+- `Image.get_url()` теперь всегда устанавливает параметр `?size=WxH` (ранее только обновлял существующий)
+- Версия обновлена с 0.5.3 до 0.6.0
+
 ## [0.5.2] - 2026-01-31
 
 ### Исправлено

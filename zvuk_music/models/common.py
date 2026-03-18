@@ -52,19 +52,19 @@ class Image(ZvukMusicModel):
 
         Note (RU): Получить URL изображения с указанным размером.
         """
+        if width <= 0 or height <= 0:
+            raise ValueError("width and height must be positive")
+
         src = self.src
 
-        # Handle relative paths
         if src.startswith("/"):
             src = f"https://zvuk.com{src}"
 
-        # Handle size parameter
         parsed = urlparse(src)
-        if "size" in parse_qs(parsed.query):
-            query_dict = parse_qs(parsed.query, keep_blank_values=True)
-            query_dict["size"] = [f"{width}x{height}"]
-            new_query = urlencode(query_dict, doseq=True)
-            src = urlunparse(parsed._replace(query=new_query))
+        query_dict = parse_qs(parsed.query, keep_blank_values=True)
+        query_dict["size"] = [f"{width}x{height}"]
+        new_query = urlencode(query_dict, doseq=True)
+        src = urlunparse(parsed._replace(query=new_query))
 
         return src
 

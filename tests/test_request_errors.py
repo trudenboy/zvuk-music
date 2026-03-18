@@ -8,7 +8,9 @@ import requests
 from zvuk_music.exceptions import (
     BadRequestError,
     BotDetectedError,
+    NetworkError,
     NotFoundError,
+    RateLimitError,
     TimedOutError,
     UnauthorizedError,
     ZvukMusicError,
@@ -91,6 +93,51 @@ class TestRequestErrors:
         """Некорректный JSON -> ZvukMusicError."""
         with pytest.raises(ZvukMusicError):
             request_obj._parse(b"not valid json at all {{{")
+
+    def test_429_raises_rate_limit_error(self, request_obj):
+        """HTTP 429 -> RateLimitError."""
+        mock_resp = MagicMock()
+        mock_resp.status_code = 429
+        mock_resp.content = b'{"errors": [{"message": "Too many requests"}]}'
+        mock_resp.headers = {}
+        with (
+            patch("requests.request", return_value=mock_resp),
+            pytest.raises(RateLimitError) as exc_info,
+        ):
+            request_obj._request_wrapper("GET", "https://example.com")
+        assert exc_info.value.retry_after is None
+
+    def test_429_with_retry_after_header(self, request_obj):
+        """HTTP 429 с Retry-After -> RateLimitError с retry_after."""
+        mock_resp = MagicMock()
+        mock_resp.status_code = 429
+        mock_resp.content = b'{"errors": [{"message": "Rate limited"}]}'
+        mock_resp.headers = {"retry-after": "60"}
+        with (
+            patch("requests.request", return_value=mock_resp),
+            pytest.raises(RateLimitError) as exc_info,
+        ):
+            request_obj._request_wrapper("GET", "https://example.com")
+        assert exc_info.value.retry_after == 60
+
+    def test_429_with_date_retry_after_header(self, request_obj):
+        """Non-integer Retry-After -> retry_after=None."""
+        mock_resp = MagicMock()
+        mock_resp.status_code = 429
+        mock_resp.content = b'{"errors": [{"message": "Rate limited"}]}'
+        mock_resp.headers = {"retry-after": "Wed, 21 Oct 2025 07:28:00 GMT"}
+        with (
+            patch("requests.request", return_value=mock_resp),
+            pytest.raises(RateLimitError) as exc_info,
+        ):
+            request_obj._request_wrapper("GET", "https://example.com")
+        assert exc_info.value.retry_after is None
+
+    def test_429_is_network_error_subclass(self):
+        """RateLimitError наследуется от NetworkError."""
+        err = RateLimitError("test", retry_after=30)
+        assert isinstance(err, NetworkError)
+        assert err.retry_after == 30
 
     def test_successful_response(self, request_obj):
         """Успешный ответ возвращает данные."""

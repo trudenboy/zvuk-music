@@ -21,10 +21,12 @@ from zvuk_music.enums import (
     BackgroundType,
     CollectionItemStatus,
     CollectionItemType,
+    LyricsType,
     OrderBy,
     OrderDirection,
     Quality,
     ReleaseType,
+    StreamQuality,
     Typename,
 )
 from zvuk_music.exceptions import (
@@ -34,6 +36,7 @@ from zvuk_music.exceptions import (
     NetworkError,
     NotFoundError,
     QualityNotAvailableError,
+    RateLimitError,
     SubscriptionRequiredError,
     TimedOutError,
     UnauthorizedError,
@@ -46,12 +49,15 @@ from zvuk_music.models import (
     BookAuthor,
     Collection,
     CollectionItem,
+    DirectStream,
     Episode,
     ExternalProfile,
     Genre,
+    GridContentItem,
     HiddenCollection,
     Image,
     Label,
+    Lyrics,
     Page,
     Playlist,
     PlaylistAuthor,
@@ -78,7 +84,7 @@ from zvuk_music.models import (
     Track,
 )
 
-__version__ = "0.5.3"
+__version__ = "0.6.1"
 __author__ = "Zvuk Music API"
 
 __all__ = [
@@ -91,10 +97,12 @@ __all__ = [
     "BackgroundType",
     "CollectionItemStatus",
     "CollectionItemType",
+    "LyricsType",
     "OrderBy",
     "OrderDirection",
     "Quality",
     "ReleaseType",
+    "StreamQuality",
     "Typename",
     # Exceptions
     "BadRequestError",
@@ -103,6 +111,7 @@ __all__ = [
     "NetworkError",
     "NotFoundError",
     "QualityNotAvailableError",
+    "RateLimitError",
     "SubscriptionRequiredError",
     "TimedOutError",
     "UnauthorizedError",
@@ -114,12 +123,15 @@ __all__ = [
     "BookAuthor",
     "Collection",
     "CollectionItem",
+    "DirectStream",
     "Episode",
     "ExternalProfile",
     "Genre",
+    "GridContentItem",
     "HiddenCollection",
     "Image",
     "Label",
+    "Lyrics",
     "Page",
     "Playlist",
     "PlaylistAuthor",

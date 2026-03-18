@@ -65,6 +65,30 @@ class NotFoundError(ZvukMusicError):
     pass
 
 
+class RateLimitError(NetworkError):
+    """Rate limit exceeded (HTTP 429).
+
+    Attributes:
+        retry_after: Seconds to wait before retrying (if provided by server).
+
+    Note (RU): Превышен лимит запросов (HTTP 429).
+    """
+
+    def __init__(
+        self,
+        message: str = "Rate limit exceeded",
+        retry_after: Optional[int] = None,
+        *args: Any,
+    ) -> None:
+        self.retry_after = retry_after
+        super().__init__(message, *args)
+
+    def __str__(self) -> str:
+        if self.retry_after is not None:
+            return f"{self.message} (retry after {self.retry_after}s)"
+        return self.message
+
+
 class GraphQLError(ZvukMusicError):
     """GraphQL query error.
 

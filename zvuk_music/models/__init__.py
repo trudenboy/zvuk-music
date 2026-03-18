@@ -7,6 +7,9 @@ from zvuk_music.models.artist import Artist, SimpleArtist
 from zvuk_music.models.book import BookAuthor, SimpleBook
 from zvuk_music.models.collection import Collection, CollectionItem, HiddenCollection
 from zvuk_music.models.common import Animation, Background, Genre, Image, Label
+from zvuk_music.models.direct_stream import DirectStream
+from zvuk_music.models.grid import GridContentItem
+from zvuk_music.models.lyrics import Lyrics
 from zvuk_music.models.playlist import (
     Playlist,
     PlaylistAuthor,
@@ -34,6 +37,12 @@ __all__ = [
     "Genre",
     "Image",
     "Label",
+    # direct_stream
+    "DirectStream",
+    # grid
+    "GridContentItem",
+    # lyrics
+    "Lyrics",
     # artist
     "Artist",
     "SimpleArtist",

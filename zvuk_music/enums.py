@@ -7,9 +7,12 @@ from enum import Enum
 
 
 class Quality(str, Enum):
-    """Audio quality.
+    """Audio quality for GraphQL DRM-wrapped streaming.
 
-    Note (RU): Качество аудио.
+    For direct (non-DRM) streaming via Tiny API, use StreamQuality instead.
+
+    Note (RU): Качество аудио для GraphQL DRM-стриминга.
+        Для прямого стриминга (без DRM) через Tiny API используйте StreamQuality.
     """
 
     MID = "mid"  # 128kbps MP3, always available
@@ -89,6 +92,30 @@ class Typename(str, Enum):
     PROFILE = "Profile"
     BOOK = "Book"
     CHAPTER = "Chapter"
+
+
+class StreamQuality(str, Enum):
+    """Direct stream quality (non-DRM) for Tiny API.
+
+    For GraphQL DRM-wrapped streaming, use Quality instead.
+
+    Note (RU): Качество прямого стрима (без DRM) для Tiny API.
+        Для GraphQL DRM-стриминга используйте Quality.
+    """
+
+    MID = "mid"
+    HIGH = "high"
+    FLAC = "flac"
+
+
+class LyricsType(str, Enum):
+    """Lyrics format type.
+
+    Note (RU): Тип формата текста песни.
+    """
+
+    SUBTITLE = "subtitle"
+    LYRICS = "lyrics"
 
 
 class BackgroundType(str, Enum):
