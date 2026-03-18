@@ -391,9 +391,7 @@ class Client:
         stream_url = result.get("stream")
         if not stream_url:
             return None
-        return DirectStream.de_json(
-            {"stream": str(stream_url), "quality": quality.value}, self
-        )
+        return DirectStream.de_json({"stream": str(stream_url), "quality": quality.value}, self)
 
     # ========== Lyrics ==========
 

@@ -708,9 +708,7 @@ class TestGetLyrics:
 
     def test_passes_correct_params(self, client_with_mock):
         """Проверка параметров запроса."""
-        client_with_mock._request.get = MagicMock(
-            return_value={"lyrics": "text", "type": "lyrics"}
-        )
+        client_with_mock._request.get = MagicMock(return_value={"lyrics": "text", "type": "lyrics"})
         client_with_mock.get_lyrics("999")
 
         call_args = client_with_mock._request.get.call_args
