@@ -22,17 +22,20 @@ class StreamUrls(ZvukMusicModel):
     Attributes:
         mid: 128kbps MP3 URL (always available).
         high: 320kbps MP3 URL (requires subscription).
+        flac: FLAC URL without DRM (requires subscription).
         flacdrm: FLAC URL with DRM (requires subscription).
 
     Note (RU): URL для стриминга.
         mid: URL 128kbps MP3 (всегда доступен).
         high: URL 320kbps MP3 (требует подписку).
+        flac: URL FLAC без DRM (требует подписку).
         flacdrm: URL FLAC с DRM (требует подписку).
     """
 
     client: Optional["ClientType"] = None
     mid: str = ""
     high: Optional[str] = None
+    flac: Optional[str] = None
     flacdrm: Optional[str] = None
 
     def __post_init__(self) -> None:
@@ -54,9 +57,10 @@ class StreamUrls(ZvukMusicModel):
         Note (RU): Получить URL для указанного качества.
         """
         if quality == Quality.FLAC:
-            if not self.flacdrm:
+            flac_url = self.flac or self.flacdrm
+            if not flac_url:
                 raise SubscriptionRequiredError("FLAC quality requires subscription")
-            return self.flacdrm
+            return flac_url
 
         if quality == Quality.HIGH:
             if not self.high:
@@ -78,8 +82,9 @@ class StreamUrls(ZvukMusicModel):
 
         Note (RU): Получить лучшее доступное качество.
         """
-        if self.flacdrm:
-            return (Quality.FLAC, self.flacdrm)
+        flac_url = self.flac or self.flacdrm
+        if flac_url:
+            return (Quality.FLAC, flac_url)
         if self.high:
             return (Quality.HIGH, self.high)
         return (Quality.MID, self.mid)
@@ -94,6 +99,7 @@ class Stream(ZvukMusicModel):
         expire_delta: Seconds until expiration.
         mid: 128kbps MP3 URL.
         high: 320kbps MP3 URL.
+        flac: FLAC URL without DRM.
         flacdrm: FLAC URL with DRM.
 
     Note (RU): Информация о стриме с временем истечения.
@@ -101,6 +107,7 @@ class Stream(ZvukMusicModel):
         expire_delta: Секунды до истечения.
         mid: URL 128kbps MP3.
         high: URL 320kbps MP3.
+        flac: URL FLAC без DRM.
         flacdrm: URL FLAC с DRM.
     """
 
@@ -109,6 +116,7 @@ class Stream(ZvukMusicModel):
     expire_delta: int = 0
     mid: str = ""
     high: Optional[str] = None
+    flac: Optional[str] = None
     flacdrm: Optional[str] = None
 
     def __post_init__(self) -> None:
@@ -148,6 +156,7 @@ class Stream(ZvukMusicModel):
             client=self.client,
             mid=self.mid,
             high=self.high,
+            flac=self.flac,
             flacdrm=self.flacdrm,
         )
         return urls.get_url(quality)
@@ -164,6 +173,7 @@ class Stream(ZvukMusicModel):
             client=self.client,
             mid=self.mid,
             high=self.high,
+            flac=self.flac,
             flacdrm=self.flacdrm,
         )
         return urls.get_best_available()

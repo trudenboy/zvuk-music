@@ -129,3 +129,44 @@ class TestStreamUrls:
         assert urls.get_url(Quality.MID) == "https://example.com/mid"
         assert urls.get_url(Quality.HIGH) == "https://example.com/high"
         assert urls.get_url(Quality.FLAC) == "https://example.com/flac"
+
+
+class TestStreamPlainFlac:
+    """Тесты поля flac (FLAC без DRM)."""
+
+    def _data(self, flac=None, flacdrm=None):
+        return {
+            "expire": "2024-01-16T12:00:00",
+            "expire_delta": 86400,
+            "mid": "https://example.com/mid",
+            "high": "https://example.com/high",
+            "flac": flac,
+            "flacdrm": flacdrm,
+        }
+
+    def test_de_json_reads_flac(self, mock_client):
+        """Поле flac читается из ответа API."""
+        stream = Stream.de_json(self._data(flac="https://example.com/flac.mp4"), mock_client)
+        assert stream.flac == "https://example.com/flac.mp4"
+
+    def test_get_url_flac_prefers_plain_flac(self, mock_client):
+        """Quality.FLAC отдаёт flac раньше flacdrm."""
+        data = self._data(flac="https://example.com/flac.mp4", flacdrm="https://example.com/drm")
+        stream = Stream.de_json(data, mock_client)
+        assert stream.get_url(Quality.FLAC) == "https://example.com/flac.mp4"
+
+    def test_get_url_flac_falls_back_to_flacdrm(self, mock_client):
+        """Без flac Quality.FLAC отдаёт flacdrm."""
+        stream = Stream.de_json(self._data(flacdrm="https://example.com/drm"), mock_client)
+        assert stream.get_url(Quality.FLAC) == "https://example.com/drm"
+
+    def test_get_best_available_prefers_plain_flac(self, mock_client):
+        """Лучшее качество — flac."""
+        stream = Stream.de_json(self._data(flac="https://example.com/flac.mp4"), mock_client)
+        assert stream.get_best_available() == (Quality.FLAC, "https://example.com/flac.mp4")
+
+    def test_stream_urls_reads_flac(self, mock_client):
+        """StreamUrls тоже поддерживает flac."""
+        urls = StreamUrls.de_json(self._data(flac="https://example.com/flac.mp4"), mock_client)
+        assert urls.get_url(Quality.FLAC) == "https://example.com/flac.mp4"
+        assert urls.get_best_available() == (Quality.FLAC, "https://example.com/flac.mp4")

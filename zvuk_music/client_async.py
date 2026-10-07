@@ -170,6 +170,14 @@ class ClientAsync:
             self._profile = profile.result
         return profile
 
+    @property
+    def profile(self) -> Optional[ProfileResult]:
+        """Profile loaded by ``init()`` or ``get_profile()``, if available.
+
+        Note (RU): Профиль, загруженный в ``init()`` или ``get_profile()``, если доступен.
+        """
+        return self._profile
+
     async def is_authorized(self) -> bool:
         """Check if the user is authorized (not anonymous).
 
@@ -716,21 +724,29 @@ class ClientAsync:
         Args:
             playlist_id: Playlist ID.
             track_ids: New track list.
-            name: New name.
-            is_public: Whether public.
+            name: New name; defaults to the playlist's current name.
+            is_public: Whether public; defaults to the playlist's current visibility.
 
         Returns:
             Whether the operation succeeded.
 
         Note (RU): Обновить плейлист целиком.
         """
+        if name is None or is_public is None:
+            # The API rejects an empty name and would otherwise reset visibility,
+            # so keep the playlist's current values for anything not given.
+            current = await self.get_playlist(playlist_id)
+            if name is None:
+                name = current.title if current else ""
+            if is_public is None:
+                is_public = current.is_public if current else False
         gql = load_query("updataPlaylist")
         items = [{"type": "track", "item_id": tid} for tid in track_ids]
         variables: Dict[str, Any] = {
             "id": str(playlist_id),
             "items": items,
-            "name": name or "",
-            "isPublic": is_public if is_public is not None else False,
+            "name": name,
+            "isPublic": is_public,
         }
 
         result = await self._request.graphql(gql, "updataPlaylist", variables)
@@ -930,9 +946,10 @@ class ClientAsync:
             direction: Sort direction.
 
         Returns:
-            List of tracks.
+            List of tracks with only ``id`` set; fetch details with ``get_tracks``.
 
-        Note (RU): Получить лайкнутые треки.
+        Note (RU): Получить лайкнутые треки. Возвращаются только ``id``,
+        подробности — через ``get_tracks``.
         """
         gql = load_query("userTracks")
         result = await self._request.graphql(

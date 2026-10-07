@@ -76,7 +76,13 @@ def gen_client(output_client_filename: str) -> None:
     new_lines = []
     for i, line in enumerate(lines):
         # Skip static methods and __init__
-        if '    def ' in line and '__init__' not in line and '@staticmethod' not in lines[max(0, i-1)]:
+        prev = lines[max(0, i-1)]
+        if (
+            '    def ' in line
+            and '__init__' not in line
+            and '@staticmethod' not in prev
+            and '@property' not in prev
+        ):
             new_lines.append(line.replace('def ', 'async def '))
         else:
             new_lines.append(line)
@@ -91,7 +97,7 @@ def gen_client(output_client_filename: str) -> None:
         'get_artists', 'get_playlists', 'get_podcasts', 'get_episodes',
         'add_to_collection', 'remove_from_collection',
         'add_to_hidden', 'remove_from_hidden',
-        'get_grid_content', 'get_collection',
+        'get_grid_content', 'get_collection', 'get_playlist',
     ]
     for method in internal_methods:
         # Handle assignment, return, and standalone call patterns

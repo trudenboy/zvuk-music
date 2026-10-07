@@ -1,5 +1,7 @@
 """Тесты утилит."""
 
+import re
+
 import pytest
 
 from zvuk_music.utils.graphql import load_query
@@ -81,3 +83,15 @@ class TestObjectHook:
         """Ключи начинающиеся с цифры получают префикс _."""
         result = Request._object_hook({"1key": "value"})
         assert "_1key" in result
+
+
+class TestQueryFields:
+    """Запросы запрашивают нужные поля."""
+
+    def test_get_stream_requests_plain_flac(self):
+        """getStream запрашивает flac (FLAC без DRM)."""
+        assert re.search(r"\bflac\b", load_query("getStream"))
+
+    def test_get_tracks_requests_has_flac(self):
+        """getTracks запрашивает hasFlac."""
+        assert "hasFlac" in load_query("getTracks")
