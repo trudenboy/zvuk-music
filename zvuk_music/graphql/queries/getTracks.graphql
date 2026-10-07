@@ -4,6 +4,7 @@ query getTracks($ids: [ID!]!) {
     title
     duration
     explicit
+    hasFlac
     artists {
       id
       title

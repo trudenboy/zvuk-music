@@ -34,3 +34,15 @@ async def test_init_blocked_profile_with_invalid_token_raises(async_client):
     async_client._request.graphql.side_effect = UnauthorizedError("bad")
     with pytest.raises(UnauthorizedError):
         await async_client.init()
+
+
+async def test_update_playlist_keeps_current_name_and_visibility(async_client):
+    """Async update_playlist подставляет текущие имя и видимость плейлиста."""
+    async_client._request.graphql.side_effect = [
+        {"get_playlists": [{"id": "1", "title": "My list", "is_public": True}]},
+        {"playlist": {"update": True}},
+    ]
+    assert await async_client.update_playlist("1", ["t1"]) is True
+    variables = async_client._request.graphql.await_args_list[-1].args[2]
+    assert variables["name"] == "My list"
+    assert variables["isPublic"] is True

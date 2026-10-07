@@ -91,7 +91,7 @@ def gen_client(output_client_filename: str) -> None:
         'get_artists', 'get_playlists', 'get_podcasts', 'get_episodes',
         'add_to_collection', 'remove_from_collection',
         'add_to_hidden', 'remove_from_hidden',
-        'get_grid_content', 'get_collection',
+        'get_grid_content', 'get_collection', 'get_playlist',
     ]
     for method in internal_methods:
         # Handle assignment, return, and standalone call patterns

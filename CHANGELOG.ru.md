@@ -5,6 +5,18 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.6.3] - 2026-10-07
+
+### Добавлено
+
+- `Stream.flac` / `StreamUrls.flac`: прогрессивный URL FLAC без DRM, запрашивается в `get_stream_urls()`; `get_url(Quality.FLAC)` и `get_best_available()` предпочитают его `flacdrm`
+- `get_tracks()` теперь запрашивает `hasFlac`, и `Track.has_flac` отражает данные API, а не всегда `False`
+
+### Исправлено
+
+- `update_playlist()` без `name` падал с «Request parameters are incorrect» и молча делал плейлист приватным; если `name` / `is_public` не переданы, берутся текущие значения плейлиста
+- В docstring `get_liked_tracks()` указано, что возвращаются только ID треков
+
 ## [0.6.2] - 2026-10-07
 
 ### Исправлено

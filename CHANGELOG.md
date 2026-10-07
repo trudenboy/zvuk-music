@@ -5,6 +5,18 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.3] - 2026-10-07
+
+### Added
+
+- `Stream.flac` / `StreamUrls.flac`: progressive FLAC URL without DRM, requested by `get_stream_urls()`; `get_url(Quality.FLAC)` and `get_best_available()` prefer it over `flacdrm`
+- `get_tracks()` now requests `hasFlac`, so `Track.has_flac` reflects the API instead of always being `False`
+
+### Fixed
+
+- `update_playlist()` without `name` failed with "Request parameters are incorrect" and silently made the playlist private; missing `name` / `is_public` now default to the playlist's current values
+- `get_liked_tracks()` docstring now states that only track IDs are returned
+
 ## [0.6.2] - 2026-10-07
 
 ### Fixed

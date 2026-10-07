@@ -405,6 +405,26 @@ class TestClientPlaylists:
         result = client_with_mock.update_playlist("12345", ["t1"], name="Updated")
         assert result is True
 
+    def test_update_playlist_keeps_current_name_and_visibility(self, client_with_mock):
+        """Без name/is_public update_playlist сохраняет текущие имя и видимость."""
+        client_with_mock._request.graphql.side_effect = [
+            {"get_playlists": [{"id": "12345", "title": "My list", "is_public": True}]},
+            {"playlist": {"update": True}},
+        ]
+        assert client_with_mock.update_playlist("12345", ["t1"]) is True
+        variables = client_with_mock._request.graphql.call_args_list[-1][0][2]
+        assert variables["name"] == "My list"
+        assert variables["isPublic"] is True
+
+    def test_update_playlist_explicit_values_skip_lookup(self, client_with_mock):
+        """С name и is_public текущий плейлист не запрашивается."""
+        client_with_mock._request.graphql.return_value = {"playlist": {"update": True}}
+        client_with_mock.update_playlist("12345", ["t1"], name="New", is_public=False)
+        assert client_with_mock._request.graphql.call_count == 1
+        variables = client_with_mock._request.graphql.call_args[0][2]
+        assert variables["name"] == "New"
+        assert variables["isPublic"] is False
+
     def test_set_playlist_public(self, client_with_mock):
         """set_playlist_public возвращает True."""
         client_with_mock._request.graphql.return_value = {"playlist": {"set_public": True}}

@@ -5,6 +5,7 @@ query getStream($ids: [ID!]!) {
       stream {
         expire
         expireDelta
+        flac
         flacdrm
         high
         mid
