@@ -89,6 +89,49 @@ class TestRequestErrors:
             with pytest.raises(BotDetectedError):
                 request_obj._parse(result)
 
+    def test_418_servicepipe_html_raises_bot_detected(self, request_obj):
+        """HTTP 418 с HTML-страницей анти-бота -> BotDetectedError без тела ответа."""
+        mock_resp = MagicMock()
+        mock_resp.status_code = 418
+        mock_resp.content = (
+            b"<!doctype html><html lang=ru><head><title>Error</title></head>"
+            b"<body><div class=servicepipe-template>Forbidden</div></body></html>"
+        )
+        mock_resp.headers = {"x-sp-crid": "123:1"}
+        with (
+            patch("requests.request", return_value=mock_resp),
+            pytest.raises(BotDetectedError) as exc_info,
+        ):
+            request_obj._request_wrapper("GET", "https://example.com")
+        assert "418" in str(exc_info.value)
+        assert "<html" not in str(exc_info.value)
+
+    def test_error_html_body_raises_bot_detected(self, request_obj):
+        """Ответ не 2xx с HTML вместо JSON -> BotDetectedError."""
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_resp.content = b"<html><body>blocked</body></html>"
+        mock_resp.headers = {}
+        with (
+            patch("requests.request", return_value=mock_resp),
+            pytest.raises(BotDetectedError),
+        ):
+            request_obj._request_wrapper("GET", "https://example.com")
+
+    def test_unknown_status_error_message_is_truncated(self, request_obj):
+        """Неизвестный статус -> NetworkError с обрезанным телом ответа."""
+        mock_resp = MagicMock()
+        mock_resp.status_code = 500
+        mock_resp.content = b'{"x": "' + b"a" * 5000 + b'"}'
+        mock_resp.headers = {}
+        with (
+            patch("requests.request", return_value=mock_resp),
+            pytest.raises(NetworkError) as exc_info,
+        ):
+            request_obj._request_wrapper("GET", "https://example.com")
+        assert "500" in str(exc_info.value)
+        assert len(str(exc_info.value)) < 400
+
     def test_invalid_json(self, request_obj):
         """Некорректный JSON -> ZvukMusicError."""
         with pytest.raises(ZvukMusicError):

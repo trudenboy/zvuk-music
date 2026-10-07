@@ -7,7 +7,11 @@ import pytest
 
 from zvuk_music import Client
 from zvuk_music.enums import CollectionItemType, OrderBy, OrderDirection, Quality, StreamQuality
-from zvuk_music.exceptions import QualityNotAvailableError
+from zvuk_music.exceptions import (
+    BotDetectedError,
+    QualityNotAvailableError,
+    UnauthorizedError,
+)
 from zvuk_music.models.direct_stream import DirectStream
 from zvuk_music.models.grid import GridContentItem
 from zvuk_music.models.lyrics import Lyrics
@@ -56,6 +60,32 @@ class TestClientAuth:
         client_with_mock._request.get = MagicMock(return_value={"id": 1, "token": "t"})
         result = client_with_mock.init()
         assert result is client_with_mock
+
+    def test_init_falls_back_to_graphql_when_profile_blocked(self, client_with_mock):
+        """init() проверяет токен через GraphQL, если tiny /profile заблокирован."""
+        client_with_mock._request.get = MagicMock(side_effect=BotDetectedError("blocked"))
+        client_with_mock._request.graphql = MagicMock(return_value={"collection": {}})
+        result = client_with_mock.init()
+        assert result is client_with_mock
+        assert client_with_mock.is_authorized() is True
+        assert client_with_mock._profile is None
+        client_with_mock._request.graphql.assert_called_once()
+
+    def test_init_blocked_profile_with_invalid_token_raises(self, client_with_mock):
+        """init() пробрасывает UnauthorizedError, если GraphQL отклонил токен."""
+        client_with_mock._request.get = MagicMock(side_effect=BotDetectedError("blocked"))
+        client_with_mock._request.graphql = MagicMock(side_effect=UnauthorizedError("bad"))
+        with pytest.raises(UnauthorizedError):
+            client_with_mock.init()
+
+    def test_init_uses_profile_when_available(self, client_with_mock):
+        """init() не делает GraphQL-проверку, если профиль доступен."""
+        client_with_mock._request.get = MagicMock(
+            return_value={"id": 7, "token": "t", "is_anonymous": False, "is_active": True}
+        )
+        client_with_mock.init()
+        client_with_mock._request.graphql.assert_not_called()
+        assert client_with_mock.is_authorized() is True
 
     def test_to_id_list_single_str(self):
         """_to_id_list с одной строкой."""

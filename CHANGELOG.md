@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.2] - 2026-10-07
+
+### Fixed
+
+- `init()` no longer fails with a valid token when `/api/tiny/profile` is blocked by Zvuk's anti-bot protection: the token is verified through GraphQL instead, `is_authorized()` returns `True`, and the profile stays unavailable
+- HTTP 418 and HTML challenge pages from the anti-bot protection now raise `BotDetectedError` instead of a generic `NetworkError`
+- Error messages for unexpected HTTP statuses no longer embed the full response body (truncated to 200 bytes)
+- Generated async client now awaits `get_collection()` when called internally
+
 ## [0.6.1] - 2026-03-18
 
 ### Fixed
