@@ -296,6 +296,14 @@ class Request:
         if 200 <= resp.status <= 299:
             return bytes(content)
 
+        # Anti-bot protection (ServicePipe) answers with HTTP 418 and an HTML
+        # challenge page instead of a JSON error.
+        is_html = b"<html" in bytes(content[:200]).lower()
+        if resp.status == 418 or (is_html and resp.status != 404):
+            raise BotDetectedError(
+                f"Request blocked by Zvuk anti-bot protection (HTTP {resp.status})"
+            )
+
         message = "Unknown error"
         try:
             parse = self._parse(content)
@@ -323,7 +331,7 @@ class Request:
         if resp.status == 502:
             raise NetworkError("Bad Gateway")
 
-        raise NetworkError(f"{message} ({resp.status}): {content!r}")
+        raise NetworkError(f"{message} ({resp.status}): {bytes(content[:200])!r}")
 
     async def graphql(
         self,

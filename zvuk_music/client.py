@@ -3,12 +3,13 @@
 Note (RU): Синхронный клиент Zvuk Music API.
 """
 
+import logging
 from typing import Any, Dict, List, Optional, Union
 
 import requests
 
 from zvuk_music.enums import CollectionItemType, OrderBy, OrderDirection, Quality, StreamQuality
-from zvuk_music.exceptions import QualityNotAvailableError
+from zvuk_music.exceptions import BotDetectedError, QualityNotAvailableError
 from zvuk_music.models.artist import Artist
 from zvuk_music.models.collection import Collection, CollectionItem, HiddenCollection
 from zvuk_music.models.direct_stream import DirectStream
@@ -24,6 +25,8 @@ from zvuk_music.models.track import Track
 from zvuk_music.utils.graphql import load_query
 from zvuk_music.utils.request import TINY_API_URL, Request
 from zvuk_music.utils.throttler import Throttler
+
+logger = logging.getLogger(__name__)
 
 
 class Client:
@@ -96,6 +99,7 @@ class Client:
             self._request.set_authorization(self.token)
 
         self._profile: Optional[ProfileResult] = None
+        self._token_verified: bool = False
 
     @staticmethod
     def get_anonymous_token() -> str:
@@ -129,9 +133,22 @@ class Client:
         Returns:
             self for method chaining.
 
-        Note (RU): Инициализировать клиент, загрузить профиль.
+        If the profile endpoint is blocked by anti-bot protection, the token is
+        verified through GraphQL instead and the profile stays unavailable.
+
+        Raises:
+            UnauthorizedError: If the token is rejected.
+
+        Note (RU): Инициализировать клиент, загрузить профиль. Если эндпоинт
+        профиля заблокирован анти-бот защитой, токен проверяется через GraphQL,
+        а профиль остаётся недоступным.
         """
-        self.get_profile()
+        try:
+            self.get_profile()
+        except BotDetectedError:
+            logger.warning("Profile endpoint is blocked, verifying token via GraphQL")
+            self.get_collection()
+            self._token_verified = True
         return self
 
     def get_profile(self) -> Optional[Profile]:
@@ -159,7 +176,7 @@ class Client:
         """
         if self._profile:
             return self._profile.is_authorized()
-        return False
+        return self._token_verified
 
     # ========== Search ==========
 
