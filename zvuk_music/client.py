@@ -166,6 +166,14 @@ class Client:
             self._profile = profile.result
         return profile
 
+    @property
+    def profile(self) -> Optional[ProfileResult]:
+        """Profile loaded by ``init()`` or ``get_profile()``, if available.
+
+        Note (RU): Профиль, загруженный в ``init()`` или ``get_profile()``, если доступен.
+        """
+        return self._profile
+
     def is_authorized(self) -> bool:
         """Check if the user is authorized (not anonymous).
 

@@ -76,7 +76,13 @@ def gen_client(output_client_filename: str) -> None:
     new_lines = []
     for i, line in enumerate(lines):
         # Skip static methods and __init__
-        if '    def ' in line and '__init__' not in line and '@staticmethod' not in lines[max(0, i-1)]:
+        prev = lines[max(0, i-1)]
+        if (
+            '    def ' in line
+            and '__init__' not in line
+            and '@staticmethod' not in prev
+            and '@property' not in prev
+        ):
             new_lines.append(line.replace('def ', 'async def '))
         else:
             new_lines.append(line)

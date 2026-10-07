@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - `Stream.flac` / `StreamUrls.flac`: progressive FLAC URL without DRM, requested by `get_stream_urls()`; `get_url(Quality.FLAC)` and `get_best_available()` prefer it over `flacdrm`
 - `get_tracks()` now requests `hasFlac`, so `Track.has_flac` reflects the API instead of always being `False`
+- `Client.profile` / `ClientAsync.profile` property: the profile loaded by `init()`, or `None` when the profile endpoint is blocked
 
 ### Fixed
 

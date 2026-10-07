@@ -11,6 +11,7 @@
 
 - `Stream.flac` / `StreamUrls.flac`: прогрессивный URL FLAC без DRM, запрашивается в `get_stream_urls()`; `get_url(Quality.FLAC)` и `get_best_available()` предпочитают его `flacdrm`
 - `get_tracks()` теперь запрашивает `hasFlac`, и `Track.has_flac` отражает данные API, а не всегда `False`
+- Свойство `Client.profile` / `ClientAsync.profile`: профиль, загруженный в `init()`, или `None`, если эндпоинт профиля заблокирован
 
 ### Исправлено
 

@@ -78,6 +78,16 @@ class TestClientAuth:
         with pytest.raises(UnauthorizedError):
             client_with_mock.init()
 
+    def test_profile_property_after_init(self, client_with_mock):
+        """profile возвращает профиль, загруженный в init()."""
+        client_with_mock._request.get = MagicMock(
+            return_value={"id": 7, "token": "t", "is_anonymous": False, "is_active": True}
+        )
+        assert client_with_mock.profile is None
+        client_with_mock.init()
+        assert client_with_mock.profile is not None
+        assert str(client_with_mock.profile.id) == "7"
+
     def test_init_uses_profile_when_available(self, client_with_mock):
         """init() не делает GraphQL-проверку, если профиль доступен."""
         client_with_mock._request.get = MagicMock(

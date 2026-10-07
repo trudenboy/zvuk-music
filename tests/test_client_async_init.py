@@ -46,3 +46,10 @@ async def test_update_playlist_keeps_current_name_and_visibility(async_client):
     variables = async_client._request.graphql.await_args_list[-1].args[2]
     assert variables["name"] == "My list"
     assert variables["isPublic"] is True
+
+
+async def test_profile_property_is_not_a_coroutine(async_client):
+    """profile в async-клиенте — обычное свойство."""
+    async_client._request.get.return_value = {"id": 7, "token": "t", "is_anonymous": False}
+    await async_client.init()
+    assert str(async_client.profile.id) == "7"
